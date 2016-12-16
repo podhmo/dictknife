@@ -12,7 +12,7 @@ class WalkerTests(unittest.TestCase):
 
     def test_it__on_container(self):
         C = namedtuple("C", "qs, d, expected_path, expected_container")
-        candidats = [
+        candidates = [
             C(qs=[],
               d={"a": {"b": {"c": {"d": 10}}}},
               expected_path=None,
@@ -30,7 +30,7 @@ class WalkerTests(unittest.TestCase):
               expected_path=None,
               expected_container=None)
         ]
-        for c in candidats:
+        for c in candidates:
             with self.subTest(qs=c.qs, d=c.d):
                 called = [False]
 
@@ -45,7 +45,7 @@ class WalkerTests(unittest.TestCase):
 
     def test_it__on_data(self):
         C = namedtuple("C", "qs, d, expected_path, expected_data")
-        candidats = [
+        candidates = [
             C(qs=["a"],
               d={"a": {"b": {"c": {"d": 10}}}},
               expected_path=["a"],
@@ -63,7 +63,7 @@ class WalkerTests(unittest.TestCase):
               expected_path=None,
               expected_data=None)
         ]
-        for c in candidats:
+        for c in candidates:
             with self.subTest(qs=c.qs, d=c.d):
                 called = [False]
 

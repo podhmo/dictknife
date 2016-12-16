@@ -1,4 +1,5 @@
 from collections import deque
+from .operators import apply
 
 
 class LooseDictWalker(object):
@@ -22,7 +23,7 @@ class LooseDictWalker(object):
         if hasattr(d, "keys"):
             for k in list(d.keys()):
                 path.append(k)
-                if len(qs) > 0 and qs[0] == k:
+                if apply(qs[0], k):
                     q = qs.popleft()
                     self._walk(path, qs, d[k])
                     if len(qs) == 0:
