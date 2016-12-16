@@ -156,7 +156,36 @@ class WalkerTests(unittest.TestCase):
             self._makeOne(on_container=second).walk([ANY, "b"], value)
 
         d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
-        self._makeOne(on_container=first).walk(["b"], d)
+        self._makeOne(on_container=first).walk([ANY, "b"], d)
+
+        expected = [
+            {'b': {'a': {'b': {'a': {'b': 10}}}}},
+            {'b': {'a': {'b': 10}}},
+            {'b': 10}
+        ]
+
+        self.assertEqual(s, expected)
+
+    def test_chains2(self):
+        from ..walkers import SimpleContext
+        from ..operators import ANY
+
+        class RecContext(SimpleContext):
+            def __init__(self, qs):
+                self.qs = qs[:]
+
+            def __call__(self, walker, fn, value):
+                return fn(walker, self, value)
+
+        s = []
+
+        def matched(walker, ctx, value):
+            s.append(value)
+            walker.walk(ctx.qs[:], value, ctx=ctx)
+
+        d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
+        qs = [ANY, "b"]
+        self._makeOne(on_container=matched).walk(qs, d, ctx=RecContext(qs))
 
         expected = [
             {'b': {'a': {'b': {'a': {'b': 10}}}}},

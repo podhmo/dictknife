@@ -1,30 +1,6 @@
 from collections import deque
 from .operators import apply
-
-
-class SimpleContext(object):
-    def push(self, ctx):
-        pass
-
-    def pop(self, ctx):
-        pass
-
-    def __call__(self, fn, walker, value):
-        return fn(value)
-
-
-class PathContext(object):
-    def __init__(self):
-        self.path = []
-
-    def push(self, v):
-        self.path.append(v)
-
-    def pop(self):
-        self.path.pop()
-
-    def __call__(self, walker, fn, value):
-        return fn(self.path, value)
+from .contexts import PathContext
 
 
 class LooseDictWalker(object):
