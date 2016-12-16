@@ -13,10 +13,13 @@ class LooseDictWalker(object):
         if self.on_data is not None:
             self.on_data(path, d[k])
 
-    def walk(self, qs, d):
-        return self._walk([], deque(qs), d)
+    def walk(self, qs, d, depth=-1):
+        return self._walk([], deque(qs), d, depth=depth)
 
-    def _walk(self, path, qs, d):
+    def _walk(self, path, qs, d, depth):
+        if depth == 0:
+            return
+
         if not qs:
             return
 
@@ -25,18 +28,18 @@ class LooseDictWalker(object):
                 path.append(k)
                 if apply(qs[0], k):
                     q = qs.popleft()
-                    self._walk(path, qs, d[k])
+                    self._walk(path, qs, d[k], depth - 1)
                     if len(qs) == 0:
                         self.on_found(path, d, k)
                     qs.appendleft(q)
                 else:
-                    self._walk(path, qs, d[k])
+                    self._walk(path, qs, d[k], depth)
                 path.pop()
             return d
         elif isinstance(d, (list, tuple)):
             path.append("[]")
             for e in d:
-                self._walk(path, qs, e)
+                self._walk(path, qs, e, depth)
             path.pop()
             return d
         else:

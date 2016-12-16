@@ -24,6 +24,14 @@ class Regexp(object):
         return self.args.search(v)
 
 
+class Any(object):
+    __repr__ = repr
+
+    def __call__(self, v):
+        return True
+ANY = Any()
+
+
 class Not(object):
     __repr__ = repr
 
@@ -58,3 +66,4 @@ class And(object):
             if not apply(e, v):
                 return False
         return True
+
