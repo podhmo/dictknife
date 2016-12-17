@@ -100,3 +100,6 @@ class ChainSource(object):
 
     def chain(self, qs, on_container=None, on_data=None):
         return self.query_factory(self, qs, on_container=on_container, on_data=on_data)
+
+
+chain = ChainSource

@@ -6,9 +6,10 @@ from .contexts import PathContext
 class LooseDictWalker(object):
     context_factory = PathContext
 
-    def __init__(self, on_container=None, on_data=None):
+    def __init__(self, on_container=None, on_data=None, context_factory=None):
         self.on_container = on_container
         self.on_data = on_data
+        self.context_factory = context_factory or self.__class__.context_factory
 
     def on_found(self, ctx, d, k):
         if self.on_container is not None:

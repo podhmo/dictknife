@@ -1,5 +1,5 @@
 from dictknife.walkers import LooseDictWalker  # NOQA
-from dictknife.chains import ChainSource  # NOQA
+from dictknife.chains import ChainSource, chain  # NOQA
 from dictknife.accessor import Accessor  # NOQA
 from dictknife.deepmerge import deepmerge  # NOQA
 from dictknife.deepequal import deepequal  # NOQA

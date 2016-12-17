@@ -1,6 +1,6 @@
 class Accessor(object):
-    def make_dict(self):
-        return {}
+    def __init__(self, make_dict=dict):
+        self.make_dict = make_dict
 
     def assign(self, d, path, value):
         for name in path[:-1]:

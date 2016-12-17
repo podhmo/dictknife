@@ -8,7 +8,7 @@ class SimpleContext(object):
     def pop(self):
         pass
 
-    def __call__(self, fn, walker, value):
+    def __call__(self, walker, fn, value):
         return fn(value)
 
 
@@ -26,16 +26,6 @@ class PathContext(object):
         return fn(self.path, value)
 
 
-class RecPathContext(object):
-    def __init__(self):
-        self.path = []
-
-    def push(self, v):
-        self.path.append(v)
-
-    def pop(self):
-        self.path.pop()
-
+class RecPathContext(PathContext):
     def __call__(self, walker, fn, value):
         return fn(walker, self.path, value)
-
