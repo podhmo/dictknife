@@ -25,7 +25,8 @@ class Regexp(object):
 
 
 class Any(object):
-    __repr__ = repr
+    def __repr__(self):
+        return '<{self.__class__.__name__}>'.format(self=self)
 
     def __call__(self, v):
         return True

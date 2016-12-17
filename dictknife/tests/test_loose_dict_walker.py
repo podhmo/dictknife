@@ -138,7 +138,7 @@ class WalkerTests(unittest.TestCase):
                 w.walk(c.qs, c.d, depth=c.depth)
                 self.assertEqual(called[0], c.expected_path is not None)
 
-    def test_chains(self):
+    def test_rec(self):
         from ..operators import ANY
         s = []
 
@@ -166,8 +166,8 @@ class WalkerTests(unittest.TestCase):
 
         self.assertEqual(s, expected)
 
-    def test_chains2(self):
-        from ..walkers import SimpleContext
+    def test_rec2(self):
+        from ..contexts import SimpleContext
         from ..operators import ANY
 
         class RecContext(SimpleContext):
@@ -193,4 +193,99 @@ class WalkerTests(unittest.TestCase):
             {'b': 10}
         ]
 
+        self.assertEqual(s, expected)
+
+
+class ChainTests(unittest.TestCase):
+    def _getTargetClass(self):
+        from dictknife import ChainSource
+        return ChainSource
+
+    def _makeOne(self, *args, **kwargs):
+        return self._getTargetClass()(*args, **kwargs)
+
+    def test_rec3__value(self):
+        C = namedtuple("C", "d, method, expected")
+        candidates = [
+            C(method="on_container",
+              d={"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}},
+              expected=[
+                  {'b': {'a': {'b': {'a': {'b': 10}}}}},
+                  {'b': {'a': {'b': 10}}},
+                  {'b': 10}
+              ]),
+            C(method="on_data",
+              d={"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}},
+              expected=[
+                  {'a': {'b': {'a': {'b': 10}}}},
+                  {'a': {'b': 10}},
+                  10,
+              ]),
+        ]
+        for c in candidates:
+            with self.subTest(d=c.d, method=c.method):
+                s = []
+
+                def on_match(ctx, walker, value):
+                    s.append(value)
+
+                chain = self._makeOne().chain(["b"]).chain(["b"]).chain(["b"])
+                chain.walk(c.d, **{c.method: on_match})
+                self.assertEqual(s, c.expected)
+
+    def test_rec3__path(self):
+        C = namedtuple("C", "d, method, expected")
+        candidates = [
+            C(method="on_container",
+              d={"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}},
+              expected=[
+                  ["a", "b"],
+                  ["a", "b", "a", "b"],
+                  ["a", "b", "a", "b", "a", "b"],
+              ]),
+            C(method="on_data",
+              d={"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}},
+              expected=[
+                  ["a", "b"],
+                  ["a", "b", "a", "b"],
+                  ["a", "b", "a", "b", "a", "b"],
+              ]),
+        ]
+        for c in candidates:
+            with self.subTest(d=c.d, method=c.method):
+                s = []
+
+                def on_match(ctx, walker, value):
+                    s.append(ctx.path[:])
+
+                chain = self._makeOne().chain(["b"]).chain(["b"]).chain(["b"])
+                chain.walk(c.d, **{c.method: on_match})
+                self.assertEqual(s, c.expected)
+
+    def test_rec3__other_methods(self):
+        d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
+        s = []
+
+        def on_match0(ctx, walker, value):
+            s.append(("0", ctx.path[:]))
+
+        def on_match1(ctx, walker, value):
+            s.append(("1", ctx.path[:]))
+
+        def on_match2(ctx, walker, value):
+            s.append(("2", ctx.path[:]))
+
+        def on_match(ctx, walker, value):
+            s.append(("default", ctx.path[:]))
+
+        chain = (self._makeOne()
+                 .chain(["b"], on_container=on_match0)
+                 .chain(["b"], on_container=on_match1)
+                 .chain(["b"], on_container=on_match2))
+        chain.walk(d, on_container=on_match)
+        expected = [
+            ("0", ["a", "b"]),
+            ("1", ["a", "b", "a", "b"]),
+            ("2", ["a", "b", "a", "b", "a", "b"]),
+        ]
         self.assertEqual(s, expected)

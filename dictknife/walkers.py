@@ -16,8 +16,11 @@ class LooseDictWalker(object):
         if self.on_data is not None:
             ctx(self, self.on_data, d[k])
 
+    def create_context(self, ctx=None):
+        return ctx or self.context_factory()
+
     def walk(self, qs, d, depth=-1, ctx=None):
-        ctx = ctx or self.context_factory()
+        ctx = self.create_context(ctx)
         return self._walk(ctx, deque(qs), d, depth=depth)
 
     def _walk(self, ctx, qs, d, depth):
@@ -39,12 +42,12 @@ class LooseDictWalker(object):
                 else:
                     self._walk(ctx, qs, d[k], depth)
                 ctx.pop()
-            return d
+            return
         elif isinstance(d, (list, tuple)):
             ctx.push("[]")
             for e in d:
                 self._walk(ctx, qs, e, depth)
             ctx.pop()
-            return d
+            return
         else:
-            return d
+            return
