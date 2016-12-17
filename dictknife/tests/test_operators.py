@@ -32,7 +32,7 @@ class OperatorsTests(unittest.TestCase):
             C(value="xxx", expected=False),
         ]
 
-        op = And("x", "xx", "xxx")
+        op = And(["x", "xx", "xxx"])
         for c in candidates:
             with self.subTest(op=op, value=c.value):
                 actual = self._callFUT(op, c.value)
@@ -48,7 +48,7 @@ class OperatorsTests(unittest.TestCase):
             C(value="xxx", expected=True),
         ]
 
-        op = Or("x", "xx", "xxx")
+        op = Or(["x", "xx", "xxx"])
         for c in candidates:
             with self.subTest(op=op, value=c.value):
                 actual = self._callFUT(op, c.value)
@@ -64,7 +64,7 @@ class OperatorsTests(unittest.TestCase):
             C(value="xxx", expected=False),
         ]
 
-        op = And(Not("x"), "xx", Not("xxx"))
+        op = And([Not("x"), "xx", Not("xxx")])
         for c in candidates:
             with self.subTest(op=op, value=c.value):
                 actual = self._callFUT(op, c.value)

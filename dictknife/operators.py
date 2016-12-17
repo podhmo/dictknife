@@ -46,7 +46,7 @@ class Not(object):
 class Or(object):
     __repr__ = repr
 
-    def __init__(self, *args):
+    def __init__(self, args):
         self.args = args
 
     def __call__(self, v):
@@ -59,7 +59,7 @@ class Or(object):
 class And(object):
     __repr__ = repr
 
-    def __init__(self, *args):
+    def __init__(self, args):
         self.args = args
 
     def __call__(self, v):
@@ -67,4 +67,3 @@ class And(object):
             if not apply(e, v):
                 return False
         return True
-
