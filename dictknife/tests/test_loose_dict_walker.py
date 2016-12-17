@@ -204,7 +204,7 @@ class ChainTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         return self._getTargetClass()(*args, **kwargs)
 
-    def test_rec3__value(self):
+    def test_value(self):
         C = namedtuple("C", "d, method, expected")
         candidates = [
             C(method="on_container",
@@ -233,7 +233,7 @@ class ChainTests(unittest.TestCase):
                 chain.walk(c.d, **{c.method: on_match})
                 self.assertEqual(s, c.expected)
 
-    def test_rec3__path(self):
+    def test_path(self):
         C = namedtuple("C", "d, method, expected")
         candidates = [
             C(method="on_container",
@@ -262,7 +262,7 @@ class ChainTests(unittest.TestCase):
                 chain.walk(c.d, **{c.method: on_match})
                 self.assertEqual(s, c.expected)
 
-    def test_rec3__other_methods(self):
+    def test_other_methods(self):
         d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
         s = []
 
@@ -286,6 +286,74 @@ class ChainTests(unittest.TestCase):
         expected = [
             ("0", ["a", "b"]),
             ("1", ["a", "b", "a", "b"]),
+            ("2", ["a", "b", "a", "b", "a", "b"]),
+        ]
+        self.assertEqual(s, expected)
+
+    def test_other_methods__break(self):
+        d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
+        s = []
+
+        def on_match0(ctx, walker, value):
+            s.append(("0", ctx.path[:]))
+
+        def on_match1(ctx, walker, value):
+            s.append(("1", ctx.path[:]))
+            return False
+
+        def on_match2(ctx, walker, value):
+            s.append(("2", ctx.path[:]))
+
+        def on_match(ctx, walker, value):
+            s.append(("default", ctx.path[:]))
+
+        chain = (self._makeOne()
+                 .chain(["b"], on_container=on_match0)
+                 .chain(["b"], on_container=on_match1)
+                 .chain(["b"], on_container=on_match2))
+        chain.walk(d, on_container=on_match)
+        expected = [
+            ("0", ["a", "b"]),
+            ("1", ["a", "b", "a", "b"]),
+        ]
+        self.assertEqual(s, expected)
+
+    def test_other_methods__callable_qs(self):
+        from ..operators import ANY
+
+        d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
+        s = []
+
+        def on_match0(ctx, walker, value):
+            s.append(("0", ctx.path[:]))
+
+        def step1(new_ctx, walker, value):
+            s.append("hai")
+            walker.walk([ANY, "b"], value, ctx=new_ctx)
+
+        def on_match1(ctx, walker, value):
+            s.append(("1", ctx.path[:]))
+
+        def step2(new_ctx, walker, value):
+            s.append("hoi")
+            walker.walk([ANY, "b"], value, ctx=new_ctx)
+
+        def on_match2(ctx, walker, value):
+            s.append(("2", ctx.path[:]))
+
+        def on_match(ctx, walker, value):
+            s.append(("default", ctx.path[:]))
+
+        chain = (self._makeOne()
+                 .chain(["b"], on_container=on_match0)
+                 .chain(step1, on_container=on_match1)
+                 .chain(step2, on_container=on_match2))
+        chain.walk(d, on_container=on_match)
+        expected = [
+            ("0", ["a", "b"]),
+            "hai",
+            ("1", ["a", "b", "a", "b"]),
+            "hoi",
             ("2", ["a", "b", "a", "b", "a", "b"]),
         ]
         self.assertEqual(s, expected)

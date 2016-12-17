@@ -79,9 +79,12 @@ class ChainQuery(object):
                 return
 
             current_query, *rest = ctx.query_list
-            qs = [ANY, *current_query.qs]
             new_ctx = self.source.context_factory(rest, path=ctx.path[:-1], value=value, parent=ctx)
-            walker.walk(qs, value, ctx=new_ctx)
+            if callable(current_query.qs):
+                current_query.qs(new_ctx, walker, value)
+            else:
+                qs = [ANY, *current_query.qs]
+                walker.walk(qs, value, ctx=new_ctx)
 
         query_list = self.flatten([])
         ctx = self.source.context_factory(query_list)
