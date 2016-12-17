@@ -13,3 +13,12 @@ class Accessor(object):
         for name in path:
             d = d[name]
         return d
+
+    def maybe_access_container(self, d, path):
+        for name in path[:-1]:
+            if name not in d:
+                return None
+            d = d[name]
+        if path[-1] not in d:
+            return None
+        return d

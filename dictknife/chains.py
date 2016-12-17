@@ -93,9 +93,10 @@ class ChainQuery(object):
 
 
 class ChainSource(object):
-    query_factory = ChainQuery
-    walker_factory = LooseDictWalker
-    context_factory = ChainedContext
+    def __init__(self, query_factory=ChainQuery, walker_factory=LooseDictWalker, context_factory=ChainedContext):
+        self.query_factory = query_factory
+        self.walker_factory = walker_factory
+        self.context_factory = context_factory
 
     def chain(self, qs, on_container=None, on_data=None):
         return self.query_factory(self, qs, on_container=on_container, on_data=on_data)
