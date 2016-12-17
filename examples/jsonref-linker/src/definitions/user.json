@@ -1,0 +1,21 @@
+{
+  "definitions": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "./primitive.json#/definitions/name"
+        },
+        "age": {
+          "$ref": "./primitive.json#/definitions/name"
+        }
+      }
+    },
+    "userlist": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/user"
+      }
+    }
+  }
+}

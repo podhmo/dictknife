@@ -1,0 +1,18 @@
+{
+  "paths": {
+    "users": {
+      "get": {
+        "summary": "user list",
+        "description": "user list",
+        "responses": {
+          "200": {
+            "description": "user list",
+            "schema": {
+              "$ref": "../definitions/user.json#/definitions/userlist"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "paths": {
+    "me": {
+      "get": {
+        "summary": "me profile",
+        "description": "me profile",
+        "responses": {
+          "200": {
+            "description": "Profile information for a user",
+            "schema": {
+              "$ref": "../definitions/user.json#/definitions/user"
+            }
+          }
+        }
+      }
+    }
+  }
+}

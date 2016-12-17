@@ -1,0 +1,15 @@
+{
+  "definitions": {
+    "name": {
+      "type": "string",
+      "description": "name of object"
+    },
+    "age": {
+      "type": "integer",
+      "description": "age of anyone",
+      "minimum": 0,
+      "maximum": 150,
+      "exclusiveMaximum": true
+    }
+  }
+}
