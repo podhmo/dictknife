@@ -15,6 +15,11 @@ class ChainedContext(object):
     def pop(self):
         self.path.pop()
 
+    def new_child(self, query_list=None, path=None, value=None):
+        query_list = query_list or self.query_list
+        path = path or self.path[:-1]
+        return self.__class__(query_list, path=path, value=value, parent=self)
+
     @property
     def on_container(self):
         if not self.query_list:
@@ -63,7 +68,7 @@ class ChainQuery(object):
         r.append(self)
         return r
 
-    def walk(self, d, on_container=None, on_data=None):
+    def walk(self, d, on_container=None, on_data=None, **kwargs):
         def on_match(ctx, walker, value):
             if ctx.path:
                 hook = ctx.parent.on_container or on_container
@@ -79,7 +84,7 @@ class ChainQuery(object):
                 return
 
             current_query, *rest = ctx.query_list
-            new_ctx = self.source.context_factory(rest, path=ctx.path[:-1], value=value, parent=ctx)
+            new_ctx = ctx.new_child(rest, value=value)
             if callable(current_query.qs):
                 current_query.qs(new_ctx, walker, value)
             else:
@@ -87,7 +92,7 @@ class ChainQuery(object):
                 walker.walk(qs, value, ctx=new_ctx)
 
         query_list = self.flatten([])
-        ctx = self.source.context_factory(query_list)
+        ctx = self.source.context_factory(query_list, **kwargs)
         walker = self.source.walker_factory(on_container=on_match)
         return on_match(ctx, walker, d)
 

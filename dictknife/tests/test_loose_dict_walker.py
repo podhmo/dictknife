@@ -355,5 +355,6 @@ class ChainTests(unittest.TestCase):
             ("1", ["a", "b", "a", "b"]),
             "hoi",
             ("2", ["a", "b", "a", "b", "a", "b"]),
+            "hoi",
         ]
         self.assertEqual(s, expected)

@@ -10,12 +10,15 @@ def halfequal(left, right):
         for k in left.keys():
             if k not in right:
                 return False
-            return halfequal(left[k], right[k])
+            if not halfequal(left[k], right[k]):
+                return False
+        return True
     elif isinstance(left, (list, tuple)):
         if len(left) != len(right):
             return False
         for x, y in zip(left, right):
             if not halfequal(x, y):
                 return False
+        return True
     else:
         return left == right

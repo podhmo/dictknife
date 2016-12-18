@@ -40,3 +40,24 @@ class DeepEqualTests(unittest.TestCase):
         }
         self.assertEqual(ref(1), ref(1), msg="prepare")
         self.assertEqual(d0, d1)
+
+    def test_it2(self):
+        d0 = {
+            "color": {
+                "type": "string",
+                "enum": ["C", "M", "Y", "K"],
+            }
+        }
+        d1 = {
+            "color": {
+                "type": "string",
+                "enum": ["R", "G", "B"],
+            }
+        }
+        self.assertNotEqual(d0, d1)
+
+    def test_it3(self):
+        from collections import OrderedDict
+        d0 = OrderedDict([('type', 'string'), ('enum', ['C', 'M', 'Y', 'K'])])
+        d1 = OrderedDict([('type', 'string'), ('enum', ['R', 'G', 'B'])])
+        self.assertNotEqual(d0, d1)

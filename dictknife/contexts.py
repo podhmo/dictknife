@@ -8,6 +8,9 @@ class SimpleContext(object):
     def pop(self):
         pass
 
+    def new_child(self):
+        return self.__class__()
+
     def __call__(self, walker, fn, value):
         return fn(value)
 
@@ -21,6 +24,7 @@ class PathContext(object):
 
     def pop(self):
         self.path.pop()
+
 
     def __call__(self, walker, fn, value):
         return fn(self.path, value)

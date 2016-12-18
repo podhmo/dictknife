@@ -14,6 +14,14 @@ class Accessor(object):
             d = d[name]
         return d
 
+    def maybe_remove(self, d, path):
+        container = self.maybe_access_container(d, path)
+        if container is not None:
+            container.pop(path[-1])
+
+    def exists(self, d, path):
+        return self.maybe_access_container(d, path) is not None
+
     def maybe_access_container(self, d, path):
         for name in path[:-1]:
             if name not in d:
