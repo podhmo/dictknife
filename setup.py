@@ -22,6 +22,10 @@ install_requires = [
 docs_extras = [
 ]
 
+load_extras = [
+    "PyYAML",
+]
+
 tests_require = [
 ]
 
@@ -29,7 +33,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='dictknife',
-      version='0.0',
+      version='0.1',
       description='utility set of handling dict',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
@@ -47,9 +51,9 @@ setup(name='dictknife',
       extras_require={
           'testing': testing_extras,
           'docs': docs_extras,
+          'load': load_extras,
       },
       tests_require=tests_require,
       test_suite="dictknife.tests",
       entry_points="""
 """)
-
