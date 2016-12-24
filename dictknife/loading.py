@@ -66,3 +66,13 @@ def setup(input=None, output=None):
     if output is not None:
         logger.debug("setup output format: %s", output)
         loading_config.output_format = output
+    yaml.add_constructor('tag:yaml.org,2002:map', construct_odict)
+    yaml.add_representer(OrderedDict, represent_odict)
+
+
+def represent_odict(dumper, instance):
+    return dumper.represent_mapping('tag:yaml.org,2002:map', instance.items())
+
+
+def construct_odict(loader, node):
+    return OrderedDict(loader.construct_pairs(node))
