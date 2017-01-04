@@ -1,12 +1,13 @@
 import sys
 from dictknife import loading
 from dictknife import Accessor
-from dictknife import LooseDictWalker
+from dictknife import LooseDictWalkingIterator
 
 
 class JSONRefAccessor(object):
     def __init__(self):
         self.accessor = Accessor()
+        self.ref_walking = LooseDictWalkingIterator(["$ref"])
 
     def access(self, fulldata, ref):
         # not support external file
@@ -22,10 +23,8 @@ class JSONRefAccessor(object):
             d.update(self.expand(fulldata, original))
             return d
         else:
-            def on_has_ref(path, d):
-                self.expand(fulldata, d)
-            walker = LooseDictWalker(on_container=on_has_ref)
-            walker.walk(["$ref"], d)
+            for path, sd in self.ref_walking.iterate(d):
+                self.expand(fulldata, sd)
             return d
 
     def extract(self, fulldata, ref):

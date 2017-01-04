@@ -19,7 +19,10 @@ definitions:
         $ref: "#/definitions/name"
   name:
     type: string
+    example: foo
+    default: boo
   age:
     type: integer
+    default: 20
 
 

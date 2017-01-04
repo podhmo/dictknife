@@ -31,8 +31,11 @@ class Dictplotter(object):
 
 def run(src, dst):
     loading.setup()
-    with open(src) as rf:
-        data = loading.load(rf)
+    if src is None:
+        data = loading.load(sys.stdin)
+    else:
+        with open(src) as rf:
+            data = loading.load(rf)
     d = Dictplotter().plot(data)
     if dst is None:
         loading.dump(d, sys.stdout)
@@ -44,7 +47,7 @@ def run(src, dst):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--src", required=True)
+    parser.add_argument("--src", default=None)
     parser.add_argument("--dst", default=None)
     args = parser.parse_args()
     run(args.src, args.dst)
