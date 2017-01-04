@@ -1,14 +1,7 @@
 import json
 import pprint
-from dictknife import LooseDictWalker
+from dictknife import LooseDictWalkingIterator
 
-refs = []
-
-
-def on_has_ref(path, d):
-    refs.append((path[:], d["$ref"]))
-
-walker = LooseDictWalker(on_container=on_has_ref)
 
 # from: https://github.com/BigstickCarpet/json-schema-ref-parser
 d = json.loads("""
@@ -30,7 +23,12 @@ d = json.loads("""
 }
 """)
 
-walker.walk(["$ref"], d)
+refs = []
+
+iterator = LooseDictWalkingIterator(["$ref"])
+for path, sd in iterator.iterate(d):
+    refs.append((path[:], sd["$ref"]))
+
 pprint.pprint(refs)
 
 [(['definitions', 'color', '$ref'],

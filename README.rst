@@ -50,21 +50,13 @@ deepmerge
 walker
 ----------------------------------------
 
-using `LooseDictWalker` example.
+using `LooseDictWalkingIterator` example.
 
 .. code-block:: python
 
   import json
   import pprint
-  from dictknife import LooseDictWalker
-
-  refs = []
-
-
-  def on_has_ref(path, d):
-      refs.append((path[:], d["$ref"]))
-
-  walker = LooseDictWalker(on_container=on_has_ref)
+  from dictknife import LooseDictWalkingIterator
 
   # from: https://github.com/BigstickCarpet/json-schema-ref-parser
   d = json.loads("""
@@ -86,7 +78,12 @@ using `LooseDictWalker` example.
   }
   """)
 
-  walker.walk(["$ref"], d)
+  refs = []
+
+  iterator = LooseDictWalkingIterator(["$ref"])
+  for path, sd in iterator.iterate(d):
+      refs.append((path[:], sd["$ref"]))
+
   pprint.pprint(refs)
 
 output
