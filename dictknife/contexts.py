@@ -25,7 +25,6 @@ class PathContext(object):
     def pop(self):
         self.path.pop()
 
-
     def __call__(self, walker, fn, value):
         return fn(self.path, value)
 
