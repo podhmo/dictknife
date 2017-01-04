@@ -33,7 +33,7 @@ testing_extras = tests_require + [
 ]
 
 setup(name='dictknife',
-      version='0.1',
+      version='0.2',
       description='utility set of handling dict',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
