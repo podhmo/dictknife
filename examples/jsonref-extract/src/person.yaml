@@ -1,0 +1,25 @@
+definitions:
+  people:
+    type: array
+    items:
+      $ref: "#/definitions/person"
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+      age:
+        $ref: "#/definitions/age"
+      group:
+        $ref: "#/definitions/group"
+  group:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+  name:
+    type: string
+  age:
+    type: integer
+
+
