@@ -1,0 +1,6 @@
+id: 1
+name: foo
+type: dog
+group:
+  name: red
+  type: DOG

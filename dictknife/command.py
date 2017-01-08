@@ -20,3 +20,16 @@ logger = logging.getLogger(__name__)
 def command(ctx, log):
     logging.basicConfig(level=getattr(logging, log))
     loading.setup()
+
+
+@command.command(help="concat dicts")
+@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
+def concat(files):
+    from collections import OrderedDict
+    from . import deepmerge
+    d = OrderedDict()
+    for f in files:
+        logger.debug("merge: %s", f)
+        with open(f) as rf:
+            d = deepmerge(d, loading.load(rf))
+    loading.dump(d, sys.stdout)

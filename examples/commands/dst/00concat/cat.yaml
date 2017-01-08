@@ -1,0 +1,6 @@
+id: 1
+name: foo
+type: cat
+group:
+  name: red
+  type: CAT
