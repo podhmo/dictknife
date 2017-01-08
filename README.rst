@@ -7,6 +7,7 @@ dictknife
 features
 
 - deepmerge
+- deepequal
 - walker
 
 
@@ -100,3 +101,39 @@ output
 
 
 todo: description about chains and operator and context,...
+
+command
+----------------------------------------
+
+install dictknife via `pip install dictknife[command]`.
+
+- concat
+- transform
+- diff
+
+TODO: gentle introduction
+
+concat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+  $ dicknife concat a.yaml b.yaml c.json
+
+transform
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+  $ transform --function misc/transform.py:lift --src src/01transform/properties.yaml --name person
+  # or
+  $ dictknife transform --code 'lambda d,name=None: {"definitions": {name: d}}' --src src/01transform/properties.yaml --name person
+
+
+diff
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+  $ dictknife diff a.yaml b.yaml
+  $ dictknife diff --sort-keys a.yaml b.yaml

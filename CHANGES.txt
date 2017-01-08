@@ -1,3 +1,15 @@
+0.3
+
+- command extras `pip install dictknife[command]`
+- adding dictknife-concat command
+- adding dictknife-transform command
+- adding dictknife-diff command
+
+
+0.2
+
+- external iterator is recommened. (using LooseDictWalkingIterator instead of LooseDictWalker)
+
 0.1
 
-- yaml/json load extras (`pip install -e .[load]`)
+- yaml/json load extras (`pip install dictknife[load]`)
