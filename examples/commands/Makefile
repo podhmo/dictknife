@@ -1,4 +1,4 @@
-default: concat transform
+default: concat transform diff
 
 concat:
 	mkdir -p dst/00concat
@@ -9,5 +9,9 @@ transform:
 	mkdir -p dst/01transform
 	dictknife transform --function misc/transform.py:lift --src src/01transform/properties.yaml --name person > dst/01transform/person.yaml
 	dictknife transform --code 'lambda d,name=None: {"definitions": {name: d}}' --src src/01transform/properties.yaml --name person > dst/01transform/person2.json
+
+diff:
+	mkdir -p dst/02diff
+	dictknife diff src/02diff/left.yaml src/02diff/right.json > dst/02diff/person.diff
 
 .PHONY: dst

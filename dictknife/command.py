@@ -62,3 +62,24 @@ def transform(name, src, dst, code, function):
             loading.dump(result, wf)
     else:
         loading.dump(result, sys.stdout)
+
+
+@command.command(help="diff dict")
+@click.option("--sort-keys", is_flag=True, default=False)
+@click.argument("left", required=True, type=click.Path(exists=True))
+@click.argument("right", required=True, type=click.Path(exists=True))
+def diff(sort_keys, left, right):
+    import json
+    import difflib
+    with open(left) as rf:
+        left_output = json.dumps(loading.load(rf), ensure_ascii=False, indent=2, sort_keys=sort_keys)
+    with open(right) as rf:
+        right_output = json.dumps(loading.load(rf), ensure_ascii=False, indent=2, sort_keys=sort_keys)
+    iterator = difflib.unified_diff(
+        left_output.splitlines(keepends=True),
+        right_output.splitlines(keepends=True),
+        fromfile=left,
+        tofile=right,
+    )
+    for line in iterator:
+        sys.stdout.write(line)

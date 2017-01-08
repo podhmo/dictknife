@@ -1,0 +1,10 @@
+Person:
+  properties:
+    Name:
+      type:
+        string
+      description: "someone's name"
+    Age:
+      type:
+        integer
+      description: age
