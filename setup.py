@@ -26,6 +26,11 @@ load_extras = [
     "PyYAML",
 ]
 
+command_extras = [
+    "PyYAML",
+    "click",
+]
+
 tests_require = [
 ]
 
@@ -52,8 +57,11 @@ setup(name='dictknife',
           'testing': testing_extras,
           'docs': docs_extras,
           'load': load_extras,
+          'command': command_extras,
       },
       tests_require=tests_require,
       test_suite="dictknife.tests",
       entry_points="""
+      [console_scripts]
+      dictknife=dictknife.command:command
 """)
