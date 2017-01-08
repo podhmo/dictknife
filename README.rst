@@ -105,7 +105,7 @@ todo: description about chains and operator and context,...
 command
 ----------------------------------------
 
-install dictknife via `pip install dictknife[command]`.
+install dictknife via `pip install dictknife[command]` .
 
 - concat
 - transform
@@ -125,7 +125,7 @@ transform
 
 .. code-block:: bash
 
-  $ transform --function misc/transform.py:lift --src src/01transform/properties.yaml --config '{"name": "person"}'
+  $ dicknife transform --function misc/transform.py:lift --src src/01transform/properties.yaml --config '{"name": "person"}'
   # or
   $ dictknife transform --code 'lambda d,**kwargs: {"definitions": {"person": d}}' --src src/01transform/properties.yaml
 
