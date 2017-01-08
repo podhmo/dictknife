@@ -22,8 +22,9 @@ def command(ctx, log):
 
 
 @command.command(help="concat dicts")
+@click.option("--dst", default=None, type=click.Path())
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-def concat(files):
+def concat(dst, files):
     from collections import OrderedDict
     from . import deepmerge
     d = OrderedDict()
@@ -31,12 +32,16 @@ def concat(files):
         logger.debug("merge: %s", f)
         with open(f) as rf:
             d = deepmerge(d, loading.load(rf))
-    loading.dump(d, sys.stdout)
+    if dst:
+        with open(dst, "w") as wf:
+            loading.dump(d, wf)
+    else:
+        loading.dump(d, sys.stdout)
 
 
 @command.command(help="transform dict")
 @click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
 @click.option("--config", default="{}")
 @click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
