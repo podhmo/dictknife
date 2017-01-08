@@ -125,9 +125,9 @@ transform
 
 .. code-block:: bash
 
-  $ transform --function misc/transform.py:lift --src src/01transform/properties.yaml --name person
+  $ transform --function misc/transform.py:lift --src src/01transform/properties.yaml --config '{"name": "person"}'
   # or
-  $ dictknife transform --code 'lambda d,name=None: {"definitions": {name: d}}' --src src/01transform/properties.yaml --name person
+  $ dictknife transform --code 'lambda d,**kwargs: {"definitions": {"person": d}}' --src src/01transform/properties.yaml
 
 
 diff

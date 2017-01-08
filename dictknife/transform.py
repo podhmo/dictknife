@@ -1,2 +1,2 @@
-def identity(data, name=None):
+def identity(data, **kwargs):
     return data

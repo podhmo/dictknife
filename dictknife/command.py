@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
-from functools import partial
 try:
     import click
 except ImportError as e:
@@ -36,18 +35,28 @@ def concat(files):
 
 
 @command.command(help="transform dict")
-@click.option("--name", default="NAME")
 @click.option("--src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path(exists=True))
+@click.option("--config", default="{}")
+@click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
 @click.option("--function", default="dictknife.transform:identity")
-def transform(name, src, dst, code, function):
+def transform(src, dst, config, config_file, code, function):
+    import json
+    from functools import partial
     from magicalimport import import_symbol
+    from . import deepmerge
 
     if code is not None:
         transform = eval(code)
     else:
         transform = import_symbol(function)
+
+    kwargs = json.loads(config)
+
+    if config_file:
+        with open(config_file) as rf:
+            kwargs = deepmerge(kwargs, loading.load(rf))
 
     if src:
         with open(src) as rf:
@@ -55,7 +64,7 @@ def transform(name, src, dst, code, function):
     else:
         data = loading.load(sys.stdin)
 
-    result = partial(transform, name=name)(data)
+    result = partial(transform, **kwargs)(data)
 
     if dst:
         with open(dst, "w") as wf:
