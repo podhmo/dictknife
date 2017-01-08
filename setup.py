@@ -29,6 +29,7 @@ load_extras = [
 command_extras = [
     "PyYAML",
     "click",
+    "magicalimport",
 ]
 
 tests_require = [

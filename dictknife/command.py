@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
-
+from functools import partial
 try:
     import click
 except ImportError as e:
@@ -33,3 +33,32 @@ def concat(files):
         with open(f) as rf:
             d = deepmerge(d, loading.load(rf))
     loading.dump(d, sys.stdout)
+
+
+@command.command(help="transform dict")
+@click.option("--name", default="NAME")
+@click.option("--src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path(exists=True))
+@click.option("--code", default=None)
+@click.option("--function", default="dictknife.transform:identity")
+def transform(name, src, dst, code, function):
+    from magicalimport import import_symbol
+
+    if code is not None:
+        transform = eval(code)
+    else:
+        transform = import_symbol(function)
+
+    if src:
+        with open(src) as rf:
+            data = loading.load(rf)
+    else:
+        data = loading.load(sys.stdin)
+
+    result = partial(transform, name=name)(data)
+
+    if dst:
+        with open(dst, "w") as wf:
+            loading.dump(result, wf)
+    else:
+        loading.dump(result, sys.stdout)
