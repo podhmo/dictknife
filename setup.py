@@ -64,5 +64,6 @@ setup(name='dictknife',
       test_suite="dictknife.tests",
       entry_points="""
       [console_scripts]
-      dictknife=dictknife.command:command
+      dictknife=dictknife.commands.dictknife:main
+      jsonknife=dictknife.commands.jsonknife:main
 """)

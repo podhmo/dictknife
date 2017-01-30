@@ -16,12 +16,12 @@ logger = logging.getLogger(__name__)
 @click.group()
 @click.option("--log", help="logging level", default="INFO", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
 @click.pass_context
-def command(ctx, log):
+def main(ctx, log):
     logging.basicConfig(level=getattr(logging, log))
     loading.setup()
 
 
-@command.command(help="concat dicts")
+@main.command(help="concat dicts")
 @click.option("--dst", default=None, type=click.Path())
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 def concat(dst, files):
@@ -39,7 +39,7 @@ def concat(dst, files):
         loading.dump(d, sys.stdout)
 
 
-@command.command(help="transform dict")
+@main.command(help="transform dict")
 @click.option("--src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--config", default="{}")
@@ -78,7 +78,7 @@ def transform(src, dst, config, config_file, code, function):
         loading.dump(result, sys.stdout)
 
 
-@command.command(help="diff dict")
+@main.command(help="diff dict")
 @click.option("--sort-keys", is_flag=True, default=False)
 @click.argument("left", required=True, type=click.Path(exists=True))
 @click.argument("right", required=True, type=click.Path(exists=True))
