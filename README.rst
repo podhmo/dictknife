@@ -9,7 +9,7 @@ features
 - deepmerge
 - deepequal
 - walker
-
+- diff
 
 deepmerge
 ----------------------------------------
@@ -137,3 +137,28 @@ diff
 
   $ dictknife diff a.yaml b.yaml
   $ dictknife diff --sort-keys a.yaml b.yaml
+
+.. code-block:: diff
+
+  --- src/02diff/left.yaml
+  +++ src/02diff/right.json
+  @@ -1,13 +1,12 @@
+   {
+  -  "Person": {
+  +  "person": {
+       "properties": {
+  -      "Name": {
+  +      "name": {
+           "type": "string",
+  -        "description": "someone's name"
+  +        "description": "Someone's name"
+         },
+  -      "Age": {
+  -        "type": "integer",
+  -        "description": "age"
+  +      "age": {
+  +        "type": "integer"
+         }
+       }
+     }
+

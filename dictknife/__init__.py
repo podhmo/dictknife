@@ -4,6 +4,7 @@ from dictknife.chain import ChainSource, chain  # NOQA
 from dictknife.accessor import Accessor  # NOQA
 from dictknife.deepmerge import deepmerge  # NOQA
 from dictknife.deepequal import deepequal  # NOQA
+from dictknife.diff import diff  # NOQA
 from dictknife.operators import (  # NOQA
     apply,
     Regexp,
