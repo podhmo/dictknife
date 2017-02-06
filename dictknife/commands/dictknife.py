@@ -26,7 +26,7 @@ def main(ctx, log):
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 def concat(dst, files):
     from collections import OrderedDict
-    from . import deepmerge
+    from .. import deepmerge
     d = OrderedDict()
     for f in files:
         logger.debug("merge: %s", f)
@@ -50,7 +50,7 @@ def transform(src, dst, config, config_file, code, function):
     import json
     from functools import partial
     from magicalimport import import_symbol
-    from . import deepmerge
+    from .. import deepmerge
 
     if code is not None:
         transform = eval(code)
