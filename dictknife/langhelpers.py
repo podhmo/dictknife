@@ -3,11 +3,6 @@ import re
 
 
 def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
-    c = name[0]
-    if c.isdigit():
-        name = "n" + name
-    elif not (c.isalpha() or c == "_"):
-        name = "x" + name
     return ignore_rx.sub("", name.replace("-", "_"))
 
 
