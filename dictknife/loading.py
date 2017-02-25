@@ -35,7 +35,11 @@ def _yaml_dump(d, fp):
     return yaml.dump(d, fp, allow_unicode=True, default_flow_style=False)
 
 
-def load(fp, format=None, fn_map={Format.yaml: yaml.load, Format.json: _json_load, Format.unknown: yaml.load}):
+default_load_fnmap = {Format.yaml: yaml.load, Format.json: _json_load, Format.unknown: yaml.load}
+default_dump_fnmap = {Format.yaml: _yaml_dump, Format.json: _json_dump, Format.unknown: _yaml_dump}
+
+
+def load(fp, format=None, fn_map=default_load_fnmap):
     if format is not None:
         loader = fn_map[format]
     else:
@@ -44,7 +48,7 @@ def load(fp, format=None, fn_map={Format.yaml: yaml.load, Format.json: _json_loa
     return loader(fp)
 
 
-def dump(d, fp, format=None, fn_map={Format.yaml: _yaml_dump, Format.json: _json_dump, Format.unknown: _yaml_dump}):
+def dump(d, fp, format=None, fn_map=default_dump_fnmap):
     if format is not None:
         dumper = fn_map[format]
     else:
