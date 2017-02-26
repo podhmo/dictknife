@@ -15,6 +15,8 @@ from dictknife import deepmerge
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import lifting_jsonschema_definition
 from dictknife.jsonknife.resolver import get_resolver_from_filename
+from dictknife.jsonknife import SampleValuePlotter
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,3 +57,12 @@ def lift(src, dst):
     data = loading.loadfile(src)
     d = lifting_jsonschema_definition(data)
     loading.dumpfile(d, dst)
+
+
+@main.command(help="output sample value from swagger's spec")
+@click.argument("src", type=click.Path(exists=True))
+def samplevalue(src):
+    data = loading.loadfile(src)
+    plotter = SampleValuePlotter()
+    d = plotter.plot(data)
+    loading.dumpfile(d, format=loading.Format.json)

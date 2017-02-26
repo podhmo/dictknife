@@ -63,22 +63,22 @@ def dump(d, fp, format=None, fn_map=default_dump_fnmap):
     return dumper(d, fp)
 
 
-def loadfile(filename=None, fn_map=default_load_fnmap):
+def loadfile(filename=None, format=None, fn_map=default_load_fnmap):
     """load file or stdin"""
     if filename is None:
-        return load(sys.stdin, fn_map=fn_map)
+        return load(sys.stdin, format=format, fn_map=fn_map)
     else:
         with open(filename) as rf:
-            return load(rf, fn_map=fn_map)
+            return load(rf, format=format, fn_map=fn_map)
 
 
-def dumpfile(d, filename=None, fn_map=default_dump_fnmap):
+def dumpfile(d, filename=None, format=None, fn_map=default_dump_fnmap):
     """dump file or stdout"""
     if filename is None:
-        return dump(d, sys.stdout, fn_map=fn_map)
+        return dump(d, sys.stdout, format=format, fn_map=fn_map)
     else:
         with open(filename, "w") as wf:
-            return dump(d, wf, fn_map=fn_map)
+            return dump(d, wf, format=format, fn_map=fn_map)
 
 
 class loading_config:
@@ -96,7 +96,6 @@ def setup(input=None, output=None):
         loading_config.output_format = output
     yaml.add_constructor('tag:yaml.org,2002:map', construct_odict)
     yaml.add_representer(OrderedDict, represent_odict)
-    yaml.Dumper.ignore_aliases = lambda *args : True
 
 
 def represent_odict(dumper, instance):
