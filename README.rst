@@ -34,7 +34,7 @@ deepmerge
       },
       "c": 100
   }
-  actual = self._callFUT(d0, d1)
+  actual = deepmerge(d0, d1)
   expected = {
       "a": {
           "x": 1
