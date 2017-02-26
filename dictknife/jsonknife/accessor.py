@@ -7,23 +7,28 @@ class JSONRefAccessor(object):
         self.accessor = Accessor()
         self.ref_walking = LooseDictWalkingIterator(["$ref"])
 
-    def access(self, fulldata, ref):
+    def access(self, doc, query):
         # not support external file
-        if not ref.startswith("#/"):
-            raise ValueError("invalid ref {!r}".format(ref))
-        path = ref[2:].split("/")
-        return self.accessor.access(fulldata, path)
+        if not query.startswith("#/"):
+            raise ValueError("invalid query {!r}".format(query))
+        return self._access(doc, query[2:])
 
-    def expand(self, fulldata, d):
+    def _access(self, doc, query):
+        if query == "":
+            return doc
+        path = [p.replace("~1", "/").replace("~0", "~") for p in query[1:].split("/")]
+        return self.accessor.access(doc, path)
+
+    def expand(self, doc, d):
         if "$ref" in d:
-            original = self.access(fulldata, d["$ref"])
+            original = self.access(doc, d["$ref"])
             d.pop("$ref")
-            d.update(self.expand(fulldata, original))
+            d.update(self.expand(doc, original))
             return d
         else:
             for path, sd in self.ref_walking.iterate(d):
-                self.expand(fulldata, sd)
+                self.expand(doc, sd)
             return d
 
-    def extract(self, fulldata, ref):
-        return self.expand(fulldata, self.access(fulldata, ref))
+    def extract(self, doc, ref):
+        return self.expand(doc, self.access(doc, ref))

@@ -11,7 +11,12 @@ class Accessor(object):
 
     def access(self, d, path):
         for name in path:
-            d = d[name]
+            try:
+                d = d[name]
+            except TypeError:
+                if not isinstance(d, (list, tuple)):
+                    raise
+                d = d[int(name)]
         return d
 
     def maybe_remove(self, d, path):
