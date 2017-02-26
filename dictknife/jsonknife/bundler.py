@@ -1,4 +1,5 @@
 import sys
+import logging
 from collections import OrderedDict
 from namedlist import namedlist
 from dictknife import LooseDictWalkingIterator
@@ -8,6 +9,7 @@ from dictknife import deepmerge
 from .accessor import StackedAccessor
 
 
+logger = logging.getLogger("jsonknife.bundler")
 CacheItem = namedlist("CacheItem", "file, localref, globalref, resolver, data")
 
 
@@ -67,15 +69,20 @@ class Bundler(object):
             finally:
                 self.accessor.pop_stack()
 
+    def fix_ref(self, resolver, sd):
+        filename, _, pointer = resolver.resolve_pathset(sd["$ref"])
+        related = self.get_item_by_globalref((filename, pointer))
+        new_ref = "#/{}".format(related.localref)
+        logger.debug("fix ref: %r -> %r (where=%r)", sd["$ref"], new_ref, resolver.filename)
+        sd["$ref"] = new_ref
+
     def bundle(self, doc=None):
         doc = doc or self.resolver.doc
         self.scan(doc)
         # side effect
         d = OrderedDict()
         for path, sd in self.ref_walking.iterate(doc):
-            filename, _, pointer = self.resolver.resolve_pathset(sd["$ref"])
-            related = self.get_item_by_globalref((filename, pointer))
-            sd["$ref"] = "#/{}".format(related.localref)
+            self.fix_ref(self.resolver, sd)
 
         d = deepmerge(d, doc)
         for name, item in self.item_map.items():
@@ -83,9 +90,7 @@ class Bundler(object):
                 continue
             data = item.data
             for path, sd in self.ref_walking.iterate(data):
-                filename, _, pointer = item.resolver.resolve_pathset(sd["$ref"])
-                related = self.get_item_by_globalref((filename, pointer))
-                sd["$ref"] = "#/{}".format(related.localref)
+                self.fix_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
         return d
 
