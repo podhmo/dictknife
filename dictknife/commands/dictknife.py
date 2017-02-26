@@ -32,11 +32,7 @@ def concat(dst, files):
         logger.debug("merge: %s", f)
         with open(f) as rf:
             d = deepmerge(d, loading.load(rf))
-    if dst:
-        with open(dst, "w") as wf:
-            loading.dump(d, wf)
-    else:
-        loading.dump(d, sys.stdout)
+    loading.dumpfile(d, dst)
 
 
 @main.command(help="transform dict")
@@ -63,19 +59,9 @@ def transform(src, dst, config, config_file, code, function):
         with open(config_file) as rf:
             kwargs = deepmerge(kwargs, loading.load(rf))
 
-    if src:
-        with open(src) as rf:
-            data = loading.load(rf)
-    else:
-        data = loading.load(sys.stdin)
-
+    data = loading.loadfile(src)
     result = partial(transform, **kwargs)(data)
-
-    if dst:
-        with open(dst, "w") as wf:
-            loading.dump(result, wf)
-    else:
-        loading.dump(result, sys.stdout)
+    loading.dumpfile(result, dst)
 
 
 @main.command(help="diff dict")

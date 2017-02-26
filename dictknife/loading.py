@@ -14,6 +14,11 @@ class Format:
     unknown = "(unknown)"
 
 
+class IgnoreReferenceDumper(yaml.Dumper):
+    def ignore_aliases(self, data):
+        return True
+
+
 def dispatch_by_format(filename, fn_map, default=Format.unknown):
     _, ext = os.path.splitext(filename)
     if ext in (".yaml", ".yml"):
@@ -33,7 +38,7 @@ def _json_dump(d, fp):
 
 
 def _yaml_dump(d, fp):
-    return yaml.dump(d, fp, allow_unicode=True, default_flow_style=False)
+    return yaml.dump(d, fp, allow_unicode=True, default_flow_style=False, Dumper=IgnoreReferenceDumper)
 
 
 default_load_fnmap = {Format.yaml: yaml.load, Format.json: _json_load, Format.unknown: yaml.load}
@@ -91,6 +96,7 @@ def setup(input=None, output=None):
         loading_config.output_format = output
     yaml.add_constructor('tag:yaml.org,2002:map', construct_odict)
     yaml.add_representer(OrderedDict, represent_odict)
+    yaml.Dumper.ignore_aliases = lambda *args : True
 
 
 def represent_odict(dumper, instance):

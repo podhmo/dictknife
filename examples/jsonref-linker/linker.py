@@ -1,9 +1,9 @@
-import json
 import os
 import logging
 from pathresolver import PathResolver
 from dictknife import LooseDictWalker
 from dictknife import Accessor
+from dictknife import loading
 from dictknife.contexts import SimpleContext
 logger = logging.getLogger(__name__)
 
@@ -19,8 +19,7 @@ class WithResolverContext(SimpleContext):
 def link(src):
     accessor = Accessor()
     cache = {}
-    with open(src) as rf:
-        data = json.load(rf)
+    data = loading.loadfile(src)
 
     def on_has_ref(walker, resolver, d):
         logger.info("ref %s (on %s)", d["$ref"], resolver.path.replace(os.getcwd(), "."))
@@ -32,7 +31,7 @@ def link(src):
             subresolver = resolver.resolve(file_path)
             if subresolver.path not in cache:
                 with subresolver.open() as rf:
-                    data = json.load(rf)
+                    data = loading.load(rf)
                     cache[subresolver.path] = data
             data = cache[subresolver.path]
             walker.walk(["$ref"], data, ctx=WithResolverContext(subresolver))
@@ -57,7 +56,7 @@ def main():
     if args.logging:
         logging.basicConfig(level=logging.INFO)
     data = link(args.file)
-    print(json.dumps(data, indent=2, ensure_ascii=False, sort_keys=True))
+    loading.dumpfile(data)
 
 if __name__ == "__main__":
     main()

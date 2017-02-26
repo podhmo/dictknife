@@ -2,9 +2,9 @@ import unittest
 
 
 class Tests(unittest.TestCase):
-    def _makeOne(self):
-        from dictknife.jsonknife.accessor import JSONRefAccessor
-        return JSONRefAccessor()
+    def _callFUT(self, *args, **kwargs):
+        from dictknife.jsonknife.accessor import access_by_json_pointer
+        return access_by_json_pointer(*args, **kwargs)
 
     def test_it(self):
         # from: https://tools.ietf.org/html/rfc6901#section-5
@@ -36,8 +36,7 @@ class Tests(unittest.TestCase):
             ("/m~0n", 8),
         ]
 
-        accessor = self._makeOne()
         for query, expected in candidates:
             with self.subTest(query=query, expected=expected):
-                actual = accessor.access_json_pointer(doc, query)
+                actual = self._callFUT(doc, query)
                 self.assertEqual(actual, expected)

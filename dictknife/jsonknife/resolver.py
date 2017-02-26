@@ -1,0 +1,79 @@
+import sys
+import logging
+import os.path
+from dictknife import loading
+from dictknife.langhelpers import reify
+
+
+logger = logging.getLogger("jsonknife.resolver")
+
+
+class OneDocResolver(object):
+    def __init__(self, doc):
+        self.doc = doc
+
+    def resolve(self, query):
+        # not support external file
+        if not query.startswith("#/"):
+            raise ValueError("invalid query {!r}".format(query))
+        return self, query[1:]
+
+
+class ExternalFileResolver(object):
+    def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None):
+        self.rawfilename = rawfilename or filename
+        self.filename = self.normpath(filename)
+        self.cache = cache or {}  # filename -> resolver
+        self.loader = loader or loading
+        self.history = history or [ROOT]
+        if doc is not None:
+            self.doc = doc
+
+    @reify
+    def doc(self):
+        logger.debug("load file[%s]: %r (where=%r)", len(self.history), self.rawfilename, self.history[-1].filename)
+        with open(self.filename) as rf:
+            return self.loader.load(rf)
+
+    def normpath(self, filename):
+        return os.path.normpath(os.path.abspath(filename))
+
+    def new(self, filename, doc=None, rawfilename=None):
+        rawfilename = rawfilename or filename
+        history = self.history[:]
+        history.append(self)
+        return self.__class__(filename, cache=self.cache, loader=self.loader, history=history, doc=doc, rawfilename=rawfilename)
+
+    def resolve(self, query):
+        if query.startswith("#"):
+            return self, query[1:]
+        if "#" not in query:
+            query = query + "#"
+
+        curdir = os.path.dirname(self.filename)
+        filepath, query = query.rsplit("#", 1)
+        fullpath = self.normpath(os.path.join(curdir, filepath))
+        return self.resolve_subresolver(fullpath, rawfilename=filepath), query
+
+    def resolve_subresolver(self, filename, rawfilename=None):
+        if filename in self.cache:
+            cached = self.cache[filename]
+            if cached.history[-1].filename == self.filename:
+                return cached
+            else:
+                return self.new(filename, doc=cached.doc, rawfilename=rawfilename)
+        subresolver = self.cache[filename] = self.new(filename, rawfilename=rawfilename)
+        return subresolver
+
+
+class ROOT:
+    filename = "*root*"
+    rawfilename = "*root*"
+    history = []
+
+
+def get_resolver_from_filename(filename, loader=loading):
+    if filename is None:
+        return OneDocResolver(loading.load(sys.stdin))
+    else:
+        return ExternalFileResolver(filename, loader=loader)
