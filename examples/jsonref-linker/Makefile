@@ -1,2 +1,2 @@
 default:
-	python linker.py --logging src/main.json | tee output.json
+	jsonknife --log=DEBUG extract --src src/main.json | tee output.yaml

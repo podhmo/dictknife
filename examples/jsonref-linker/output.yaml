@@ -1,0 +1,35 @@
+paths:
+  /me:
+    get:
+      summary: me profile
+      description: me profile
+      responses:
+        '200':
+          description: Profile information for a user
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: name of object
+              age:
+                type: string
+                description: name of object
+  /users:
+    get:
+      summary: user list
+      description: user list
+      responses:
+        '200':
+          description: user list
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: name of object
+                age:
+                  type: string
+                  description: name of object

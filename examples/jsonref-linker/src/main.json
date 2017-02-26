@@ -1,10 +1,10 @@
 {
   "paths": {
     "/me": {
-      "$ref": "./api/me.json#paths/me"
+      "$ref": "./api/me.json#/paths/me"
     },
     "/users": {
-      "$ref": "./api/user.json#paths/users"
+      "$ref": "./api/user.json#/paths/users"
     }
   }
 }
