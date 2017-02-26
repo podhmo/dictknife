@@ -1,5 +1,4 @@
 # -*- coding:utf-8 -*-
-import sys
 from collections import OrderedDict
 from dictknife import loading
 
@@ -7,7 +6,7 @@ from dictknife import loading
 class Dictplotter(object):
     def plot(self, d):
         if d["type"] == "object":
-            return self.plot_object(d["properties"], OrderedDict())
+            return self.plot_object(d.get("properties") or {}, OrderedDict())
         elif d["type"] == "array":
             return self.plot_array(d["items"], [])
         elif "example" in d:
@@ -31,17 +30,9 @@ class Dictplotter(object):
 
 def run(src, dst):
     loading.setup()
-    if src is None:
-        data = loading.load(sys.stdin)
-    else:
-        with open(src) as rf:
-            data = loading.load(rf)
+    data = loading.loadfile(src)
     d = Dictplotter().plot(data)
-    if dst is None:
-        loading.dump(d, sys.stdout)
-    else:
-        with open(dst, "w") as wf:
-            loading.dump(d, wf)
+    loading.dumpfile(d, dst)
 
 
 def main():
