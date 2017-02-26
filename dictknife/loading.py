@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import sys
 import json
 import yaml
 import os.path
@@ -55,6 +56,24 @@ def dump(d, fp, format=None, fn_map=default_dump_fnmap):
         fname = getattr(fp, "name", "(unknown)")
         dumper = dispatch_by_format(fname, fn_map, default=loading_config.output_format)
     return dumper(d, fp)
+
+
+def loadfile(filename=None, fn_map=default_load_fnmap):
+    """load file or stdin"""
+    if filename is None:
+        return load(sys.stdin, fn_map=fn_map)
+    else:
+        with open(filename) as rf:
+            return load(rf, fn_map=fn_map)
+
+
+def dumpfile(d, filename=None, fn_map=default_dump_fnmap):
+    """dump file or stdout"""
+    if filename is None:
+        return dump(d, sys.stdout, fn_map=fn_map)
+    else:
+        with open(filename, "w") as wf:
+            return dump(d, wf, fn_map=fn_map)
 
 
 class loading_config:
