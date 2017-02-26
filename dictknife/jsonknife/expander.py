@@ -1,42 +1,32 @@
-from dictknife import Accessor
 from dictknife import LooseDictWalkingIterator
 from dictknife.langhelpers import reify
-from .resolver import OneDocResolver
-from .accessor import access_by_json_pointer
+from .accessor import StackedAccessor
 
 
 class Expander(object):
-    def __init__(self, resolver, accessor=Accessor()):
-        self.accessor = accessor
+    def __init__(self, resolver):
+        self.accessor = StackedAccessor(resolver)
         self.resolver = resolver
-
-    @classmethod
-    def from_doc(cls, doc):
-        return cls(resolver=OneDocResolver(doc))
-
-    @property
-    def doc(self):
-        return self.resolver.doc
 
     @reify
     def ref_walking(self):
         return LooseDictWalkingIterator(["$ref"])
 
-    def expand(self, resolver=None):
-        return self.expand_subpart(self.doc, resolver=resolver)
+    def access(self, ref):
+        return self.accessor.access_and_stacked(ref)
 
-    def access(self, ref, resolver=None):
-        resolver = resolver or self.resolver
-        subresolver, pointer = resolver.resolve(ref)
-        return access_by_json_pointer(subresolver.doc, pointer, accessor=self.accessor)
+    def expand(self):
+        return self.expand_subpart(self.resolver.doc)
 
     def expand_subpart(self, subpart, resolver=None):
         resolver = resolver or self.resolver
         if "$ref" in subpart:
-            subresolver, pointer = resolver.resolve(subpart["$ref"])
-            original = access_by_json_pointer(subresolver.doc, pointer, accessor=self.accessor)
-            subpart.pop("$ref")
-            subpart.update(self.expand_subpart(original, resolver=subresolver))
+            try:
+                original = self.accessor.access_and_stacked(subpart["$ref"])
+                subpart.pop("$ref")
+                subpart.update(self.expand_subpart(original, resolver=self.accessor.resolver))
+            finally:
+                self.accessor.pop_stack()
             return subpart
         else:
             for path, sd in self.ref_walking.iterate(subpart):
