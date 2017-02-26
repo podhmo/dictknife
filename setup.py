@@ -36,6 +36,7 @@ tests_require = [
 ]
 
 testing_extras = tests_require + [
+    "PyYAML",
 ]
 
 setup(name='dictknife',
