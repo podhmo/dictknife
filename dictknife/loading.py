@@ -29,7 +29,7 @@ def _json_load(fp):
 
 
 def _json_dump(d, fp):
-    return json.dump(d, fp, ensure_ascii=False, indent=2)
+    return json.dump(d, fp, ensure_ascii=False, indent=2, default=str)
 
 
 def _yaml_dump(d, fp):
