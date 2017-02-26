@@ -16,6 +16,7 @@ except IOError:
 
 
 install_requires = [
+    "namedlist",
 ]
 
 
