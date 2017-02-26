@@ -1,0 +1,11 @@
+definitions:
+  x:
+    type: object
+    properties:
+      color:
+        $ref: "./color/cmyk.yaml#/definitions/color"
+  y:
+    type: object
+    properties:
+      color:
+        $ref: "./color/rgb.yaml#/definitions/color"

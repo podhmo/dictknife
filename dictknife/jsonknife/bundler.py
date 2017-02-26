@@ -1,3 +1,4 @@
+import sys
 from collections import OrderedDict
 from namedlist import namedlist
 from dictknife import LooseDictWalkingIterator
@@ -11,11 +12,12 @@ CacheItem = namedlist("CacheItem", "file, localref, globalref, resolver, data")
 
 
 class Bundler(object):
-    def __init__(self, resolver):
+    def __init__(self, resolver, strict=False):
         self.raw_accessor = Accessor()
         self.accessor = CachedItemAccessor(resolver)
         self.resolver = resolver
         self.item_map = {}  # localref -> item
+        self.strict = strict
 
     def get_item_by_globalref(self, globalref):
         return self.accessor.cache[globalref]
@@ -36,6 +38,22 @@ class Bundler(object):
             item.localref = item.localref[1:]
         return item
 
+    def fix_conflict_item(self, olditem, newitem):
+        msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
+        if self.strict:
+            raise RuntimeError(msg)
+        sys.stderr.write(msg)
+        sys.stderr.write("\n")
+        i = 1
+        while True:
+            new_localref = "{}{}".format(newitem.localref, i)
+            if new_localref not in self.item_map:
+                newitem.localref = new_localref
+                break
+            i += 1
+        self.item_map[newitem.localref] = newitem
+        self.scan(doc=newitem.data)
+
     def scan(self, doc):
         for path, sd in self.ref_walking.iterate(doc):
             try:
@@ -44,6 +62,8 @@ class Bundler(object):
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
                     self.scan(doc=item.data)
+                if item.globalref != self.item_map[item.localref].globalref:
+                    self.fix_conflict_item(self.item_map[item.localref], item)
             finally:
                 self.accessor.pop_stack()
 
