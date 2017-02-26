@@ -39,5 +39,5 @@ class Tests(unittest.TestCase):
         accessor = self._makeOne()
         for query, expected in candidates:
             with self.subTest(query=query, expected=expected):
-                actual = accessor._access(doc, query)
+                actual = accessor.access_json_pointer(doc, query)
                 self.assertEqual(actual, expected)
