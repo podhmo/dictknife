@@ -13,6 +13,7 @@ except ImportError as e:
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.jsonknife import Expander
+from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import lifting_jsonschema_definition
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife import SampleValuePlotter
@@ -47,6 +48,16 @@ def extract(src, dst, refs, with_name):
                 d[ref.rsplit("/", 2)[-1]] = extracted
             else:
                 d = deepmerge(d, extracted)
+    loading.dumpfile(d, dst)
+
+
+@main.command(help="bundle")
+@click.option("--src", default=None, type=click.Path(exists=True), required=True)
+@click.option("--dst", default=None, type=click.Path())
+def bundle(src, dst):
+    resolver = get_resolver_from_filename(src)
+    bundler = Bundler(resolver)
+    d = bundler.bundle()
     loading.dumpfile(d, dst)
 
 

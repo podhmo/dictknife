@@ -5,6 +5,7 @@ from dictknife.accessor import Accessor  # NOQA
 from dictknife.deepmerge import deepmerge  # NOQA
 from dictknife.deepequal import deepequal  # NOQA
 from dictknife.diff import diff  # NOQA
+from dictknife.pp import pp
 from dictknife.operators import (  # NOQA
     apply,
     Regexp,

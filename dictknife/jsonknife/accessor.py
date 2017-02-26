@@ -20,6 +20,9 @@ class StackedAccessor(object):
     def access_and_stacked(self, ref):
         subresolver, pointer = self.resolver.resolve(ref)
         self.stack.append(subresolver)
+        return self._access(subresolver, pointer)
+
+    def _access(self, subresolver, pointer):
         return access_by_json_pointer(subresolver.doc, pointer, accessor=self.accessor)
 
     def pop_stack(self):

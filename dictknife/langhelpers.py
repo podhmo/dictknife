@@ -19,6 +19,22 @@ def untitleize(name):
     return "{}{}".format(name[0].lower(), name[1:])
 
 
+def pairsplit(s, sep):
+    r = s.split(sep, 1)
+    if len(r) == 1:
+        return r[0], ""
+    else:
+        return r
+
+
+def pairrsplit(s, sep):
+    r = s.rsplit(sep, 1)
+    if len(r) == 1:
+        return r[0], ""
+    else:
+        return r
+
+
 # stolen from pyramid
 class reify(object):
     """cached property"""

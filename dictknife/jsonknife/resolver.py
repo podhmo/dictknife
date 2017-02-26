@@ -2,7 +2,7 @@ import sys
 import logging
 import os.path
 from dictknife import loading
-from dictknife.langhelpers import reify
+from dictknife.langhelpers import reify, pairrsplit
 
 
 logger = logging.getLogger("jsonknife.resolver")
@@ -20,6 +20,9 @@ class OneDocResolver(object):
 
 
 class ExternalFileResolver(object):
+    def __repr__(self):
+        return "<FileResolver {!r}>".format(self.filename)
+
     def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None):
         self.rawfilename = rawfilename or filename
         self.filename = self.normpath(filename)
@@ -44,15 +47,19 @@ class ExternalFileResolver(object):
         history.append(self)
         return self.__class__(filename, cache=self.cache, loader=self.loader, history=history, doc=doc, rawfilename=rawfilename)
 
+    def resolve_pathset(self, query):  # todo: refactoring
+        filepath, query = pairrsplit(query, "#")
+        curdir = os.path.dirname(self.filename)
+        fullpath = self.normpath(os.path.join(curdir, filepath))
+        return fullpath, filepath, query
+
     def resolve(self, query):
         if query.startswith("#"):
             return self, query[1:]
         if "#" not in query:
             query = query + "#"
 
-        curdir = os.path.dirname(self.filename)
-        filepath, query = query.rsplit("#", 1)
-        fullpath = self.normpath(os.path.join(curdir, filepath))
+        fullpath, filepath, query = self.resolve_pathset(query)
         return self.resolve_subresolver(fullpath, rawfilename=filepath), query
 
     def resolve_subresolver(self, filename, rawfilename=None):
