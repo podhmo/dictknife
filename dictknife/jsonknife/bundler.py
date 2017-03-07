@@ -14,34 +14,19 @@ logger = logging.getLogger("jsonknife.bundler")
 CacheItem = namedlist("CacheItem", "file, localref, globalref, resolver, data")
 
 
-class Bundler(object):
-    def __init__(self, resolver, strict=False):
-        self.raw_accessor = Accessor()
-        self.accessor = CachedItemAccessor(resolver)
-        self.resolver = resolver
-        self.item_map = {}  # localref -> item
-        self.strict = strict
+class SwaggerLocalrefFixer(object):  # todo: rename
+    prefixes = set(["definitions", "paths", "responses", "parameters"])
 
-    def get_item_by_globalref(self, globalref):
-        return self.accessor.cache[globalref]
-
-    def get_item_by_localref(self, localref):
-        return self.item_map[localref]
-
-    @reify
-    def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
-
-    def fix_localref_item(self, path, item, prefixes=set(["definitions", "paths", "responses", "parameters"])):
+    def fix_localref(self, path, item):
         localref = item.localref
         if localref.startswith("/"):
             localref = localref[1:]
         prefix, name = pairrsplit(localref, "/")
 
-        if prefix not in prefixes:
+        if prefix not in self.prefixes:
             found = None
             for node in reversed(path):
-                if node in prefixes:
+                if node in self.prefixes:
                     found = node
                     break
                 if node == "schema":
@@ -63,7 +48,12 @@ class Bundler(object):
         # print("changes: {} -> {}".format(localref, item.localref), file=sys.stderr)
         return item
 
-    def fix_conflict_item(self, olditem, newitem):
+
+def SimpleConflictFixer(object):  # todo: rename
+    def __init__(self, item_map):
+        self.item_map = item_map
+
+    def fix_conflict(self, olditem, newitem):
         msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
             raise RuntimeError(msg)
@@ -77,18 +67,46 @@ class Bundler(object):
                 break
             i += 1
         self.item_map[newitem.localref] = newitem
-        self.scan(doc=newitem.data)
+        return newitem
+
+
+class Bundler(object):
+    def __init__(self, resolver, strict=False):
+        self.raw_accessor = Accessor()
+        self.accessor = CachedItemAccessor(resolver)
+        self.resolver = resolver
+        self.item_map = {}  # localref -> item
+        self.strict = strict
+
+    @reify
+    def localref_fixer(self):  # todo: rename
+        return SwaggerLocalrefFixer()
+
+    @reify
+    def conflict_fixer(self):  # todo: rename
+        return SimpleConflictFixer(self.item_map)
+
+    def get_item_by_globalref(self, globalref):
+        return self.accessor.cache[globalref]
+
+    def get_item_by_localref(self, localref):
+        return self.item_map[localref]
+
+    @reify
+    def ref_walking(self):
+        return LooseDictWalkingIterator(["$ref"])
 
     def scan(self, doc):
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access_and_stacked(sd["$ref"])
-                item = self.fix_localref_item(path, item)
+                item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
                     self.scan(doc=item.data)
                 if item.globalref != self.item_map[item.localref].globalref:
-                    self.fix_conflict_item(self.item_map[item.localref], item)
+                    newitem = self.conflict_fixer.fix_conflict(self.item_map[item.localref], item)
+                    self.scan(doc=newitem.data)
             finally:
                 self.accessor.pop_stack()
 
