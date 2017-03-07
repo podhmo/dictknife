@@ -1,9 +1,10 @@
 import sys
 import logging
+import os.path
 from collections import OrderedDict
 from namedlist import namedlist
 from dictknife import LooseDictWalkingIterator
-from dictknife.langhelpers import reify
+from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
 from .accessor import StackedAccessor
@@ -31,13 +32,35 @@ class Bundler(object):
     def ref_walking(self):
         return LooseDictWalkingIterator(["$ref"])
 
-    def fix_localref_item(self, path, item):
+    def fix_localref_item(self, path, item, prefixes=set(["definitions", "paths", "responses", "parameters"])):
+        localref = item.localref
+        if localref.startswith("/"):
+            localref = localref[1:]
+        prefix, name = pairrsplit(localref, "/")
+
+        if prefix not in prefixes:
+            found = None
+            for node in reversed(path):
+                if node in prefixes:
+                    found = node
+                    break
+                if node == "schema":
+                    found = "definitions"
+                    break
+            if found is None:
+                logger.info("fix localref: prefix is not found from %s", path)
+                found = "definitions"
+
+            prefix = found
+
+        if not name:
+            name = pairrsplit(item.globalref[1], "/")[1]
+            if not name:
+                name = os.path.splitext(pairrsplit(item.globalref[0], "/")[1])[0]
+
         # xxx: side effect
-        if not item.localref:
-            localref = "/{}".format("/".join(path))
-            item.localref = localref.replace("/properties/", "_").replace("/items/", "_item").replace("/$ref", "")  # xxx:
-        if item.localref.startswith("/"):
-            item.localref = item.localref[1:]
+        item.localref = "{}/{}".format(prefix, name)
+        # print("changes: {} -> {}".format(localref, item.localref), file=sys.stderr)
         return item
 
     def fix_conflict_item(self, olditem, newitem):
