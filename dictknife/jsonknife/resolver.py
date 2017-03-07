@@ -49,6 +49,8 @@ class ExternalFileResolver(object):
 
     def resolve_pathset(self, query):  # todo: refactoring
         filepath, query = pairrsplit(query, "#")
+        if filepath == "":
+            return self.filename, self.filename, query
         curdir = os.path.dirname(self.filename)
         fullpath = self.normpath(os.path.join(curdir, filepath))
         return fullpath, filepath, query
