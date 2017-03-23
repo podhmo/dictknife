@@ -145,7 +145,7 @@ class SwaggerLocalrefFixer(object):  # todo: rename
         return item
 
 
-def SimpleConflictFixer(object):  # todo: rename
+class SimpleConflictFixer(object):  # todo: rename
     def __init__(self, item_map, strict=False):
         self.item_map = item_map
         self.strict = strict

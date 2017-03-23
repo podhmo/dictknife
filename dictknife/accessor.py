@@ -32,6 +32,8 @@ class Accessor(object):
             if name not in d:
                 return None
             d = d[name]
+        if not d:
+            return None
         if path[-1] not in d:
             return None
         return d

@@ -4,7 +4,7 @@ import json
 import yaml
 import os.path
 import logging
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict, ChainMap
 logger = logging.getLogger(__name__)
 
 
@@ -86,7 +86,7 @@ class loading_config:
     output_format = Format.yaml
 
 
-def setup(input=None, output=None):
+def setup(input=None, output=None, dict_classes=[OrderedDict, defaultdict, ChainMap]):
     global loading_config
     if input is not None:
         logger.debug("setup input format: %s", input)
@@ -95,7 +95,8 @@ def setup(input=None, output=None):
         logger.debug("setup output format: %s", output)
         loading_config.output_format = output
     yaml.add_constructor('tag:yaml.org,2002:map', construct_odict)
-    yaml.add_representer(OrderedDict, represent_odict)
+    for dict_class in dict_classes:
+        yaml.add_representer(dict_class, represent_odict)
 
 
 def represent_odict(dumper, instance):
