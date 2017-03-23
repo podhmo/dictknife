@@ -1,10 +1,16 @@
 from dictknife import Accessor
 
 
+def normalize_json_pointer(ref):
+    if "~" not in ref:
+        return ref
+    return ref.replace("~1", "/").replace("~0", "~")
+
+
 def access_by_json_pointer(doc, query, accessor=Accessor()):
     if query == "":
         return doc
-    path = [p.replace("~1", "/").replace("~0", "~") for p in query[1:].split("/")]
+    path = [normalize_json_pointer(p) for p in query[1:].split("/")]
     return accessor.access(doc, path)
 
 

@@ -7,7 +7,7 @@ from dictknife import LooseDictWalkingIterator
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
-from .accessor import StackedAccessor
+from .accessor import StackedAccessor, normalize_json_pointer
 
 
 logger = logging.getLogger("jsonknife.bundler")
@@ -98,6 +98,17 @@ class Emitter(object):
             for path, sd in self.ref_walking.iterate(data):
                 self.replace_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
+
+        # adhoc paths support
+        will_removes = set()
+        paths = d.get("paths") or {}
+        for path, sub in list(paths.items()):
+            if "$ref" in sub and sub["$ref"].startswith("#/"):
+                related_path = tuple(sub["$ref"][2:].split("/"))
+                paths[path] = self.raw_accessor.access(d, related_path).copy()
+                will_removes.add(related_path)
+        for related_path in will_removes:
+            self.raw_accessor.maybe_remove(d, related_path)
         return d
 
     def replace_ref(self, resolver, sd):
