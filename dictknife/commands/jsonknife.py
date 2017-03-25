@@ -61,13 +61,20 @@ def bundle(src, dst):
     loading.dumpfile(d, dst)
 
 
-@main.command(help="lifting jsonschema sub definition")
+@main.command(help="flatten jsonschema sub definitions")
 @click.option("--src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
-def lift(src, dst):
+def flatten(src, dst):
     data = loading.loadfile(src)
     d = lifting_jsonschema_definition(data)
     loading.dumpfile(d, dst)
+
+
+@main.command(help="flatten jsonschema sub definitions(deprecated)")
+@click.option("--src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
+def lift(src, dst):
+    return flatten(src, dst)
 
 
 @main.command(help="output sample value from swagger's spec")
