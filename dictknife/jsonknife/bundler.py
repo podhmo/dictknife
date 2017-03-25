@@ -115,8 +115,9 @@ class Emitter(object):
         filename, _, pointer = resolver.resolve_pathset(sd["$ref"])
         related = self.get_item_by_globalref((filename, pointer))
         new_ref = "#/{}".format(related.localref)
-        logger.debug("fix ref: %r -> %r (where=%r)", sd["$ref"], new_ref, resolver.filename)
-        sd["$ref"] = new_ref
+        if sd["$ref"] != new_ref:
+            logger.debug("fix ref: %r -> %r (where=%r)", sd["$ref"], new_ref, resolver.filename)
+            sd["$ref"] = new_ref
 
 
 class SwaggerLocalrefFixer(object):  # todo: rename
