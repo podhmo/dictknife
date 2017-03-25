@@ -83,8 +83,9 @@ class SubDefinitionLifting:
         return self.return_definition(data, fullname, typ="array")
 
 
-# TODO: rename to flatten
-def lifting_jsonschema_definition(data, replace=True):
+def flatten(data, replace=True):
+    if "definitions" not in data:
+        return data
     w = SubDefinitionLifting(replace=replace)
     for name in list(data["definitions"].keys()):
         prop = data["definitions"].pop(name)
@@ -92,3 +93,6 @@ def lifting_jsonschema_definition(data, replace=True):
         extracted[name] = prop
         data["definitions"].update(reversed(extracted.items()))
     return data
+
+# BC
+lifting_jsonschema_definition = flatten
