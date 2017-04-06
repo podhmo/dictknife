@@ -15,4 +15,3 @@ def merge(d, q, make_dict=dict):
         else:
             d[k] = merge(d.get(k), v, make_dict=make_dict)
     return d
-

@@ -92,6 +92,7 @@ class LooseDictWalkingIterator(object):
     def iterate(self, d, qs=None, depth=-1, ctx=None):
         qs = qs or self.qs
         ctx = self.create_context(ctx)
+        ctx._arrived = set()
         return self._iterate(ctx, deque(self.qs), d, depth=depth)
 
     def _iterate(self, ctx, qs, d, depth):
@@ -102,6 +103,10 @@ class LooseDictWalkingIterator(object):
             return
 
         if hasattr(d, "keys"):
+            i = id(d)
+            if i in ctx._arrived:
+                return
+            ctx._arrived.add(i)
             for k in list(d.keys()):
                 ctx.push(k)
                 if apply(qs[0], k):
@@ -115,6 +120,10 @@ class LooseDictWalkingIterator(object):
                 ctx.pop()
             return
         elif isinstance(d, (list, tuple)):
+            i = id(d)
+            if i in ctx._arrived:
+                return
+            ctx._arrived.add(i)
             ctx.push("[]")
             for e in d:
                 yield from self._iterate(ctx, qs, e, depth)
