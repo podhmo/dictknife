@@ -3,6 +3,21 @@ from dictknife.langhelpers import reify
 from .accessor import StackedAccessor
 
 
+def detect_circur_reference(doc, d):
+    if id(doc) == id(d):
+        return True
+    elif isinstance(d, dict):
+        for v in d.values():
+            if detect_circur_reference(doc, v):
+                return True
+    elif isinstance(d, list):
+        for x in d:
+            if detect_circur_reference(doc, x):
+                return True
+    else:
+        return False
+
+
 class Expander(object):
     def __init__(self, resolver):
         self.accessor = StackedAccessor(resolver)
@@ -18,20 +33,6 @@ class Expander(object):
     def expand(self):
         return self.expand_subpart(self.resolver.doc)
 
-    def _find_self(self, me, d):
-        if id(me) == id(d):
-            return True
-        elif isinstance(d, dict):
-            for v in d.values():
-                if self._find_self(me, v):
-                    return True
-        elif isinstance(d, list):
-            for x in d:
-                if self._find_self(me, x):
-                    return True
-        else:
-            return False
-
     def expand_subpart(self, subpart, resolver=None, ctx=None):
         resolver = resolver or self.resolver
 
@@ -40,8 +41,7 @@ class Expander(object):
                 original = self.accessor.access_and_stacked(subpart["$ref"])
                 ref = subpart.pop("$ref")
                 new_subpart = self.expand_subpart(original, resolver=self.accessor.resolver, ctx=ctx)
-                # for circular reference
-                if self._find_self(subpart, new_subpart):
+                if detect_circur_reference(subpart, new_subpart):
                     subpart["$ref"] = ref
                 else:
                     subpart.update(new_subpart)
