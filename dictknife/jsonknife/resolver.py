@@ -86,8 +86,12 @@ class ROOT:
     history = []
 
 
-def get_resolver_from_filename(filename, loader=loading):
+def get_resolver_from_filename(filename, loader=loading, doc=None):
     if filename is None:
-        return OneDocResolver(loading.load(sys.stdin))
+        doc = doc or loading.load(sys.stdin)
+        return OneDocResolver(doc)
     else:
-        return ExternalFileResolver(filename, loader=loader)
+        resolver = ExternalFileResolver(filename, loader=loader)
+        if doc:
+            resolver.doc = doc
+        return resolver
