@@ -9,8 +9,9 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class OneDocResolver(object):
-    def __init__(self, doc):
+    def __init__(self, doc, name="*root*"):
         self.doc = doc
+        self.name = name
 
     def resolve(self, query):
         # not support external file
@@ -31,6 +32,10 @@ class ExternalFileResolver(object):
         self.history = history or [ROOT]
         if doc is not None:
             self.doc = doc
+
+    @property
+    def name(self):
+        return self.filename
 
     @reify
     def doc(self):

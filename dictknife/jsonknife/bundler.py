@@ -64,6 +64,10 @@ class Scanner(object):
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(self.item_map[item.localref], item)
                     self.scan(doc=newitem.data)
+            except RuntimeError:
+                raise
+            except Exception as e:
+                raise RuntimeError("{} (where={})".format(e, self.accessor.resolver.name))
             finally:
                 self.accessor.pop_stack()
 
