@@ -2,16 +2,15 @@ import sys
 import logging
 import os.path
 from collections import OrderedDict
-from namedlist import namedlist
 from dictknife import LooseDictWalkingIterator
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
-from .accessor import StackedAccessor, normalize_json_pointer
+from .accessor import CachedItemAccessor, CachedItem
 
 
 logger = logging.getLogger("jsonknife.bundler")
-CacheItem = namedlist("CacheItem", "file, localref, globalref, resolver, data")
+
 
 
 class Bundler(object):
@@ -181,25 +180,3 @@ class SimpleConflictFixer(object):  # todo: rename
             i += 1
         self.item_map[newitem.localref] = newitem
         return newitem
-
-
-class CachedItemAccessor(StackedAccessor):
-    def __init__(self, resolver):
-        super().__init__(resolver)
-        self.cache = {}  # globalref -> item
-
-    def _access(self, subresolver, pointer):
-        globalref = (subresolver.filename, pointer)
-        item = self.cache.get(globalref)
-        if item is not None:
-            return item
-        data = super()._access(subresolver, pointer)
-        item = CacheItem(
-            file=subresolver.filename,
-            resolver=subresolver,
-            localref=pointer,
-            globalref=globalref,
-            data=data,
-        )
-        self.cache[globalref] = item
-        return item

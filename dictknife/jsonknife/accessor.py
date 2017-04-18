@@ -1,4 +1,6 @@
 from dictknife import Accessor
+from namedlist import namedlist
+CachedItem = namedlist("CachedItem", "file, localref, globalref, resolver, data")
 
 
 def normalize_json_pointer(ref):
@@ -25,7 +27,7 @@ class StackedAccessor(object):
 
     def access(self, ref):
         subresolver, pointer = self.resolver.resolve(ref)
-        self.stack.append(subresolver)
+        self.push_stack(subresolver)
         return self._access(subresolver, pointer)
 
     def _access(self, subresolver, pointer):
@@ -36,3 +38,25 @@ class StackedAccessor(object):
 
     def push_stack(self, resolver):
         return self.stack.append(resolver)
+
+
+class CachedItemAccessor(StackedAccessor):
+    def __init__(self, resolver):
+        super().__init__(resolver)
+        self.cache = {}  # globalref -> item
+
+    def _access(self, subresolver, pointer):
+        globalref = (subresolver.filename, pointer)
+        item = self.cache.get(globalref)
+        if item is not None:
+            return item
+        data = super()._access(subresolver, pointer)
+        item = CachedItem(
+            file=subresolver.filename,
+            resolver=subresolver,
+            localref=pointer,
+            globalref=globalref,
+            data=data,
+        )
+        self.cache[globalref] = item
+        return item
