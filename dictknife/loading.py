@@ -4,6 +4,7 @@ import json
 import yaml
 import os.path
 import logging
+from io import StringIO
 from collections import OrderedDict, defaultdict, ChainMap
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,10 @@ default_load_fnmap = {Format.yaml: yaml.load, Format.json: _json_load, Format.un
 default_dump_fnmap = {Format.yaml: _yaml_dump, Format.json: _json_dump, Format.unknown: _yaml_dump}
 
 
+def loads(s, *args, **kwargs):
+    return load(StringIO(s), *args, **kwargs)
+
+
 def load(fp, format=None, fn_map=default_load_fnmap):
     if format is not None:
         loader = fn_map[format]
@@ -52,6 +57,12 @@ def load(fp, format=None, fn_map=default_load_fnmap):
         fname = getattr(fp, "name", "(unknown)")
         loader = dispatch_by_format(fname, fn_map, default=loading_config.input_format)
     return loader(fp)
+
+
+def dumps(d, *args, **kwargs):
+    fp = StringIO()
+    dump(d, fp, *args, **kwargs)
+    return fp.getvalue()
 
 
 def dump(d, fp, format=None, fn_map=default_dump_fnmap):
