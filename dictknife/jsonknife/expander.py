@@ -28,7 +28,7 @@ class Expander(object):
         return LooseDictWalkingIterator(["$ref"])
 
     def access(self, ref):
-        return self.accessor.access_and_stacked(ref)
+        return self.accessor.access(ref)
 
     def expand(self):
         return self.expand_subpart(self.resolver.doc)
@@ -38,7 +38,7 @@ class Expander(object):
 
         if "$ref" in subpart:
             try:
-                original = self.accessor.access_and_stacked(subpart["$ref"])
+                original = self.accessor.access(subpart["$ref"])
                 ref = subpart.pop("$ref")
                 new_subpart = self.expand_subpart(original, resolver=self.accessor.resolver, ctx=ctx)
                 if detect_circur_reference(subpart, new_subpart):

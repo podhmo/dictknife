@@ -56,7 +56,7 @@ class Scanner(object):
     def scan(self, doc):
         for path, sd in self.ref_walking.iterate(doc):
             try:
-                item = self.accessor.access_and_stacked(sd["$ref"])
+                item = self.accessor.access(sd["$ref"])
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item

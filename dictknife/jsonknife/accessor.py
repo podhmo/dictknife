@@ -23,7 +23,7 @@ class StackedAccessor(object):
     def resolver(self):
         return self.stack[-1]
 
-    def access_and_stacked(self, ref):
+    def access(self, ref):
         subresolver, pointer = self.resolver.resolve(ref)
         self.stack.append(subresolver)
         return self._access(subresolver, pointer)
