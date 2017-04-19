@@ -22,9 +22,10 @@ def main(ctx, log):
 
 
 @main.command(help="concat dicts")
-@click.option("--dst", default=None, type=click.Path())
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-def concat(dst, files):
+@click.option("--dst", default=None, type=click.Path())
+@click.option("-f", "--format", default=None)
+def concat(files, dst, format):
     from collections import OrderedDict
     from .. import deepmerge
     d = OrderedDict()
@@ -32,7 +33,7 @@ def concat(dst, files):
         logger.debug("merge: %s", f)
         with open(f) as rf:
             d = deepmerge(d, loading.load(rf))
-    loading.dumpfile(d, dst)
+    loading.dumpfile(d, dst, format=format)
 
 
 @main.command(help="transform dict")
@@ -42,7 +43,8 @@ def concat(dst, files):
 @click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
 @click.option("--function", default="dictknife.transform:identity")
-def transform(src, dst, config, config_file, code, function):
+@click.option("-f", "--format", default=None)
+def transform(src, dst, config, config_file, code, function, format):
     import json
     from functools import partial
     from magicalimport import import_symbol
@@ -61,7 +63,7 @@ def transform(src, dst, config, config_file, code, function):
 
     data = loading.loadfile(src)
     result = partial(transform, **kwargs)(data)
-    loading.dumpfile(result, dst)
+    loading.dumpfile(result, dst, format=format)
 
 
 @main.command(help="diff dict")
