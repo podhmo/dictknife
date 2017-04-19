@@ -6,11 +6,10 @@ from dictknife import LooseDictWalkingIterator
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
-from .accessor import CachedItemAccessor, CachedItem
+from .accessor import CachedItemAccessor
 
 
 logger = logging.getLogger("jsonknife.bundler")
-
 
 
 class Bundler(object):
