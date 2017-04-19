@@ -9,9 +9,12 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class OneDocResolver(object):
-    def __init__(self, doc, name="*root*"):
+    def __init__(self, doc, name="*root*", onload=None):
         self.doc = doc
         self.name = name
+        self.onload = onload
+        if self.onload is not None:
+            self.onload(self.doc, self)
 
     def resolve(self, query):
         # not support external file
@@ -21,17 +24,20 @@ class OneDocResolver(object):
 
 
 class ExternalFileResolver(object):
-    def __repr__(self):
-        return "<FileResolver {!r}>".format(self.filename)
-
-    def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None):
+    def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None, onload=None):
         self.rawfilename = rawfilename or filename
         self.filename = self.normpath(filename)
         self.cache = cache or {}  # filename -> resolver
         self.loader = loader or loading
         self.history = history or [ROOT]
+        self.onload = onload
         if doc is not None:
             self.doc = doc
+            if self.onload is not None:
+                self.onload(self.doc, self)
+
+    def __repr__(self):
+        return "<FileResolver {!r}>".format(self.filename)
 
     @property
     def name(self):
@@ -41,7 +47,10 @@ class ExternalFileResolver(object):
     def doc(self):
         logger.debug("load file[%s]: %r (where=%r)", len(self.history), self.rawfilename, self.history[-1].filename)
         with open(self.filename) as rf:
-            return self.loader.load(rf)
+            doc = self.loader.load(rf)
+        if self.onload is not None:
+            self.onload(doc, self)
+        return doc
 
     def normpath(self, filename):
         return os.path.normpath(os.path.abspath(filename))
@@ -50,7 +59,9 @@ class ExternalFileResolver(object):
         rawfilename = rawfilename or filename
         history = self.history[:]
         history.append(self)
-        return self.__class__(filename, cache=self.cache, loader=self.loader, history=history, doc=doc, rawfilename=rawfilename)
+        return self.__class__(
+            filename, cache=self.cache, loader=self.loader, history=history, doc=doc, rawfilename=rawfilename, onload=self.onload
+        )
 
     def resolve_pathset(self, query):  # todo: refactoring
         filepath, query = pairrsplit(query, "#")
@@ -86,12 +97,12 @@ class ROOT:
     history = []
 
 
-def get_resolver_from_filename(filename, loader=loading, doc=None):
+def get_resolver_from_filename(filename, loader=loading, doc=None, onload=None):
     if filename is None:
         doc = doc or loading.load(sys.stdin)
-        return OneDocResolver(doc)
+        return OneDocResolver(doc, onload=onload)
     else:
-        resolver = ExternalFileResolver(filename, loader=loader)
+        resolver = ExternalFileResolver(filename, loader=loader, onload=onload)
         if doc:
             resolver.doc = doc
         return resolver
