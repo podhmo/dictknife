@@ -35,7 +35,7 @@ class Handler:
         return newdef
 
 
-class SubDefinitionLifting:
+class Flattener:
     def __init__(self, replace=True):
         self.replace = replace
 
@@ -86,7 +86,7 @@ class SubDefinitionLifting:
 def flatten(data, replace=True):
     if "definitions" not in data:
         return data
-    w = SubDefinitionLifting(replace=replace)
+    w = Flattener(replace=replace)
     for name in list(data["definitions"].keys()):
         prop = data["definitions"].pop(name)
         extracted = w.extract(prop, Handler([name]))
@@ -95,4 +95,5 @@ def flatten(data, replace=True):
     return data
 
 # BC
+SubDefinitionLifting = Flattener
 lifting_jsonschema_definition = flatten
