@@ -12,6 +12,7 @@ except ImportError as e:
     sys.exit(-1)
 from dictknife import loading
 from dictknife import deepmerge
+from dictknife.accessor import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import lifting_jsonschema_definition
@@ -31,12 +32,40 @@ def main(ctx, log):
     loading.setup()
 
 
-@main.command(help="extract")
+@main.command(help="cut")
+@click.option("--src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
+@click.option("refs", "--ref", default=None, multiple=True)
+def cut(src, dst, refs):
+    d = loading.loadfile(src)
+    accessor = Accessor(OrderedDict)
+    for ref in refs:
+        if ref.startswith("#/"):
+            ref = ref[2:]
+        accessor.maybe_remove(d, ref.split("/"))
+    loading.dumpfile(d, dst)
+
+
+@main.command(help="deref")
+@click.option("--src", default=None, type=click.Path(exists=True), required=True)
+@click.option("--dst", default=None, type=click.Path())
+@click.option("refs", "--ref", default=None, multiple=True)
+@click.option("--with-name", is_flag=True, default=False)
+def deref(src, dst, refs, with_name):
+    return _deref(src, dst, refs, with_name)
+
+
+@main.command(help="extract(deprecated, this is same as deref)")
 @click.option("--src", default=None, type=click.Path(exists=True), required=True)
 @click.option("--dst", default=None, type=click.Path())
 @click.option("refs", "--ref", default=None, multiple=True)
 @click.option("--with-name", is_flag=True, default=False)
 def extract(src, dst, refs, with_name):
+    # deprecated
+    return _deref(src, dst, refs, with_name)
+
+
+def _deref(src, dst, refs, with_name):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
     if not refs:

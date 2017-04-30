@@ -12,8 +12,11 @@ def normalize_json_pointer(ref):
 def access_by_json_pointer(doc, query, accessor=Accessor()):
     if query == "":
         return doc
-    path = [normalize_json_pointer(p) for p in query[1:].split("/")]
-    return accessor.access(doc, path)
+    try:
+        path = [normalize_json_pointer(p) for p in query[1:].split("/")]
+        return accessor.access(doc, path)
+    except KeyError:
+        raise KeyError(query)
 
 
 class StackedAccessor(object):
