@@ -9,7 +9,7 @@ try:
     from . import yaml
 except ImportError:
     from .fake import FakeModule
-    yaml = FakeModule("yaml", "yaml module is not found. please pip install yaml")
+    yaml = FakeModule("yaml", "yaml module is not found. please pip install PyYAML")
 try:
     from . import toml
 except ImportError:
@@ -115,6 +115,7 @@ class Dispatcher:
 dispather = Dispatcher()
 dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"), setup=yaml.setup)
 dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
+dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 
