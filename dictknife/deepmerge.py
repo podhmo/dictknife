@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
-import functools
+import copy
+from collections import OrderedDict
 
 
 def _deepmerge(left, right):
@@ -30,5 +31,26 @@ def _deepmerge(left, right):
         return right
 
 
-def deepmerge(*ds):
-    return functools.reduce(_deepmerge, ds)
+def _deepmerge_override(left, right):
+    if hasattr(right, "keys"):
+        for k, v in right.items():
+            if k in left:
+                left[k] = _deepmerge_override(left[k], v)
+            else:
+                left[k] = copy.deepcopy(v)
+        return left
+    elif isinstance(right, (list, tuple)):
+        return right[:]
+    else:
+        return right
+
+
+def deepmerge(*ds, override=False, make_dict=OrderedDict):
+    if override:
+        merge = _deepmerge_override
+    else:
+        merge = _deepmerge
+    left = make_dict()
+    for right in ds:
+        left = merge(left, right)
+    return left
