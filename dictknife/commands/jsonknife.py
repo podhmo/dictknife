@@ -113,4 +113,4 @@ def samplevalue(src):
     data = loading.loadfile(src)
     plotter = SampleValuePlotter()
     d = plotter.plot(data)
-    loading.dumpfile(d, format=loading.Format.json)
+    loading.dumpfile(d, format="json")
