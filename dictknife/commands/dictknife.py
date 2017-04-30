@@ -4,17 +4,18 @@ import sys
 try:
     import click
 except ImportError as e:
-    sys.stderr.write(str(e))
-    sys.stderr.write("\n")
-    sys.stderr.write("please install via `pip install dictknife[command]`")
-    sys.stderr.write("\n")
+    print(e, file=sys.stderr)
+    print("please install via `pip install dictknife[command]`", file=sys.stderr)
     sys.exit(-1)
 from dictknife import loading
+
+
 logger = logging.getLogger(__name__)
+loglevels = list(logging._nameToLevel.keys())
 
 
 @click.group()
-@click.option("--log", help="logging level", default="INFO", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
+@click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
 @click.pass_context
 def main(ctx, log):
     logging.basicConfig(level=getattr(logging, log))
@@ -24,7 +25,7 @@ def main(ctx, log):
 @main.command(help="concat dicts")
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
-@click.option("-f", "--format", default=None)
+@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
 def concat(files, dst, format):
     from collections import OrderedDict
     from .. import deepmerge
@@ -43,7 +44,7 @@ def concat(files, dst, format):
 @click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
 @click.option("--function", default="dictknife.transform:identity")
-@click.option("-f", "--format", default=None)
+@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
 def transform(src, dst, config, config_file, code, function, format):
     import json
     from functools import partial

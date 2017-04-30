@@ -20,10 +20,11 @@ from dictknife.jsonknife import SampleValuePlotter
 
 
 logger = logging.getLogger(__name__)
+loglevels = list(logging._nameToLevel.keys())
 
 
 @click.group()
-@click.option("--log", help="logging level", default="INFO", type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
+@click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
 @click.pass_context
 def main(ctx, log):
     logging.basicConfig(level=getattr(logging, log))

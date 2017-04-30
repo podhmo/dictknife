@@ -104,12 +104,14 @@ class Dispatcher:
         self.dumper.add_format(fmt, dump)
         for ext in exts:
             self.exts_matching[ext] = fmt
+        if setup is not None:
+            self.setups[setup] = False
 
     def setup(self):
         for setup, used in list(self.setups.items()):
             if not used:
                 setup()
-                self.setups[setup] = used
+                self.setups[setup] = True
 
 
 dispather = Dispatcher()
@@ -128,7 +130,7 @@ dumps = dispather.dumper.dumps
 dumpfile = dispather.dumper.dumpfile
 
 
-def get_supported_formats(dispather=dispather):
+def get_formats(dispather=dispather):
     return [fmt for fmt in dispather.loader.fn_map.keys() if fmt != unknown]
 
 
