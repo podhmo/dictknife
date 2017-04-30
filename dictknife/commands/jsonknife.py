@@ -47,7 +47,7 @@ def cut(src, dst, refs):
 
 
 @main.command(help="deref")
-@click.option("--src", default=None, type=click.Path(exists=True), required=True)
+@click.option("--src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("refs", "--ref", default=None, multiple=True)
 @click.option("--with-name", is_flag=True, default=False)
