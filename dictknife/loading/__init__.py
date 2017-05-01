@@ -5,6 +5,7 @@ import logging
 from io import StringIO
 logger = logging.getLogger(__name__)   # NOQA
 from . import json
+from . import raw
 try:
     from . import yaml
 except ImportError:
@@ -118,6 +119,7 @@ dispather = Dispatcher()
 dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"), setup=yaml.setup)
 dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
 dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
+dispather.add_format("raw", raw.load, raw.dump, exts=[])
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 

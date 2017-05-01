@@ -28,8 +28,8 @@ class StackedAccessor(object):
     def resolver(self):
         return self.stack[-1]
 
-    def access(self, ref):
-        subresolver, pointer = self.resolver.resolve(ref)
+    def access(self, ref, format=None):
+        subresolver, pointer = self.resolver.resolve(ref, format=format)
         self.push_stack(subresolver)
         return self._access(subresolver, pointer)
 
