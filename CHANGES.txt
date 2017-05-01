@@ -1,3 +1,7 @@
+0.4.3
+
+- raw format
+
 0.4.2
 
 - deepmerge with override option
