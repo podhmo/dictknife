@@ -6,7 +6,7 @@ try:
 except ImportError as e:
     print(e, file=sys.stderr)
     print("please install via `pip install dictknife[command]`", file=sys.stderr)
-    sys.exit(-1)
+    sys.exit(1)
 from dictknife import loading
 
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
 
 
-@click.group()
+@click.group(context_settings={'help_option_names': ['-h', '--help']})
 @click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
 @click.pass_context
 def main(ctx, log):

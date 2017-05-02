@@ -5,11 +5,9 @@ import sys
 try:
     import click
 except ImportError as e:
-    sys.stderr.write(str(e))
-    sys.stderr.write("\n")
-    sys.stderr.write("please install via `pip install dictknife[command]`")
-    sys.stderr.write("\n")
-    sys.exit(-1)
+    print(e, file=sys.stderr)
+    print("please install via `pip install dictknife[command]`", file=sys.stderr)
+    sys.exit(1)
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.accessor import Accessor
@@ -24,7 +22,7 @@ logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
 
 
-@click.group()
+@click.group(context_settings={'help_option_names': ['-h', '--help']})
 @click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
 @click.pass_context
 def main(ctx, log):
@@ -108,9 +106,10 @@ def lift(src, dst):
 
 
 @main.command(help="output sample value from swagger's spec")
-@click.argument("src", type=click.Path(exists=True))
-def samplevalue(src):
+@click.argument("src", type=click.Path(exists=True), default=None, required=False)
+@click.option("-f", "--format", type=click.Choice(loading.get_formats()), default="json")
+def samplevalue(src, format):
     data = loading.loadfile(src)
     plotter = SampleValuePlotter()
     d = plotter.plot(data)
-    loading.dumpfile(d, format="json")
+    loading.dumpfile(d, format=format)
