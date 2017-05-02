@@ -21,6 +21,13 @@ def setup(dict_classes=[OrderedDict, defaultdict, ChainMap]):
     def _construct_odict(loader, node):
         return OrderedDict(loader.construct_pairs(node))
 
+    def _represent_str(dumper, instance):
+        if "\n" in instance:
+            return dumper.represent_scalar('tag:yaml.org,2002:str', instance, style='|')
+        else:
+            return dumper.represent_scalar('tag:yaml.org,2002:str', instance)
+
     yaml.add_constructor('tag:yaml.org,2002:map', _construct_odict)
     for dict_class in dict_classes:
         yaml.add_representer(dict_class, _represent_odict)
+    yaml.add_representer(str, _represent_str)
