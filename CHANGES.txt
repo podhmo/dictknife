@@ -1,3 +1,8 @@
+0.4.4
+
+- adjusting commands options
+- changing yaml's multine line string format
+
 0.4.3
 
 - raw format
