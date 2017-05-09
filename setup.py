@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
-
+import fastentrypoints
 
 from setuptools import setup, find_packages
 here = os.path.abspath(os.path.dirname(__file__))
