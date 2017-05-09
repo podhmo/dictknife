@@ -68,12 +68,11 @@ def transform(src, dst, config, config_file, code, function, format):
 
 
 @main.command(help="diff dict")
-@click.option("--sort-keys", is_flag=True, default=False)
 @click.option("--normalize", is_flag=True, default=False)
 @click.argument("left", required=True, type=click.Path(exists=True))
 @click.argument("right", required=True, type=click.Path(exists=True))
 @click.argument("n", required=False, type=click.INT, default=3)
-def diff(sort_keys, normalize, left, right, n):
+def diff(normalize, left, right, n):
     from dictknife import diff
     with open(left) as rf:
         left_data = loading.load(rf)
