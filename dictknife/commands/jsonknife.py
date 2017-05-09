@@ -17,7 +17,6 @@ from dictknife.jsonknife import lifting_jsonschema_definition
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife import SampleValuePlotter
 
-
 logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
 
@@ -50,20 +49,6 @@ def cut(src, dst, refs):
 @click.option("refs", "--ref", default=None, multiple=True)
 @click.option("--with-name", is_flag=True, default=False)
 def deref(src, dst, refs, with_name):
-    return _deref(src, dst, refs, with_name)
-
-
-@main.command(help="extract(deprecated, this is same as deref)")
-@click.option("--src", default=None, type=click.Path(exists=True), required=True)
-@click.option("--dst", default=None, type=click.Path())
-@click.option("refs", "--ref", default=None, multiple=True)
-@click.option("--with-name", is_flag=True, default=False)
-def extract(src, dst, refs, with_name):
-    # deprecated
-    return _deref(src, dst, refs, with_name)
-
-
-def _deref(src, dst, refs, with_name):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
     if not refs:
@@ -96,13 +81,6 @@ def flatten(src, dst):
     data = loading.loadfile(src)
     d = lifting_jsonschema_definition(data)
     loading.dumpfile(d, dst)
-
-
-@main.command(help="flatten jsonschema sub definitions(deprecated)")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-def lift(src, dst):
-    return flatten(src, dst)
 
 
 @main.command(help="output sample value from swagger's spec")
