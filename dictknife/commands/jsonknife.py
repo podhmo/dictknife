@@ -86,7 +86,7 @@ def flatten(src, dst):
 @main.command(help="output sample value from swagger's spec")
 @click.argument("src", type=click.Path(exists=True), default=None, required=False)
 @click.option("-f", "--format", type=click.Choice(loading.get_formats()), default="json")
-def samplevalue(src, format):
+def examples(src, format):
     data = loading.loadfile(src)
     plotter = SampleValuePlotter()
     d = plotter.plot(data)
