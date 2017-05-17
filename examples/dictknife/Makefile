@@ -5,6 +5,10 @@ concat:
 	dictknife concat src/00concat/base.yaml src/00concat/cat.yaml > dst/00concat/cat.yaml
 	dictknife concat src/00concat/base.yaml src/00concat/dog.json > dst/00concat/dog.yaml
 
+concat2:
+	mkdir -p dst/03concat
+	dictknife concat src/03concat/abc.yaml src/03concat/xyz.yaml > dst/03concat/abcxyz.yaml
+
 transform:
 	mkdir -p dst/01transform
 	dictknife transform --function misc/transform.py:lift --config '{"name": "person"}' --src src/01transform/properties.yaml > dst/01transform/person.yaml
