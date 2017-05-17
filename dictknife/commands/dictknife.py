@@ -33,7 +33,13 @@ def concat(files, dst, format):
     for f in files:
         logger.debug("merge: %s", f)
         with open(f) as rf:
-            d = deepmerge(d, loading.load(rf))
+            sd = loading.load(rf)
+        if isinstance(sd, (list, tuple)):
+            if not isinstance(d, (list, tuple)):
+                d = [d] if d else []
+            d.extend(sd)
+        else:
+            d = deepmerge(d, sd)
     loading.dumpfile(d, dst, format=format)
 
 
