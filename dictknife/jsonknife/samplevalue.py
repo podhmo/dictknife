@@ -5,9 +5,10 @@ class SampleValuePlotter(object):
     """sample value from swagger's example and default"""
 
     def plot(self, d):
-        if "properties" in d or d["type"] == "object":
+        typ = d.get("type")
+        if "properties" in d or typ == "object":
             return self.plot_object(d.get("properties") or {}, OrderedDict())
-        elif d["type"] == "array":
+        elif typ == "array":
             return self.plot_array(d["items"], [])
         elif "example" in d:
             return d["example"]
