@@ -14,8 +14,9 @@ from dictknife.accessor import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import lifting_jsonschema_definition
-from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife import SampleValuePlotter
+from dictknife.jsonknife.resolver import get_resolver_from_filename
+from dictknife.jsonknife.accessor import assign_by_json_pointer
 
 logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
@@ -47,8 +48,8 @@ def cut(src, dst, refs):
 @click.option("--src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("refs", "--ref", default=None, multiple=True)
-@click.option("--with-name", is_flag=True, default=False)
-def deref(src, dst, refs, with_name):
+@click.option("--unwrap", default=None)
+def deref(src, dst, refs, unwrap):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
     if not refs:
@@ -56,9 +57,12 @@ def deref(src, dst, refs, with_name):
     else:
         d = OrderedDict()
         for ref in refs:
+            ref_unwrap = unwrap
+            if "@" in ref:
+                ref, ref_unwrap = ref.split("@", 1)
             extracted = expander.expand_subpart(expander.access(ref))
-            if with_name:
-                d[ref.rsplit("/", 2)[-1]] = extracted
+            if ref_unwrap:
+                assign_by_json_pointer(d, ref_unwrap.lstrip("#"), extracted)
             else:
                 d = deepmerge(d, extracted)
     loading.dumpfile(d, dst)

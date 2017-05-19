@@ -19,6 +19,16 @@ def access_by_json_pointer(doc, query, accessor=Accessor()):
         raise KeyError(query)
 
 
+def assign_by_json_pointer(doc, query, v, accessor=Accessor()):
+    if query == "":
+        return doc
+    try:
+        path = [normalize_json_pointer(p) for p in query[1:].split("/")]
+        return accessor.assign(doc, path, v)
+    except KeyError:
+        raise KeyError(query)
+
+
 class StackedAccessor(object):
     def __init__(self, resolver, accessor=Accessor()):
         self.stack = [resolver]
