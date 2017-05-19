@@ -62,7 +62,7 @@ def deref(src, dst, refs, unwrap):
                 ref, ref_unwrap = ref.split("@", 1)
             extracted = expander.expand_subpart(expander.access(ref))
             if ref_unwrap:
-                assign_by_json_pointer(d, ref_unwrap.lstrip("#"), extracted)
+                assign_by_json_pointer(d, ref_unwrap, extracted)
             else:
                 d = deepmerge(d, extracted)
     loading.dumpfile(d, dst)

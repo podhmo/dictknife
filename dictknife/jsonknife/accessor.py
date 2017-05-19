@@ -13,7 +13,7 @@ def access_by_json_pointer(doc, query, accessor=Accessor()):
     if query == "":
         return doc
     try:
-        path = [normalize_json_pointer(p) for p in query[1:].split("/")]
+        path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
         return accessor.access(doc, path)
     except KeyError:
         raise KeyError(query)
@@ -23,7 +23,7 @@ def assign_by_json_pointer(doc, query, v, accessor=Accessor()):
     if query == "":
         return doc
     try:
-        path = [normalize_json_pointer(p) for p in query[1:].split("/")]
+        path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
         return accessor.assign(doc, path, v)
     except KeyError:
         raise KeyError(query)
