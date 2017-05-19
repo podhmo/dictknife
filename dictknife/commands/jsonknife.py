@@ -49,20 +49,25 @@ def cut(src, dst, refs):
 @click.option("--dst", default=None, type=click.Path())
 @click.option("refs", "--ref", default=None, multiple=True)
 @click.option("--unwrap", default=None)
-def deref(src, dst, refs, unwrap):
+@click.option("--wrap", default=None)
+def deref(src, dst, refs, unwrap, wrap):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
+    if unwrap and not refs:
+        refs = list(refs)
+        refs.append(unwrap)
+
     if not refs:
         d = expander.expand()
     else:
         d = OrderedDict()
         for ref in refs:
-            ref_unwrap = unwrap
+            ref_wrap = wrap
             if "@" in ref:
-                ref, ref_unwrap = ref.split("@", 1)
+                ref, ref_wrap = ref.split("@", 1)
             extracted = expander.expand_subpart(expander.access(ref))
-            if ref_unwrap:
-                assign_by_json_pointer(d, ref_unwrap, extracted)
+            if ref_wrap:
+                assign_by_json_pointer(d, ref_wrap, extracted)
             else:
                 d = deepmerge(d, extracted)
     loading.dumpfile(d, dst)
