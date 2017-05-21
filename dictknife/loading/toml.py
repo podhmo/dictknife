@@ -1,5 +1,8 @@
 import toml
 
 
-load = toml.load
+def load(fp, *, loader=None, **kwargs):
+    return toml.load(fp, **kwargs)
+
+
 dump = toml.dump

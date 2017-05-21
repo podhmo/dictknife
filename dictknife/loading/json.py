@@ -2,7 +2,7 @@ import json
 from collections import OrderedDict
 
 
-def load(fp):
+def load(fp, *, loader=None):
     return json.load(fp, object_pairs_hook=OrderedDict)
 
 

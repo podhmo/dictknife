@@ -6,6 +6,7 @@ from io import StringIO
 logger = logging.getLogger(__name__)   # NOQA
 from . import json
 from . import raw
+from . import env
 try:
     from . import yaml
 except ImportError:
@@ -38,7 +39,7 @@ class Loader:
         else:
             fname = getattr(fp, "name", "(unknown)")
             load = self.dispatcher.dispatch(fname, self.fn_map)
-        return load(fp)
+        return load(fp, loader=self)
 
     def loadfile(self, filename=None, format=None):
         """load file or stdin"""
@@ -120,6 +121,7 @@ dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"), setup
 dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
 dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
+dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 

@@ -7,11 +7,14 @@ class IgnoreReferenceDumper(yaml.Dumper):
         return True
 
 
-load = yaml.load
+def load(fp, *, loader=None, **kwargs):
+    return yaml.load(fp, **kwargs)
 
 
 def dump(d, fp):
-    return yaml.dump(d, fp, allow_unicode=True, default_flow_style=False, Dumper=IgnoreReferenceDumper)
+    return yaml.dump(
+        d, fp, allow_unicode=True, default_flow_style=False, Dumper=IgnoreReferenceDumper
+    )
 
 
 def setup(dict_classes=[OrderedDict, defaultdict, ChainMap]):
