@@ -8,7 +8,6 @@ from dictknife import Accessor
 from dictknife import deepmerge
 from .accessor import CachedItemAccessor
 
-
 logger = logging.getLogger("jsonknife.bundler")
 
 
@@ -16,7 +15,7 @@ class Bundler(object):
     def __init__(self, resolver, strict=False):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
-        self.item_map = {}  # localref -> item
+        self.item_map = OrderedDict()  # localref -> item
         self.strict = strict
 
     @reify
