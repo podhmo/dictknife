@@ -1,3 +1,9 @@
+0.4.7
+
+- loading via envvar with white list
+- jsonknife deref with --unwrap,--wrap option and --ref supports '<unwrap>@<wrap>' expression
+- jsonknife bundle generating ordered output
+
 0.4.5
 
 - dictknife concat with list JSON
