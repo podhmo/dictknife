@@ -26,21 +26,23 @@ def main(ctx, log):
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-def concat(files, dst, format):
+@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
+def concat(files, dst, format, input_format, output_format):
     from collections import OrderedDict
     from .. import deepmerge
     d = OrderedDict()
     for f in files:
         logger.debug("merge: %s", f)
         with open(f) as rf:
-            sd = loading.load(rf)
+            sd = loading.load(rf, format=input_format or format)
         if isinstance(sd, (list, tuple)):
             if not isinstance(d, (list, tuple)):
                 d = [d] if d else []
             d.extend(sd)
         else:
             d = deepmerge(d, sd)
-    loading.dumpfile(d, dst, format=format)
+    loading.dumpfile(d, dst, format=output_format or format)
 
 
 @main.command(help="transform dict")
