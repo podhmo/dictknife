@@ -16,7 +16,7 @@ from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import lifting_jsonschema_definition
 from dictknife.jsonknife import SampleValuePlotter
 from dictknife.jsonknife.resolver import get_resolver_from_filename
-from dictknife.jsonknife.accessor import assign_by_json_pointer
+from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
 
 logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
@@ -94,9 +94,12 @@ def flatten(src, dst):
 
 @main.command(help="output sample value from swagger's spec")
 @click.argument("src", type=click.Path(exists=True), default=None, required=False)
+@click.option("--ref", default=None)
 @click.option("-f", "--format", type=click.Choice(loading.get_formats()), default="json")
-def examples(src, format):
+def examples(src, ref, format):
     data = loading.loadfile(src)
+    if ref is not None:
+        data = access_by_json_pointer(data, ref)
     plotter = SampleValuePlotter()
     d = plotter.plot(data)
     loading.dumpfile(d, format=format)
