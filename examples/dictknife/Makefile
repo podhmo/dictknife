@@ -18,4 +18,8 @@ diff:
 	mkdir -p dst/02diff
 	dictknife diff src/02diff/left.yaml src/02diff/right.json > dst/02diff/person.diff
 
+linecat:
+	mkdir -p dst/04linecat
+	dictknife linecat --src src/04linecat/log.txt --format json > dst/04linecat/log.json
+
 .PHONY: dst

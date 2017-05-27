@@ -98,3 +98,28 @@ def diff(normalize, left, right, n, debug):
             left_data, right_data, fromfile=left, tofile=right, n=n, normalize=normalize
         ):
             print(line)
+
+
+@main.command(help="line cat")
+@click.option("--src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
+@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("--debug", is_flag=True)
+def linecat(src, dst, input_format, output_format, format, debug):
+    input_format = input_format or format
+    output_format = output_format or format
+
+    def consume(itr):
+        r = []
+        for line in itr:
+            r.append(loading.loads(line, format=input_format))
+        loading.dumpfile(r, dst, format=output_format)
+
+    with traceback_shortly(debug):
+        if src is None:
+            consume(iter(sys.stdin))
+        else:
+            with open(src) as rf:
+                consume(iter(rf))
