@@ -1,5 +1,7 @@
 # -*- coding:utf-8 -*-
 import re
+import sys
+import contextlib
 
 
 def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
@@ -35,9 +37,22 @@ def pairrsplit(s, sep):
         return r
 
 
+@contextlib.contextmanager
+def traceback_shortly(debug):
+    try:
+        yield
+    except Exception as e:
+        if debug:
+            raise
+        else:
+            print("\x1b[33m\x1b[1m{e.__class__.__name__}: {e}\x1b[0m".format(e=e, file=sys.stderr))
+            sys.exit(1)
+
+
 # stolen from pyramid
 class reify(object):
     """cached property"""
+
     def __init__(self, wrapped):
         self.wrapped = wrapped
         try:

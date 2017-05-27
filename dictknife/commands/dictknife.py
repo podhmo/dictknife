@@ -8,7 +8,7 @@ except ImportError as e:
     print("please install via `pip install dictknife[command]`", file=sys.stderr)
     sys.exit(1)
 from dictknife import loading
-
+from dictknife.langhelpers import traceback_shortly
 
 logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
@@ -28,21 +28,23 @@ def main(ctx, log):
 @click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
-def concat(files, dst, format, input_format, output_format):
+@click.option("--debug", is_flag=True)
+def concat(files, dst, format, input_format, output_format, debug):
     from collections import OrderedDict
     from .. import deepmerge
-    d = OrderedDict()
-    for f in files:
-        logger.debug("merge: %s", f)
-        with open(f) as rf:
-            sd = loading.load(rf, format=input_format or format)
-        if isinstance(sd, (list, tuple)):
-            if not isinstance(d, (list, tuple)):
-                d = [d] if d else []
-            d.extend(sd)
-        else:
-            d = deepmerge(d, sd)
-    loading.dumpfile(d, dst, format=output_format or format)
+    with traceback_shortly(debug):
+        d = OrderedDict()
+        for f in files:
+            logger.debug("merge: %s", f)
+            with open(f) as rf:
+                sd = loading.load(rf, format=input_format or format)
+            if isinstance(sd, (list, tuple)):
+                if not isinstance(d, (list, tuple)):
+                    d = [d] if d else []
+                d.extend(sd)
+            else:
+                d = deepmerge(d, sd)
+        loading.dumpfile(d, dst, format=output_format or format)
 
 
 @main.command(help="transform dict")
@@ -52,27 +54,31 @@ def concat(files, dst, format, input_format, output_format):
 @click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
 @click.option("--function", default="dictknife.transform:identity")
+@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-def transform(src, dst, config, config_file, code, function, format):
-    import json
-    from functools import partial
+@click.option("--debug", is_flag=True)
+def transform(
+    src, dst, config, config_file, code, function, input_format, output_format, format, debug
+):
     from magicalimport import import_symbol
     from .. import deepmerge
+    with traceback_shortly(debug):
+        if code is not None:
+            transform = eval(code)
+        else:
+            transform = import_symbol(function)
 
-    if code is not None:
-        transform = eval(code)
-    else:
-        transform = import_symbol(function)
+        input_format = input_format or format
+        kwargs = loading.loads(config, format=input_format)
 
-    kwargs = json.loads(config)
+        if config_file:
+            with open(config_file) as rf:
+                kwargs = deepmerge(kwargs, loading.load(rf, format=input_format))
 
-    if config_file:
-        with open(config_file) as rf:
-            kwargs = deepmerge(kwargs, loading.load(rf))
-
-    data = loading.loadfile(src)
-    result = partial(transform, **kwargs)(data)
-    loading.dumpfile(result, dst, format=format)
+        data = loading.loadfile(src, input_format)
+        result = transform(data, **kwargs)
+        loading.dumpfile(result, dst, format=output_format or format)
 
 
 @main.command(help="diff dict")
@@ -80,11 +86,15 @@ def transform(src, dst, config, config_file, code, function, format):
 @click.argument("left", required=True, type=click.Path(exists=True))
 @click.argument("right", required=True, type=click.Path(exists=True))
 @click.argument("n", required=False, type=click.INT, default=3)
-def diff(normalize, left, right, n):
+@click.option("--debug", is_flag=True)
+def diff(normalize, left, right, n, debug):
     from dictknife import diff
-    with open(left) as rf:
-        left_data = loading.load(rf)
-    with open(right) as rf:
-        right_data = loading.load(rf)
-    for line in diff(left_data, right_data, fromfile=left, tofile=right, n=n, normalize=normalize):
-        print(line)
+    with traceback_shortly(debug):
+        with open(left) as rf:
+            left_data = loading.load(rf)
+        with open(right) as rf:
+            right_data = loading.load(rf)
+        for line in diff(
+            left_data, right_data, fromfile=left, tofile=right, n=n, normalize=normalize
+        ):
+            print(line)
