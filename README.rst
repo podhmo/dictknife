@@ -6,4 +6,7 @@ dictknife
 
 swiss army knife for handling dict.
 
-`http://dictknife.readthedocs.io/<http://dictknife.readthedocs.io/>`_
+doc
+----------------------------------------
+
+http://dictknife.readthedocs.io
