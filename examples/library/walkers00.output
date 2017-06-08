@@ -1,0 +1,4 @@
+definitions/person/$ref schemas/people/Bruce-Wayne.json
+definitions/place/$ref schemas/places.yaml#/definitions/Gotham-City
+definitions/color/$ref #/definitions/thing/properties/colors/black-as-the-night
+definitions/thing/$ref http://wayne-enterprises.com/things/batmobile

@@ -12,4 +12,4 @@ $ pip install "dictknife[command]"
 
 # source
 
-https://github.com/podhmo/dictknife
+[https://github.com/podhmo/dictknife]

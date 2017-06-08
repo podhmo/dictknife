@@ -11,6 +11,7 @@ dictknife
    :caption: Contents:
 
    install
+   library
    commands
    commands2
 
