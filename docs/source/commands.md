@@ -71,7 +71,7 @@ $ dictknife diff person{0,2}.yaml
 
 ### normalize option
 
-If input data is yaml format, the type of keys are maybe not one type.
+If input data is yaml format, the types of keys are maybe not one type.
 
 ```bash
 $ cat <<-EOS > status.yaml
