@@ -3,7 +3,7 @@ docs: runlib
 .PHONY: docs
 
 runlib:
-	make -C examples/library
+	$(MAKE) -C examples/library
 
 run:
 	for i in `find . -name Makefile | grep -v docs`; do make -C `dirname $$i`; done
