@@ -1,8 +1,5 @@
-commands2
+as command (jsonknife)
 ========================================
-
-jsonknife
-----------------------------------------
 
 Handling JSON data espencially swagger like structure.
 
@@ -13,7 +10,7 @@ Handling JSON data espencially swagger like structure.
 - flatten
 
 deref and cut
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------
 
 .. code-block:: bash
 
@@ -27,7 +24,7 @@ src/colors.yaml
    :language: yaml
 
 deref
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 deref is unwrap function.
 
@@ -54,7 +51,7 @@ dst/02deref.yaml with `--ref "#/rainbow/yellow@yellow" --ref "#/rainbow/indigo@i
    :language: yaml
 
 cut
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -67,7 +64,7 @@ dst/00cut.yaml
 
 
 bundle and deref
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------
 
 .. code-block:: bash
 
@@ -103,7 +100,7 @@ src/definitions/user.json
 .. literalinclude:: ../../examples/linker/src/definitions/user.json
 
 bundle output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 bundle output is this.
 
@@ -120,7 +117,7 @@ bundle.yaml
    :language: yaml
 
 deref output
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 deref output is this.
 
@@ -137,7 +134,7 @@ deref.yaml
    :language: yaml
 
 flatten
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------
 
 only swagger like structure (toplevel is `#/definitions`).
 
@@ -161,7 +158,7 @@ dst/abc.yaml
    :language: yaml
 
 examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------
 
 only swagger like structure (toplevel is `#/definitions`).
 

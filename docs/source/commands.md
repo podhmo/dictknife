@@ -1,12 +1,10 @@
-# commands
-
-## dictknife
+# as command (dictknife)
 
 - concat
 - diff
 - transform
 
-### concat
+## concat
 
 1. Concat dict like data(JSON, YAML).
 
@@ -32,7 +30,7 @@ name = "foo"
 age = 20
 ```
 
-### diff
+## diff
 
 json diff
 
@@ -71,7 +69,7 @@ $ dictknife diff person{0,2}.yaml
  }
 ```
 
-#### normalize option
+### normalize option
 
 If input data is yaml format, the type of keys are maybe not one type.
 
@@ -88,7 +86,7 @@ TypeError: unorderable types: str() < int()
 $ dictknife diff --normalize status.yaml status.yaml
 ```
 
-### transform
+## transform
 
 ```bash
 $ cat status.yaml
