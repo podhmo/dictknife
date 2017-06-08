@@ -40,13 +40,14 @@ result
 with override=True
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+..
+   (in sphinx>1.6 using diff option with dictknife._sphinx patch)
 .. literalinclude:: ../../examples/library/deepmerge01.py
-   :diff: ../../examples/library/deepmerge00.py
 
-diff
+result
 
 .. literalinclude:: ../../examples/library/deepmerge01.output
-   :diff: ../../examples/library/deepmerge00.output
+
 
 deepequal
 ----------------------------------------
