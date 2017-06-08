@@ -12,13 +12,13 @@ try:
 except IOError:
     README = CHANGES = ''
 
-
 install_requires = [
     "namedlist",
 ]
 
-
 docs_extras = [
+    "sphinx",
+    "recommonmark",
 ]
 
 load_extras = [
@@ -31,39 +31,40 @@ command_extras = [
     "magicalimport",
 ]
 
-tests_require = [
-]
+tests_require = []
 
 testing_extras = tests_require + [
     "PyYAML",
 ]
 
-setup(name='dictknife',
-      version='0.4.8',
-      description='utility set of handling dict',
-      long_description=README + '\n\n' + CHANGES,
-      classifiers=[
-          "Programming Language :: Python",
-          "Programming Language :: Python :: Implementation :: CPython",
-      ],
-      keywords='dict, dict-handling',
-      author="podhmo",
-      author_email="ababjam61@gmail.com",
-      url="https://github.com/podhmo/dictknife",
-      packages=find_packages(exclude=["dictknife.tests"]),
-      include_package_data=True,
-      zip_safe=False,
-      install_requires=install_requires,
-      extras_require={
-          'testing': testing_extras,
-          'docs': docs_extras,
-          'load': load_extras,
-          'command': command_extras,
-      },
-      tests_require=tests_require,
-      test_suite="dictknife.tests",
-      entry_points="""
+setup(
+    name='dictknife',
+    version='0.4.8',
+    description='utility set of handling dict',
+    long_description=README + '\n\n' + CHANGES,
+    classifiers=[
+        "Programming Language :: Python",
+        "Programming Language :: Python :: Implementation :: CPython",
+    ],
+    keywords='dict, dict-handling',
+    author="podhmo",
+    author_email="ababjam61@gmail.com",
+    url="https://github.com/podhmo/dictknife",
+    packages=find_packages(exclude=["dictknife.tests"]),
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=install_requires,
+    extras_require={
+        'testing': testing_extras,
+        'docs': docs_extras,
+        'load': load_extras,
+        'command': command_extras,
+    },
+    tests_require=tests_require,
+    test_suite="dictknife.tests",
+    entry_points="""
       [console_scripts]
       dictknife=dictknife.commands.dictknife:main
       jsonknife=dictknife.commands.jsonknife:main
-""")
+"""
+)
