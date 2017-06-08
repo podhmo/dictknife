@@ -2,7 +2,7 @@ default: orthodox
 
 orthodox:
 	jsonknife deref --src src/person.yaml --dst dst/extracted.yaml --ref "#/definitions/person"
-	jsonknife examples dst/extracted.yaml > dst/data.json
+	jsonknife examples dst/extracted.yaml --format yaml > dst/data.yaml
 
 ref:
 	jsonknife deref --src src/primitive.yaml --ref "#/definitions/name" > dst/00nowrap.yaml

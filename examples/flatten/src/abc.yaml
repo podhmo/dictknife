@@ -1,0 +1,21 @@
+definitions:
+  a:
+    type: object
+    properties:
+      b:
+        type: object
+        properties:
+          c:
+            type: object
+            properties:
+              name:
+                type: string
+          vs:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type: integer

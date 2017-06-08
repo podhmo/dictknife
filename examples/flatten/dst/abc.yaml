@@ -1,0 +1,29 @@
+definitions:
+  a:
+    type: object
+    properties:
+      b:
+        $ref: '#/definitions/aB'
+  aB:
+    type: object
+    properties:
+      c:
+        $ref: '#/definitions/aBC'
+      vs:
+        $ref: '#/definitions/aBVs'
+  aBVs:
+    type: array
+    items:
+      $ref: '#/definitions/aBVsItem'
+  aBVsItem:
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: integer
+  aBC:
+    type: object
+    properties:
+      name:
+        type: string

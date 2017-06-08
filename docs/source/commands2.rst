@@ -136,11 +136,61 @@ deref.yaml
 .. literalinclude:: ../../examples/linker/deref.yaml
    :language: yaml
 
-deref
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 flatten
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+only swagger like structure (toplevel is `#/definitions`).
+
+.. code-block:: bash
+
+  $ tree src
+  src/
+  └── abc.yaml
+
+  $ mkdir -p dst
+  $ jsonknife flatten --src src/abc.yaml --dst dst/abc.yaml
+
+src/abc.yaml
+
+.. literalinclude:: ../../examples/flatten/src/abc.yaml
+   :language: yaml
+
+dst/abc.yaml
+
+.. literalinclude:: ../../examples/flatten/dst/abc.yaml
+   :language: yaml
+
 examples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+only swagger like structure (toplevel is `#/definitions`).
+
+.. code-block:: bash
+
+   $ tree src
+   src/
+   ├── person.yaml
+   └── primitive.yaml
+
+   $ jsonknife deref --src src/person.yaml --dst dst/extracted.yaml --ref "#/definitions/person"
+   $ jsonknife examples dst/extracted.yaml --format yaml > dst/data.yaml
+
+src/person.yaml
+
+.. literalinclude:: ../../examples/deref/src/person.yaml
+   :language: yaml
+
+src/primitive.yaml
+
+.. literalinclude:: ../../examples/deref/src/primitive.yaml
+   :language: yaml
+
+dst/extracted.yaml
+
+.. literalinclude:: ../../examples/deref/dst/extracted.yaml
+   :language: yaml
+
+dst/data.yaml
+
+.. literalinclude:: ../../examples/deref/dst/data.yaml
+   :language: yaml
