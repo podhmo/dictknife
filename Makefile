@@ -1,3 +1,3 @@
 docs:
-	$(MAKE) dirhtml -C docs
+	$(MAKE) html -C docs
 .PHONY: docs
