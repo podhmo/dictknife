@@ -1,0 +1,34 @@
+paths:
+  /me:
+    get:
+      summary: me profile
+      description: me profile
+      responses:
+        '200':
+          description: Profile information for a user
+          schema:
+            $ref: '#/definitions/user'
+  /users:
+    get:
+      summary: user list
+      description: user list
+      responses:
+        '200':
+          description: user list
+          schema:
+            $ref: '#/definitions/userlist'
+definitions:
+  name:
+    type: string
+    description: name of object
+  user:
+    type: object
+    properties:
+      name:
+        $ref: '#/definitions/name'
+      age:
+        $ref: '#/definitions/name'
+  userlist:
+    type: array
+    items:
+      $ref: '#/definitions/user'

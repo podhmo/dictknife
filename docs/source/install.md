@@ -4,7 +4,7 @@
 $ pip install dictknife
 ```
 
-## using commands
+when using commands.
 
 ```
 $ pip install "dictknife[command]"

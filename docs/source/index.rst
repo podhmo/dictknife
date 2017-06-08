@@ -7,11 +7,12 @@ dictknife
 =====================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Contents:
 
    install
    commands
+   commands2
 
 Indices and tables
 ==================

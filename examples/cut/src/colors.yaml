@@ -1,0 +1,22 @@
+rainbow:
+  red:
+    hex: "#FF0000"
+    rgb: [255, 0, 0]
+  orange:
+    hex: "#FF7F00"
+    rgb: [255, 127, 0]
+  yellow:
+    hex: "#FFFF00"
+    rgb: [255, 255, 0]
+  green:
+    hex: "#00FF00"
+    rgb: [0, 255, 0]
+  blue:
+    hex: "#0000FF"
+    rgb: [0, 0, 255]
+  indigo:
+    hex: "#4B0082"
+    rgb: [75, 0, 130]
+  violet:
+    hex: "#8B00FF"
+    rgb: [139, 0, 255]

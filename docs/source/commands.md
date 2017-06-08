@@ -105,19 +105,3 @@ $ cat status.yaml | dictknife transform --code='lambda d: [d,d,d]'
 - 200: ok
   default: hmm
 ```
-
-## jsonknife
-
-Handling JSON data espencially swagger like structure.
-
-- bundle
-- cut
-- deref
-- examples
-- flatten
-
-### bundle
-### cut
-### deref
-### flatten
-### examples

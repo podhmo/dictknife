@@ -1,0 +1,12 @@
+yellow:
+  hex: '#FFFF00'
+  rgb:
+  - 255
+  - 255
+  - 0
+indigo:
+  hex: '#4B0082'
+  rgb:
+  - 75
+  - 0
+  - 130
