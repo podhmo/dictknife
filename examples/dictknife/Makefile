@@ -24,6 +24,6 @@ linecat:
 
 diff2:
 	mkdir -p dst/05diff
-	dictknife diff --normalize src/05diff/people0.yaml src/05diff/people1.yaml
+	dictknife diff --normalize src/05diff/people0.yaml src/05diff/people1.yaml > dst/05diff/people.diff
 	# diff -u <(jq -S . <(dictknife concat --output-format=json  src/05diff/people0.yaml)) <(jq -S . <(dictknife concat --output-format=json src/05diff/people1.yaml))
 .PHONY: dst
