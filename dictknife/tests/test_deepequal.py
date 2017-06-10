@@ -11,9 +11,9 @@ class ref(object):
 
 
 class DeepEqualTests(unittest.TestCase):
-    def _callFUT(self, left, right):
+    def _callFUT(self, left, right, normalize):
         from dictknife import deepequal
-        return deepequal(left, right)
+        return deepequal(left, right, normalize=normalize)
 
     def test_it(self):
         d0 = {
@@ -39,7 +39,7 @@ class DeepEqualTests(unittest.TestCase):
             }
         }
         self.assertEqual(ref(1), ref(1), msg="prepare")
-        self.assertEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it2(self):
         d0 = {
@@ -51,13 +51,21 @@ class DeepEqualTests(unittest.TestCase):
         d1 = {
             "color": {
                 "type": "string",
-                "enum": ["R", "G", "B"],
+                "enum": ["K", "Y", "M", "C"],
             }
         }
         self.assertNotEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it3(self):
         from collections import OrderedDict
         d0 = OrderedDict([('type', 'string'), ('enum', ['C', 'M', 'Y', 'K'])])
-        d1 = OrderedDict([('type', 'string'), ('enum', ['R', 'G', 'B'])])
+        d1 = OrderedDict([('type', 'string'), ('enum', ['K', 'Y', 'M', 'C'])])
         self.assertNotEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))
+
+    def test_it4(self):
+        d0 = [[[1, 2, 3], [1]], [[1, 2], [2, 3], [3, 4]]]
+        d1 = [[[1], [1, 2, 3]], [[1, 2], [3, 4], [2, 3]]]
+        self.assertNotEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))

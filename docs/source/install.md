@@ -10,6 +10,6 @@ when using commands.
 $ pip install "dictknife[command]"
 ```
 
-# source
+source
 
-[https://github.com/podhmo/dictknife]
+[https://github.com/podhmo/dictknife](https://github.com/podhmo/dictknife)

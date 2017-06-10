@@ -52,6 +52,29 @@ result
 deepequal
 ----------------------------------------
 
+.. literalinclude:: ../../examples/library/deepequal00.py
+
+result
+
+.. literalinclude:: ../../examples/library/deepequal00.output
+
+
+with normalize option
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. literalinclude:: ../../examples/library/deepequal01.py
+
+result
+
+.. literalinclude:: ../../examples/library/deepequal01.output
+
+.. literalinclude:: ../../examples/library/deepequal02.py
+
+result
+
+.. literalinclude:: ../../examples/library/deepequal02.output
+
+
 loading
 ----------------------------------------
 
