@@ -79,6 +79,9 @@ loader.py
 
 .. literalinclude:: ../../examples/library2/customloader/loader.py
 
-.. note::
+another example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   todo: onload hook
+Resolver's constructor has `onload` argument, this is the hook called when loading data. you can make another version of custom data loader(almost same behavior), using this hook.
+
+.. literalinclude:: ../../examples/library2/customloader/loader2.py
