@@ -12,6 +12,7 @@ dictknife
 
    install
    library
+   library2
    commands
    commands2
 

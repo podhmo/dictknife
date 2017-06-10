@@ -1,0 +1,39 @@
+load data
+
+  definitions:
+    person:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+  
+access by json pointer
+
+  access : /definitions/person/properties
+  name:
+    type: string
+  age:
+    type: integer
+  
+  access : #/definitions/person/properties
+  name:
+    type: string
+  age:
+    type: integer
+  
+assign by json pointer
+
+  assign : /definitions/person/properties/nickname = {'type': 'string'}
+  definitions:
+    person:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+        nickname:
+          type: string
+  

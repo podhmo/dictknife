@@ -14,17 +14,21 @@ def pp(d, out=None):
 
 
 @contextlib.contextmanager
-def indent(n, prefix=None):
+def indent(n, prefix=None, newline=True):
     buf = StringIO()
     with contextlib.redirect_stdout(buf):
-        if prefix is not None:
-            buf.write(prefix)
         yield buf
     buf.seek(0)
 
-    prefix = " " * n
+    padding = " " * n
     write = sys.stdout.write
-    for line in buf:
+
+    if prefix is not None:
         write(prefix)
+        if newline:
+            write("\n")
+
+    for line in buf:
+        write(padding)
         write(line)
     sys.stdout.flush()
