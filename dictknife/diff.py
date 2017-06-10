@@ -1,5 +1,6 @@
 import difflib
 import json
+from .deepequal import sort_flexibly
 
 
 def _default_tostring(d, default=str):
@@ -28,6 +29,8 @@ def diff(
 ):
     """fancy diff"""
     if normalize:
+        d0 = sort_flexibly(d0)
+        d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
     s0 = tostring(d0).split(terminator)

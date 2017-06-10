@@ -22,4 +22,8 @@ linecat:
 	mkdir -p dst/04linecat
 	dictknife linecat --src src/04linecat/log.txt --format json > dst/04linecat/log.json
 
+diff2:
+	mkdir -p dst/05diff
+	dictknife diff --normalize src/05diff/people0.yaml src/05diff/people1.yaml
+	# diff -u <(jq -S . <(dictknife concat --output-format=json  src/05diff/people0.yaml)) <(jq -S . <(dictknife concat --output-format=json src/05diff/people1.yaml))
 .PHONY: dst
