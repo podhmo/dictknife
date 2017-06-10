@@ -78,6 +78,26 @@ result
 loading
 ----------------------------------------
 
+support format
+
+- yaml
+- json
+- toml
+
+.. code-block:: python
+
+   from dictknife import loading
+
+   loading.setup()
+
+   # load
+   d = loading.loadfile("foo.yaml")
+   d = loading.loadfile(None, format="yaml")  # from sys.stdin
+
+   # dump
+   loading.dumpfile(d, "foo.json")
+   loading.dumpfile(d, None, format="toml")  # to sys.stdout
+
 walkers
 ----------------------------------------
 
