@@ -78,7 +78,7 @@ result
 loading
 ----------------------------------------
 
-support format
+supported formats
 
 - yaml
 - json
