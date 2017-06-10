@@ -86,6 +86,69 @@ TypeError: unorderable types: str() < int()
 $ dictknife diff --normalize status.yaml status.yaml
 ```
 
+### more normalize option
+
+If your data is array, then, another tool something like jq, sorting is not supported.
+
+For example, in the situation like a below.
+
+```
+$ cat <<-EOS > people0.json
+[
+  {
+    "name": "foo",
+    "age": 10
+  },
+  {
+    "name": "bar",
+    "age": 20
+  }
+]
+EOS
+$ cat <<-EOS > people1.json
+[
+  {
+    "name": "bar",
+    "age": 20
+  },
+  {
+    "name": "foo",
+    "age": 10
+  }
+]
+EOS
+
+# jq's -S is not working
+$ diff -u <(jq -S . people0.json) <(jq -S . people1.json)
+--- /dev/fd/63	2017-06-10 15:41:12.000000000 +0900
++++ /dev/fd/62	2017-06-10 15:41:12.000000000 +0900
+@@ -1,10 +1,10 @@
+ [
+   {
+-    "age": 10,
+-    "name": "foo"
+-  },
+-  {
+     "age": 20,
+     "name": "bar"
++  },
++  {
++    "age": 10,
++    "name": "foo"
+   }
+ ]
+
+# of cource, using sort_by is working (but it is needed that structural knowledge about data).
+$ diff -u <(jq -S "sort_by(.name)" people0.json) <(jq -S "sort_by(.name)" people1.json)
+```
+
+we can check diff with `--normalize` option only.
+
+```bash
+dictknife diff --normalize people0.json people1.json
+```
+
+
 ## transform
 
 ```bash
