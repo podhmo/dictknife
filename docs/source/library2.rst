@@ -49,11 +49,6 @@ how to use it.
 
   $ python loader.py main.yaml > loader.output
 
-loaded data
-
-.. literalinclude:: ../../examples/library2/customloader/loader.output
-   :language: yaml
-
 input data are like below.
 
 main.yaml
@@ -71,6 +66,11 @@ name.yaml
 age.yaml
 
 .. literalinclude:: ../../examples/library2/customloader/age.yaml
+
+loaded data
+
+.. literalinclude:: ../../examples/library2/customloader/loader.output
+   :language: yaml
 
 code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
