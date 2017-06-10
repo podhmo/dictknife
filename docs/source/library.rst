@@ -111,3 +111,15 @@ result
 
    todo: description about chains and operator and context,...
 
+
+accessor
+----------------------------------------
+
+accessor is convenience wrapper for accessing dict.
+
+
+.. literalinclude:: ../../examples/library/accessor00.py
+
+result
+
+.. literalinclude:: ../../examples/library/accessor00.output

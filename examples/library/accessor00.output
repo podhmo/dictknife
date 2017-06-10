@@ -1,0 +1,29 @@
+  assign:
+  OrderedDict([('a', OrderedDict([('b', OrderedDict([('c', 'v')]))]))])
+  {
+    "a": {
+      "b": {
+        "c": "v"
+      }
+    }
+  }
+  
+  access: ["a", "b", "c"]
+  ['a', 'b', 'c'] v
+  
+  exists:
+  ['a', 'b', 'c'] True
+  ['a', 'b', 'x'] False
+  
+  maybe_remove:
+  ['a', 'b', 'x'] None
+  ['a', 'b', 'c'] None
+  {
+    "a": {
+      "b": {}
+    }
+  }
+  
+  maybe_access_container:
+  ['a', 'b', 'x'] None
+  ['a', 'b', 'c'] OrderedDict([('c', 'v')])

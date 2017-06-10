@@ -14,9 +14,11 @@ def pp(d, out=None):
 
 
 @contextlib.contextmanager
-def indent(n):
+def indent(n, prefix=None):
     buf = StringIO()
     with contextlib.redirect_stdout(buf):
+        if prefix is not None:
+            buf.write(prefix)
         yield buf
     buf.seek(0)
 
