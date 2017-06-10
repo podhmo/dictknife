@@ -1,0 +1,6 @@
+type: object
+properties:
+  name:
+    $include: name.yaml
+  age:
+    $include: age.yaml

@@ -1,0 +1,7 @@
+definitions:
+  person:
+    $include: ./person.yaml
+  people:
+    type: array
+    items:
+      $include: ./person.yaml
