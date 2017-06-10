@@ -79,3 +79,6 @@ loader.py
 
 .. literalinclude:: ../../examples/library2/customloader/loader.py
 
+.. note::
+
+   todo: onload hook
