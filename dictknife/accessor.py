@@ -27,6 +27,12 @@ class Accessor(object):
     def exists(self, d, path):
         return self.maybe_access_container(d, path) is not None
 
+    def maybe_access(self, d, path):
+        d = self.maybe_access_container(d, path)
+        if d is None:
+            return None
+        return d.get(path[-1])
+
     def maybe_access_container(self, d, path):
         for name in path[:-1]:
             if name not in d:

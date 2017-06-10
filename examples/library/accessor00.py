@@ -39,3 +39,8 @@ with indent(2, '\nmaybe_remove:\n'):
 with indent(2, '\nmaybe_access_container:\n'):
     print(['a', 'b', 'x'], a.maybe_access_container(d, ['a', 'b', 'x']))
     print(['a', 'b', 'c'], a.maybe_access_container(d, ['a', 'b', 'c']))
+
+# maybe_access (this is not good name!!)
+with indent(2, '\nmaybe_access:\n'):
+    print(['a', 'b', 'x'], a.maybe_access(d, ['a', 'b', 'x']))
+    print(['a', 'b', 'c'], a.maybe_access(d, ['a', 'b', 'c']))

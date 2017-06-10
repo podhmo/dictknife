@@ -27,3 +27,7 @@
   maybe_access_container:
   ['a', 'b', 'x'] None
   ['a', 'b', 'c'] OrderedDict([('c', 'v')])
+  
+  maybe_access:
+  ['a', 'b', 'x'] None
+  ['a', 'b', 'c'] v
