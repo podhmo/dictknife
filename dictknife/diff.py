@@ -1,9 +1,9 @@
 import difflib
-import json
 from .deepequal import sort_flexibly
 
 
 def _default_tostring(d, default=str):
+    import json
     return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=True, default=default)
 
 
