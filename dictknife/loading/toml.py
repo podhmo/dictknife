@@ -1,8 +1,18 @@
-import toml
+from .util import LazyImporter, ImportPromise
+importer = LazyImporter()
 
 
-def load(fp, *, loader=None, **kwargs):
-    return toml.load(fp, **kwargs)
+@importer.setup
+def import_toml():
+    import toml
+    return ImportPromise(module=toml, cont=None)
 
 
-dump = toml.dump
+@importer.use
+def load(m, fp, *, loader=None, **kwargs):
+    return m.load(fp, **kwargs)
+
+
+@importer.use
+def dump(m, *args, **kwargs):
+    return m.dump(*args, **kwargs)

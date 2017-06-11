@@ -1,10 +1,19 @@
-import json
 from collections import OrderedDict
+from .util import LazyImporter, ImportPromise
+importer = LazyImporter()
 
 
-def load(fp, *, loader=None):
-    return json.load(fp, object_pairs_hook=OrderedDict)
+@importer.setup
+def import_json():
+    import json
+    return ImportPromise(module=json, cont=None)
 
 
-def dump(d, fp):
-    return json.dump(d, fp, ensure_ascii=False, indent=2, default=str)
+@importer.use
+def load(m, fp, *, loader=None):
+    return m.load(fp, object_pairs_hook=OrderedDict)
+
+
+@importer.use
+def dump(m, d, fp):
+    return m.dump(d, fp, ensure_ascii=False, indent=2, default=str)
