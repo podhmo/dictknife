@@ -47,7 +47,7 @@ class Loader:
             return self.load(sys.stdin, format=format)
         else:
             with open(filename) as rf:
-                return load(rf, format=format)
+                return self.load(rf, format=format)
 
 
 class Dumper:
