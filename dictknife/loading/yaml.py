@@ -1,23 +1,35 @@
-import yaml
 from collections import OrderedDict, defaultdict, ChainMap
+from .util import LazyImporter, ImportPromise
+
+importer = LazyImporter()
 
 
-class IgnoreReferenceDumper(yaml.Dumper):
-    def ignore_aliases(self, data):
-        return True
+@importer.setup
+def import_yaml():
+    import yaml
+
+    class IgnoreReferenceDumper(yaml.Dumper):
+        def ignore_aliases(self, data):
+            return True
+
+    yaml.IgnoreReferenceDumper = IgnoreReferenceDumper
+    return ImportPromise(module=yaml, cont=setup)
 
 
-def load(fp, *, loader=None, **kwargs):
-    return yaml.load(fp, **kwargs)
+@importer.use
+def load(m, fp, *, loader=None, **kwargs):
+    return m.load(fp, **kwargs)
 
 
-def dump(d, fp):
-    return yaml.dump(
-        d, fp, allow_unicode=True, default_flow_style=False, Dumper=IgnoreReferenceDumper
+@importer.use
+def dump(m, d, fp):
+    return m.dump(
+        d, fp, allow_unicode=True, default_flow_style=False, Dumper=m.IgnoreReferenceDumper
     )
 
 
-def setup(dict_classes=[OrderedDict, defaultdict, ChainMap]):
+@importer.use
+def setup(m, dict_classes=[OrderedDict, defaultdict, ChainMap]):
     def _represent_odict(dumper, instance):
         return dumper.represent_mapping('tag:yaml.org,2002:map', instance.items())
 
@@ -30,7 +42,7 @@ def setup(dict_classes=[OrderedDict, defaultdict, ChainMap]):
         else:
             return dumper.represent_scalar('tag:yaml.org,2002:str', instance)
 
-    yaml.add_constructor('tag:yaml.org,2002:map', _construct_odict)
+    m.add_constructor('tag:m.org,2002:map', _construct_odict)
     for dict_class in dict_classes:
-        yaml.add_representer(dict_class, _represent_odict)
-    yaml.add_representer(str, _represent_str)
+        m.add_representer(dict_class, _represent_odict)
+    m.add_representer(str, _represent_str)
