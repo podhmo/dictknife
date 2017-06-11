@@ -3,21 +3,12 @@ import sys
 import os.path
 import logging
 from io import StringIO
-logger = logging.getLogger(__name__)   # NOQA
+logger = logging.getLogger(__name__)  # NOQA
 from . import json
 from . import raw
 from . import env
-try:
-    from . import yaml
-except ImportError:
-    from .fake import FakeModule
-    yaml = FakeModule("yaml", "yaml module is not found. please pip install PyYAML")
-try:
-    from . import toml
-except ImportError:
-    from .fake import FakeModule
-    toml = FakeModule("toml", "toml module is not found. please pip install toml")
-
+from . import yaml
+from . import toml
 
 unknown = "(unknown)"
 
@@ -123,7 +114,6 @@ dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
 dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
-
 
 # short cuts
 load = dispather.loader.load
