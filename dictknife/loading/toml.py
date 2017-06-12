@@ -1,11 +1,11 @@
-from .util import LazyImporter, ImportPromise
+from .util import LazyImporter
 importer = LazyImporter()
 
 
 @importer.setup
 def import_toml():
     import toml
-    return ImportPromise(module=toml, cont=None)
+    return toml
 
 
 @importer.use
