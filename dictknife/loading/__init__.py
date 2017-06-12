@@ -85,30 +85,21 @@ class Dispatcher:
         self.loader = self.loader_factory(self)
         self.dumper = self.dumper_factory(self)
         self.exts_matching = {}
-        self.setups = {}
 
     def dispatch(self, filename, fn_map, default=unknown):
         _, ext = os.path.splitext(filename)
         fmt = self.exts_matching.get(ext) or default
         return fn_map[fmt]
 
-    def add_format(self, fmt, load, dump, exts, setup=None):
+    def add_format(self, fmt, load, dump, exts):
         self.loader.add_format(fmt, load)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
             self.exts_matching[ext] = fmt
-        if setup is not None:
-            self.setups[setup] = False
-
-    def setup(self):
-        for setup, used in list(self.setups.items()):
-            if not used:
-                setup()
-                self.setups[setup] = True
 
 
 dispather = Dispatcher()
-dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"), setup=yaml.setup)
+dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
 dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
 dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
@@ -136,4 +127,3 @@ def setup(input=None, output=None, dispather=dispather, unknown=unknown):
     if output is not None:
         logger.debug("setup output format: %s", output)
         dispather.dumper.add_format(unknown, output)
-    dispather.setup()
