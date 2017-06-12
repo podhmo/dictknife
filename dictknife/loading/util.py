@@ -1,8 +1,5 @@
 from functools import wraps
 from dictknife.langhelpers import reify
-from collections import namedtuple
-
-ImportPromise = namedtuple("ImportPromise", "module, cont")
 
 
 class LazyImporter:
@@ -21,10 +18,7 @@ class LazyImporter:
         @wraps(fn)
         def _use(*args, **kwargs):
             if self.module is None:
-                promise = self.import_()
-                self.module = promise.module
-                if promise.cont is not None:
-                    promise.cont()
+                self.module = self.import_()
             return fn(self.module, *args, **kwargs)
 
         return _use

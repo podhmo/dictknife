@@ -1,12 +1,12 @@
 from collections import OrderedDict
-from .util import LazyImporter, ImportPromise
+from .util import LazyImporter
 importer = LazyImporter()
 
 
 @importer.setup
 def import_json():
     import json
-    return ImportPromise(module=json, cont=None)
+    return json
 
 
 @importer.use
