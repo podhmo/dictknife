@@ -42,7 +42,7 @@ def setup(m, dict_classes=[OrderedDict, defaultdict, ChainMap]):
         else:
             return dumper.represent_scalar('tag:yaml.org,2002:str', instance)
 
-    m.add_constructor('tag:m.org,2002:map', _construct_odict)
+    m.add_constructor('tag:yaml.org,2002:map', _construct_odict)
     for dict_class in dict_classes:
         m.add_representer(dict_class, _represent_odict)
     m.add_representer(str, _represent_str)
