@@ -136,8 +136,6 @@ deref.yaml
 examples
 ----------------------------------------
 
-only swagger like structure (toplevel is `#/definitions`).
-
 .. code-block:: bash
 
    $ tree src
