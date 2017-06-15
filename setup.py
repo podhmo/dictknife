@@ -66,5 +66,6 @@ setup(
       [console_scripts]
       dictknife=dictknife.commands.dictknife:main
       jsonknife=dictknife.commands.jsonknife:main
+      swaggerknife=dictknife.commands.swaggerknife:main
 """
 )
