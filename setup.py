@@ -13,7 +13,6 @@ except IOError:
     README = CHANGES = ''
 
 install_requires = [
-    "namedlist",
 ]
 
 docs_extras = [

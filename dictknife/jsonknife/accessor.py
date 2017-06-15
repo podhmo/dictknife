@@ -1,6 +1,13 @@
 from dictknife import Accessor
-from namedlist import namedlist
-CachedItem = namedlist("CachedItem", "file, localref, globalref, resolver, data")
+
+
+class CachedItem:
+    def __init__(self, file, localref, globalref, resolver, data):
+        self.file = file
+        self.localref = localref
+        self.globalref = globalref
+        self.resolver = resolver
+        self.data = data
 
 
 def normalize_json_pointer(ref):
