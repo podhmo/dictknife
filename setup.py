@@ -18,6 +18,7 @@ install_requires = [
 docs_extras = [
     "sphinx",
     "recommonmark",
+    "sphinx_rtd_theme",
 ]
 
 load_extras = [
