@@ -25,7 +25,7 @@ def main(ctx, log):
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--name", default="top")
 @click.option("--annotations", default=None, type=click.Path(exists=True))
-@click.option("--emit", default="schema", type=click.Choice(["schema", "info"]))
+@click.option("--emit", default="schema", type=click.Choice(["schema", "info", "jsonschema"]))
 def json2swagger(src, dst, name, annotations, emit):
     from prestring import Module
     from dictknife.swaggerknife.json2swagger import Detector, Emitter
@@ -43,6 +43,14 @@ def json2swagger(src, dst, name, annotations, emit):
 
     if emit == "info":
         loading.dumpfile(info, filename=dst)
+    elif emit == "jsonschema":
+        m = Module(indent="  ")
+        m.stmt(name)
+        emitter.emit(info, m)
+        d = emitter.doc
+        root = d["definitions"].pop(name)
+        root.update(d)
+        loading.dumpfile(root, filename=dst)
     else:
         m = Module(indent="  ")
         m.stmt(name)

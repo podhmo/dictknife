@@ -1,8 +1,6 @@
-import sys
 import logging
-from dictknife import loading
 from collections import OrderedDict
-from prestring import NameStore, Module
+from prestring import NameStore
 
 
 logger = logging.getLogger(__name__)
