@@ -48,3 +48,13 @@ def json2swagger(src, dst, name, annotations, emit):
         m.stmt(name)
         emitter.emit(info, m)
         loading.dumpfile(emitter.doc, filename=dst)
+
+
+@main.command(help="flatten jsonschema sub definitions")
+@click.argument("src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
+def flatten(src, dst):
+    from dictknife.swaggerknife.flatten import flatten
+    data = loading.loadfile(src)
+    d = flatten(data)
+    loading.dumpfile(d, dst)

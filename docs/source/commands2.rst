@@ -7,7 +7,6 @@ Handling JSON data espencially swagger like structure.
 - cut
 - deref
 - examples
-- flatten
 
 deref and cut
 ----------------------------------------
@@ -133,29 +132,6 @@ deref.yaml
 .. literalinclude:: ../../examples/linker/deref.yaml
    :language: yaml
 
-flatten
-----------------------------------------
-
-only swagger like structure (toplevel is `#/definitions`).
-
-.. code-block:: bash
-
-  $ tree src
-  src/
-  └── abc.yaml
-
-  $ mkdir -p dst
-  $ jsonknife flatten --src src/abc.yaml --dst dst/abc.yaml
-
-src/abc.yaml
-
-.. literalinclude:: ../../examples/flatten/src/abc.yaml
-   :language: yaml
-
-dst/abc.yaml
-
-.. literalinclude:: ../../examples/flatten/dst/abc.yaml
-   :language: yaml
 
 examples
 ----------------------------------------

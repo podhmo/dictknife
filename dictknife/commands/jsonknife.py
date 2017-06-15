@@ -13,7 +13,6 @@ from dictknife import deepmerge
 from dictknife.accessor import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
-from dictknife.jsonknife import lifting_jsonschema_definition
 from dictknife.jsonknife import SampleValuePlotter
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
@@ -80,15 +79,6 @@ def bundle(src, dst):
     resolver = get_resolver_from_filename(src)
     bundler = Bundler(resolver)
     d = bundler.bundle()
-    loading.dumpfile(d, dst)
-
-
-@main.command(help="flatten jsonschema sub definitions")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-def flatten(src, dst):
-    data = loading.loadfile(src)
-    d = lifting_jsonschema_definition(data)
     loading.dumpfile(d, dst)
 
 

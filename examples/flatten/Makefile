@@ -1,3 +1,3 @@
 default:
 	mkdir -p dst
-	jsonknife flatten --src src/abc.yaml --dst dst/abc.yaml
+	swaggerknife flatten src/abc.yaml --dst dst/abc.yaml

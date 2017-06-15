@@ -15,6 +15,7 @@ dictknife
    library2
    commands
    commands2
+   commands3
 
 Indices and tables
 ==================
