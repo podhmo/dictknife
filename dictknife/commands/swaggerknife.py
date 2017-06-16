@@ -21,13 +21,12 @@ def main(ctx, log):
 
 
 @main.command(help="tojsonschema")
-@click.argument("src", default=None, type=click.Path(exists=True))
+@click.argument("src", default=None, type=click.Path(exists=True), required=False)
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--name", default="top")
 def tojsonschema(src, dst, name):
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)
-    root["required"] = True
     root.update(d)
     loading.dumpfile(root, filename=dst)
 
@@ -70,7 +69,7 @@ def json2swagger(files, dst, name, annotate, emit, with_minimap):
 
 
 @main.command(help="flatten jsonschema sub definitions")
-@click.argument("src", default=None, type=click.Path(exists=True))
+@click.argument("src", default=None, type=click.Path(exists=True), required=False)
 @click.option("--dst", default=None, type=click.Path())
 def flatten(src, dst):
     from dictknife.swaggerknife.flatten import flatten
