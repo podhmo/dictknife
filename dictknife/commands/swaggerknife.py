@@ -33,26 +33,28 @@ def tojsonschema(src, dst, name):
 
 
 @main.command(help="json2swagger")
-@click.argument("src", default=None, type=click.Path(exists=True))
+@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--name", default="top")
-@click.option("--annotations", default=None, type=click.Path(exists=True))
+@click.option("--annotate", default=None, type=click.Path(exists=True))
 @click.option("--emit", default="schema", type=click.Choice(["schema", "info"]))
 @click.option("--with-minimap", is_flag=True)
-def json2swagger(src, dst, name, annotations, emit, with_minimap):
+def json2swagger(files, dst, name, annotate, emit, with_minimap):
     from prestring import Module
     from dictknife.swaggerknife.json2swagger import Detector, Emitter
 
-    if annotations is not None:
-        annotations = loading.loadfile(annotations)
+    if annotate is not None:
+        annotate = loading.loadfile(annotate)
     else:
-        annotations = {}
+        annotate = {}
 
     detector = Detector()
-    emitter = Emitter(annotations)
+    emitter = Emitter(annotate)
 
-    data = loading.loadfile(src)
-    info = detector.detect(data, name)
+    info = None
+    for src in files:
+        data = loading.loadfile(src)
+        info = detector.detect(data, name, info=info)
 
     if emit == "info":
         loading.dumpfile(info, filename=dst)

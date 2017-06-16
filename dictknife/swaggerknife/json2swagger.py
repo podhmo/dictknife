@@ -2,7 +2,6 @@ import logging
 from collections import OrderedDict
 from prestring import NameStore
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,9 +38,9 @@ class Detector:
     def make_info(self):
         return {"freq": 0, "freq2": 0, "type": "any", "children": OrderedDict(), "values": []}
 
-    def detect(self, d, name):
+    def detect(self, d, name, info=None):
         s = OrderedDict()
-        s[name] = self.make_info()
+        s[name] = info or self.make_info()
         path = [name]
         self._detect(d, s[name], name, path=path)
         return s[name]
@@ -85,7 +84,7 @@ class Emitter:
 
         self.ns = NameStore()
         self.cw = CommentWriter()
-        self.annotations = annotations  # Dict[string, Dict]
+        self.annotations = annotations or {}  # Dict[string, Dict]
 
     def resolve_name(self, info, fromarray=False, suffix=""):
         ref = info["ref"] + suffix
@@ -129,7 +128,10 @@ class Emitter:
         props = d["properties"]
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
-        required = [name for name, f in info["children"].items() if (f.get("freq2") or f["freq"]) == info["freq"]]
+        required = [
+            name for name, f in info["children"].items()
+            if (f.get("freq2") or f["freq"]) == info["freq"]
+        ]
         if required:
             d["required"] = required
 

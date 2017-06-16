@@ -1,0 +1,7 @@
+"#/Top/a":
+  name: X
+"#/Top/a/b":
+  name: Y
+"#/Top/a/b/c":
+  name: Z
+  enum: [1,2,3,4,5]

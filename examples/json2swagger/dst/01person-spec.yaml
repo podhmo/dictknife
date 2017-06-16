@@ -1,0 +1,16 @@
+definitions:
+  person:
+    type: object
+    properties:
+      name:
+        type: string
+        example: bar
+      age:
+        type: integer
+        example: 22
+      nickname:
+        type: string
+        example: F
+    required:
+    - name
+    - age
