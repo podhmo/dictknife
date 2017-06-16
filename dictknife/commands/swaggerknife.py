@@ -26,7 +26,8 @@ def main(ctx, log):
 @click.option("--name", default="top")
 @click.option("--annotations", default=None, type=click.Path(exists=True))
 @click.option("--emit", default="schema", type=click.Choice(["schema", "info", "jsonschema"]))
-def json2swagger(src, dst, name, annotations, emit):
+@click.option("--with-minimap", is_flag=True)
+def json2swagger(src, dst, name, annotations, emit, with_minimap):
     from prestring import Module
     from dictknife.swaggerknife.json2swagger import Detector, Emitter
 
@@ -55,6 +56,10 @@ def json2swagger(src, dst, name, annotations, emit):
         m = Module(indent="  ")
         m.stmt(name)
         emitter.emit(info, m)
+        if with_minimap:
+            print("# minimap ###")
+            print("# *", end="")
+            print("\n# ".join(str(m).split("\n")))
         loading.dumpfile(emitter.doc, filename=dst)
 
 
