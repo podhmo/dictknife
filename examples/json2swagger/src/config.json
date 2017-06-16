@@ -1,0 +1,16 @@
+{
+  "server": {
+    "host": "localhost",
+    "port": "3306",
+    "slave": [
+      {"weight": 1, "ip": "10.0.0.1"},
+      {"weight": 5, "ip": "10.0.0.2"},
+      {"weight": 3, "ip": "10.0.0.3"},
+      {"weight": 2, "ip": "10.0.0.4"}
+    ]
+  },
+  "db": {
+    "user": "root",
+    "pass": "pass"
+  }
+}

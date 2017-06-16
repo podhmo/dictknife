@@ -20,12 +20,24 @@ def main(ctx, log):
     loading.setup()
 
 
+@main.command(help="tojsonschema")
+@click.argument("src", default=None, type=click.Path(exists=True))
+@click.option("--dst", default=None, type=click.Path())
+@click.option("--name", default="top")
+def tojsonschema(src, dst, name):
+    d = loading.loadfile(src)
+    root = d["definitions"].pop(name)
+    root["required"] = True
+    root.update(d)
+    loading.dumpfile(root, filename=dst)
+
+
 @main.command(help="json2swagger")
 @click.argument("src", default=None, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--name", default="top")
 @click.option("--annotations", default=None, type=click.Path(exists=True))
-@click.option("--emit", default="schema", type=click.Choice(["schema", "info", "jsonschema"]))
+@click.option("--emit", default="schema", type=click.Choice(["schema", "info"]))
 @click.option("--with-minimap", is_flag=True)
 def json2swagger(src, dst, name, annotations, emit, with_minimap):
     from prestring import Module
@@ -44,14 +56,6 @@ def json2swagger(src, dst, name, annotations, emit, with_minimap):
 
     if emit == "info":
         loading.dumpfile(info, filename=dst)
-    elif emit == "jsonschema":
-        m = Module(indent="  ")
-        m.stmt(name)
-        emitter.emit(info, m)
-        d = emitter.doc
-        root = d["definitions"].pop(name)
-        root.update(d)
-        loading.dumpfile(root, filename=dst)
     else:
         m = Module(indent="  ")
         m.stmt(name)
