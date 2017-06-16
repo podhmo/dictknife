@@ -1,5 +1,5 @@
 definitions:
-  c:
+  Zs:
     type: array
     items:
       type: integer
@@ -14,7 +14,7 @@ definitions:
     type: object
     properties:
       c:
-        $ref: '#/definitions/c'
+        $ref: '#/definitions/Zs'
     required:
     - c
   X:
