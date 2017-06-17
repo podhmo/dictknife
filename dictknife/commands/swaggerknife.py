@@ -8,6 +8,7 @@ except ImportError as e:
     print("please install via `pip install dictknife[command]`", file=sys.stderr)
     sys.exit(1)
 from dictknife import loading
+from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 loglevels = list(logging._nameToLevel.keys())
 
@@ -35,20 +36,22 @@ def tojsonschema(src, dst, name):
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("--name", default="top")
+@click.option("--detector", default="Detector")
+@click.option("--emitter", default="Emitter")
 @click.option("--annotate", default=None, type=click.Path(exists=True))
 @click.option("--emit", default="schema", type=click.Choice(["schema", "info"]))
 @click.option("--with-minimap", is_flag=True)
-def json2swagger(files, dst, name, annotate, emit, with_minimap):
+def json2swagger(files, dst, name, detector, emitter, annotate, emit, with_minimap):
     from prestring import Module
-    from dictknife.swaggerknife.json2swagger import Detector, Emitter
 
     if annotate is not None:
         annotate = loading.loadfile(annotate)
     else:
         annotate = {}
 
-    detector = Detector()
-    emitter = Emitter(annotate)
+    ns = "dictknife.swaggerknife.json2swagger"
+    detector = import_symbol(detector, ns=ns)()
+    emitter = import_symbol(emitter, ns=ns)(annotate)
 
     info = None
     for src in files:

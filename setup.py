@@ -12,8 +12,7 @@ try:
 except IOError:
     README = CHANGES = ''
 
-install_requires = [
-]
+install_requires = []
 
 docs_extras = [
     "sphinx",
@@ -29,6 +28,7 @@ command_extras = [
     "PyYAML",
     "click",
     "magicalimport",
+    "prestring",
 ]
 
 tests_require = []

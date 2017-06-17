@@ -7,17 +7,17 @@ logger = logging.getLogger(__name__)
 
 def resolve_type(val):
     if isinstance(val, str):
-        return "string"
+        return "string", None
     elif isinstance(val, bool):
-        return "boolean"
+        return "boolean", None
     elif isinstance(val, int):
-        return "integer"
+        return "integer", None
     elif isinstance(val, float):
-        return "number"
+        return "number", None
     elif hasattr(val, "keys"):
-        return "object"
+        return "object", None
     elif isinstance(val, (list, tuple)):
-        return "array"
+        return "array", None
     else:
         raise ValueError("unsupported for {!r}".format(val))
 
@@ -35,6 +35,8 @@ def make_signature(info):
 
 
 class Detector:
+    resolve_type = staticmethod(resolve_type)
+
     def make_info(self):
         return {"freq": 0, "freq2": 0, "type": "any", "children": OrderedDict(), "values": []}
 
@@ -67,10 +69,12 @@ class Detector:
             if d is None:
                 s["type2"] = "null"
             else:
-                typ = resolve_type(d)
+                typ, fmt = self.resolve_type(d)
                 s["name"] = name
                 s["freq"] += 1
                 s["type"] = typ
+                if fmt is not None:
+                    s["format"] = fmt
                 s["values"].append(d)
         ref = "#/{}".format("/".join(path))
         logger.debug("ref %s", ref)
@@ -146,6 +150,8 @@ class Emitter:
 
     def make_primitive_schema(self, info):
         d = OrderedDict(type=info["type"])
+        if "format" in info:
+            d["format"] = info["format"]
         if info["values"]:
             d["example"] = info["values"][0]
         if info.get("type2") == "null":
