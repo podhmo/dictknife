@@ -1,3 +1,10 @@
+0.5.0
+
+- lazy loading for loading data (e.g. yaml, toml)
+- dictknife linecat command
+- short error message
+- dictknife diff support array
+
 0.4.7
 
 - loading via envvar with white list
