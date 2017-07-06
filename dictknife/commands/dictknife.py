@@ -53,7 +53,7 @@ def concat(files, dst, format, input_format, output_format, debug):
 @click.option("--config", default="{}")
 @click.option("--config-file", default=None, type=click.Path(exists=True))
 @click.option("--code", default=None)
-@click.option("--function", default="dictknife.transform:identity")
+@click.option("--function", default=None)
 @click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
@@ -66,8 +66,10 @@ def transform(
     with traceback_shortly(debug):
         if code is not None:
             transform = eval(code)
-        else:
+        elif function is not None:
             transform = import_symbol(function)
+        else:
+            transform = lambda x: x  # NOQA
 
         input_format = input_format or format
         kwargs = loading.loads(config, format=input_format)
