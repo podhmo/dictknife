@@ -22,6 +22,7 @@ docs_extras = [
 
 load_extras = [
     "PyYAML",
+    "toml",
 ]
 
 command_extras = [
