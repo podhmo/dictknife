@@ -52,5 +52,7 @@ def deepmerge(*ds, override=False, make_dict=OrderedDict):
         merge = _deepmerge
     left = make_dict()
     for right in ds:
+        if not right:
+            continue
         left = merge(left, right)
     return left
