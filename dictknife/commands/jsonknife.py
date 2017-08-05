@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 from collections import OrderedDict
-from dictknife.cli import SubCommandParser
+from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.accessor import Accessor
@@ -40,7 +40,7 @@ def main():
         examples, description="output sample value from swagger's spec"
     ) as add_argument:
         add_argument("src", nargs="?", default=None)
-        add_argument("--dst", default=None)
+        add_argument("--ref", dest="ref", default=None)
         add_argument("-f", "--format", default="json", choices=formats)
 
     args = parser.parse_args()
@@ -48,7 +48,7 @@ def main():
     return args.fn(args)
 
 
-def cut(src, dst, refs):
+def cut(*, src, dst, refs):
     d = loading.loadfile(src)
     accessor = Accessor(OrderedDict)
     for ref in refs:
@@ -58,7 +58,7 @@ def cut(src, dst, refs):
     loading.dumpfile(d, dst)
 
 
-def deref(src, dst, refs, unwrap, wrap):
+def deref(*, src, dst, refs, unwrap, wrap):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
     if unwrap and not refs:
@@ -81,14 +81,14 @@ def deref(src, dst, refs, unwrap, wrap):
     loading.dumpfile(d, dst)
 
 
-def bundle(src, dst):
+def bundle(*, src, dst):
     resolver = get_resolver_from_filename(src)
     bundler = Bundler(resolver)
     d = bundler.bundle()
     loading.dumpfile(d, dst)
 
 
-def examples(src, ref, format):
+def examples(*, src, ref, format):
     data = loading.loadfile(src)
     if ref is not None:
         data = access_by_json_pointer(data, ref)

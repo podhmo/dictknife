@@ -33,6 +33,6 @@ def subparser(subparsers, fn, *args, **kwargs):
     yield add_argument
 
     def run(args):
-        return fn(*[getattr(args, name) for name in dests])
+        return fn(**{name: getattr(args, name) for name in dests})
 
     parser.set_defaults(fn=run)

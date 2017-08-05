@@ -1,14 +1,14 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
-from dictknife.cli import SubCommandParser
+from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
 
 logger = logging.getLogger(__name__)
 
 
-def concat(files, dst, format, input_format, output_format, debug):
+def concat(*, files, dst, format, input_format, output_format, debug):
     from collections import OrderedDict
     from .. import deepmerge
     with traceback_shortly(debug):
@@ -27,7 +27,7 @@ def concat(files, dst, format, input_format, output_format, debug):
 
 
 def transform(
-    src, dst, config, config_file, code, function, input_format, output_format, format, debug
+    *, src, dst, config, config_file, code, function, input_format, output_format, format, debug
 ):
     from magicalimport import import_symbol
     from .. import deepmerge
@@ -51,7 +51,7 @@ def transform(
         loading.dumpfile(result, dst, format=output_format or format)
 
 
-def diff(normalize, left, right, n, debug):
+def diff(*, normalize, left, right, n, debug):
     from dictknife import diff
     with traceback_shortly(debug):
         with open(left) as rf:
@@ -64,7 +64,7 @@ def diff(normalize, left, right, n, debug):
             print(line)
 
 
-def linecat(src, dst, input_format, output_format, format, debug):
+def linecat(*, src, dst, input_format, output_format, format, debug):
     input_format = input_format or format
     output_format = output_format or format
 
