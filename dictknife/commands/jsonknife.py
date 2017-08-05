@@ -14,40 +14,6 @@ from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_
 logger = logging.getLogger(__name__)
 
 
-def main():
-    parser = SubCommandParser()
-
-    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
-    formats = loading.get_formats()
-
-    with parser.subcommand(cut) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--ref", dest="refs", action="append")
-
-    with parser.subcommand(deref) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--ref", dest="refs", action="append")
-        add_argument("--unwrap", default=None)
-        add_argument("--wrap", default=None)
-
-    with parser.subcommand(bundle) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-
-    with parser.subcommand(
-        examples, description="output sample value from swagger's spec"
-    ) as add_argument:
-        add_argument("src", nargs="?", default=None)
-        add_argument("--ref", dest="ref", default=None)
-        add_argument("-f", "--format", default="json", choices=formats)
-
-    args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log))
-    return args.fn(args)
-
-
 def cut(*, src, dst, refs):
     d = loading.loadfile(src)
     accessor = Accessor(OrderedDict)
@@ -95,3 +61,37 @@ def examples(*, src, ref, format):
     plotter = SampleValuePlotter()
     d = plotter.plot(data)
     loading.dumpfile(d, format=format)
+
+
+def main():
+    parser = SubCommandParser()
+
+    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    formats = loading.get_formats()
+
+    with parser.subcommand(cut) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--ref", dest="refs", action="append")
+
+    with parser.subcommand(deref) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--ref", dest="refs", action="append")
+        add_argument("--unwrap", default=None)
+        add_argument("--wrap", default=None)
+
+    with parser.subcommand(bundle) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+
+    with parser.subcommand(
+        examples, description="output sample value from swagger's spec"
+    ) as add_argument:
+        add_argument("src", nargs="?", default=None)
+        add_argument("--ref", dest="ref", default=None)
+        add_argument("-f", "--format", default="json", choices=formats)
+
+    args = parser.parse_args()
+    logging.basicConfig(level=getattr(logging, args.log))
+    return args.fn(args)
