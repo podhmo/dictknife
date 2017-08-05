@@ -1,30 +1,11 @@
 # -*- coding:utf-8 -*-
 import logging
-import sys
-try:
-    import click
-except ImportError as e:
-    print(e, file=sys.stderr)
-    print("please install via `pip install dictknife[command]`", file=sys.stderr)
-    sys.exit(1)
 from dictknife import loading
+from dictknife.commandline import SubCommandParser
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
-loglevels = list(logging._nameToLevel.keys())
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help']})
-@click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
-@click.pass_context
-def main(ctx, log):
-    logging.basicConfig(level=getattr(logging, log))
-    loading.setup()
-
-
-@main.command(help="tojsonschema")
-@click.argument("src", default=None, type=click.Path(exists=True), required=False)
-@click.option("--dst", default=None, type=click.Path())
-@click.option("--name", default="top")
 def tojsonschema(src, dst, name):
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)
@@ -32,15 +13,6 @@ def tojsonschema(src, dst, name):
     loading.dumpfile(root, filename=dst)
 
 
-@main.command(help="json2swagger")
-@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("--name", default="top")
-@click.option("--detector", default="Detector")
-@click.option("--emitter", default="Emitter")
-@click.option("--annotate", default=None, type=click.Path(exists=True))
-@click.option("--emit", default="schema", type=click.Choice(["schema", "info"]))
-@click.option("--with-minimap", is_flag=True)
 def json2swagger(files, dst, name, detector, emitter, annotate, emit, with_minimap):
     from prestring import Module
 
@@ -71,11 +43,39 @@ def json2swagger(files, dst, name, detector, emitter, annotate, emit, with_minim
         loading.dumpfile(emitter.doc, filename=dst)
 
 
-@main.command(help="flatten jsonschema sub definitions")
-@click.argument("src", default=None, type=click.Path(exists=True), required=False)
-@click.option("--dst", default=None, type=click.Path())
 def flatten(src, dst):
     from dictknife.swaggerknife.flatten import flatten
     data = loading.loadfile(src)
     d = flatten(data)
     loading.dumpfile(d, dst)
+
+
+def main():
+    parser = SubCommandParser()
+
+    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+
+    with parser.subcommand(tojsonschema) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--name", default="top")
+
+    with parser.subcommand(json2swagger) as add_argument:
+        add_argument("files", nargs="*", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--name", default="top")
+        add_argument("--detector", default="Detector")
+        add_argument("--emitter", default="Emitter")
+        add_argument("--annotate", default=None)
+        add_argument("--emit", default="schema", choices=["schema", "info"])
+        add_argument("--with-minimap", action="store_true")
+
+    with parser.subcommand(
+        flatten, description="flatten jsonschema sub definitions"
+    ) as add_argument:
+        add_argument("src", nargs="?", default=None)
+        add_argument("--dst", default=None)
+
+    args = parser.parse_args()
+    logging.basicConfig(level=getattr(logging, args.log))
+    return args.fn(args)

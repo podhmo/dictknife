@@ -1,35 +1,14 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
-try:
-    import click
-except ImportError as e:
-    print(e, file=sys.stderr)
-    print("please install via `pip install dictknife[command]`", file=sys.stderr)
-    sys.exit(1)
+from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
 
 logger = logging.getLogger(__name__)
-loglevels = list(logging._nameToLevel.keys())
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help']})
-@click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
-@click.pass_context
-def main(ctx, log):
-    logging.basicConfig(level=getattr(logging, log))
-    loading.setup()
-
-
-@main.command(help="concat dicts")
-@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("-i", "--input-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("-o", "--output-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--debug", is_flag=True)
-def concat(files, dst, format, input_format, output_format, debug):
+def concat(*, files, dst, format, input_format, output_format, debug):
     from collections import OrderedDict
     from .. import deepmerge
     with traceback_shortly(debug):
@@ -47,19 +26,8 @@ def concat(files, dst, format, input_format, output_format, debug):
         loading.dumpfile(d, dst, format=output_format or format)
 
 
-@main.command(help="transform dict")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("--config", default="{}")
-@click.option("--config-file", default=None, type=click.Path(exists=True))
-@click.option("--code", default=None)
-@click.option("--function", default=None)
-@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--debug", is_flag=True)
 def transform(
-    src, dst, config, config_file, code, function, input_format, output_format, format, debug
+    *, src, dst, config, config_file, code, function, input_format, output_format, format, debug
 ):
     from magicalimport import import_symbol
     from .. import deepmerge
@@ -83,13 +51,7 @@ def transform(
         loading.dumpfile(result, dst, format=output_format or format)
 
 
-@main.command(help="diff dict")
-@click.option("--normalize", is_flag=True, default=False)
-@click.argument("left", required=True, type=click.Path(exists=True))
-@click.argument("right", required=True, type=click.Path(exists=True))
-@click.argument("n", required=False, type=click.INT, default=3)
-@click.option("--debug", is_flag=True)
-def diff(normalize, left, right, n, debug):
+def diff(*, normalize, left, right, n, debug):
     from dictknife import diff
     with traceback_shortly(debug):
         with open(left) as rf:
@@ -102,14 +64,7 @@ def diff(normalize, left, right, n, debug):
             print(line)
 
 
-@main.command(help="line cat")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--debug", is_flag=True)
-def linecat(src, dst, input_format, output_format, format, debug):
+def linecat(*, src, dst, input_format, output_format, format, debug):
     input_format = input_format or format
     output_format = output_format or format
 
@@ -125,3 +80,49 @@ def linecat(src, dst, input_format, output_format, format, debug):
         else:
             with open(src) as rf:
                 consume(iter(rf))
+
+
+def main():
+    parser = SubCommandParser()
+
+    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    formats = loading.get_formats()
+
+    with parser.subcommand(concat, description="concat dicts") as add_argument:
+        add_argument("files", nargs="*", default=sys.stdin)
+        add_argument("--dst", default=None)
+        add_argument("-f", "--format", default=None, choices=formats)
+        add_argument("-i", "--input-format", default=None, choices=formats)
+        add_argument("-o", "--output-format", default=None, choices=formats)
+        add_argument("--debug", action="store_true")
+
+    with parser.subcommand(transform, description="transform dict") as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--config", default="{}")
+        add_argument("--config-file", default=None)
+        add_argument("--code", default=None)
+        add_argument("--function", default=None)
+        add_argument("-i", "--input-format", default=None, choices=formats)
+        add_argument("-o", "--output-format", default=None, choices=formats)
+        add_argument("-f", "--format", default=None, choices=formats)
+        add_argument("--debug", action="store_true")
+
+    with parser.subcommand(diff, description="diff dict") as add_argument:
+        add_argument("--normalize", action="store_true")
+        add_argument("left")
+        add_argument("right")
+        add_argument("--n", default=3, type=int)
+        add_argument("--debug", action="store_true")
+
+    with parser.subcommand(linecat) as add_argument:
+        add_argument("files", nargs="*", default=sys.stdin)
+        add_argument("--dst", default=None)
+        add_argument("-i", "--input-format", default=None, choices=formats)
+        add_argument("-o", "--output-format", default=None, choices=formats)
+        add_argument("-f", "--format", default=None, choices=formats)
+        add_argument("--debug", action="store_true")
+
+    args = parser.parse_args()
+    logging.basicConfig(level=getattr(logging, args.log))
+    return args.fn(args)

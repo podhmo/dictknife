@@ -27,7 +27,6 @@ load_extras = [
 
 command_extras = [
     "PyYAML",
-    "click",
     "magicalimport",
     "prestring",
 ]
