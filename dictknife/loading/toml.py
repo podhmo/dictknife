@@ -1,18 +1,9 @@
-from .util import LazyImporter
-importer = LazyImporter()
+from ._lazyimport import m
 
 
-@importer.setup
-def import_toml():
-    import toml
-    return toml
+def load(fp, *, loader=None, **kwargs):
+    return m.toml.load(fp, **kwargs)
 
 
-@importer.use
-def load(m, fp, *, loader=None, **kwargs):
-    return m.load(fp, **kwargs)
-
-
-@importer.use
-def dump(m, *args, **kwargs):
-    return m.dump(*args, **kwargs)
+def dump(*args, **kwargs):
+    return m.toml.dump(*args, **kwargs)

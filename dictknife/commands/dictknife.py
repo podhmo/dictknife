@@ -26,8 +26,8 @@ def main(ctx, log):
 @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
 @click.option("--dst", default=None, type=click.Path())
 @click.option("-f", "--format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--input-format", default=None, type=click.Choice(loading.get_formats()))
-@click.option("--output-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("-i", "--input-format", default=None, type=click.Choice(loading.get_formats()))
+@click.option("-o", "--output-format", default=None, type=click.Choice(loading.get_formats()))
 @click.option("--debug", is_flag=True)
 def concat(files, dst, format, input_format, output_format, debug):
     from collections import OrderedDict

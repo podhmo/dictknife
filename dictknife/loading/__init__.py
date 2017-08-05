@@ -3,13 +3,13 @@ import sys
 import os.path
 import logging
 from io import StringIO
-logger = logging.getLogger(__name__)  # NOQA
 from . import json
 from . import raw
 from . import env
 from . import yaml
 from . import toml
 
+logger = logging.getLogger(__name__)
 unknown = "(unknown)"
 
 

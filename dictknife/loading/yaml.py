@@ -1,22 +1,9 @@
-from .util import LazyImporter
-
-importer = LazyImporter()
+from ._lazyimport import m
 
 
-@importer.setup
-def import_yaml():
-    from . import _yaml as m
-    m.setup(m.Loader, m.Dumper)
-    return m
+def load(fp, *, loader=None, **kwargs):
+    return m.yaml.load(fp, Loader=m.yaml.Loader, **kwargs)
 
 
-@importer.use
-def load(m, fp, *, loader=None, **kwargs):
-    return m.load(fp, Loader=m.Loader, **kwargs)
-
-
-@importer.use
-def dump(m, d, fp):
-    return m.dump(
-        d, fp, allow_unicode=True, default_flow_style=False, Dumper=m.Dumper
-    )
+def dump(d, fp):
+    return m.yaml.dump(d, fp, allow_unicode=True, default_flow_style=False, Dumper=m.yaml.Dumper)
