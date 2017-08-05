@@ -1,13 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 from collections import OrderedDict
-import sys
-try:
-    import click
-except ImportError as e:
-    print(e, file=sys.stderr)
-    print("please install via `pip install dictknife[command]`", file=sys.stderr)
-    sys.exit(1)
+from dictknife.cli import SubCommandParser
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.accessor import Accessor
@@ -18,21 +12,42 @@ from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
 
 logger = logging.getLogger(__name__)
-loglevels = list(logging._nameToLevel.keys())
 
 
-@click.group(context_settings={'help_option_names': ['-h', '--help']})
-@click.option("--log", help="logging level", default="INFO", type=click.Choice(loglevels))
-@click.pass_context
-def main(ctx, log):
-    logging.basicConfig(level=getattr(logging, log))
-    loading.setup()
+def main():
+    parser = SubCommandParser()
+
+    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    formats = loading.get_formats()
+
+    with parser.subcommand(cut) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--ref", dest="refs", action="append")
+
+    with parser.subcommand(deref) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+        add_argument("--ref", dest="refs", action="append")
+        add_argument("--unwrap", default=None)
+        add_argument("--wrap", default=None)
+
+    with parser.subcommand(bundle) as add_argument:
+        add_argument("--src", default=None)
+        add_argument("--dst", default=None)
+
+    with parser.subcommand(
+        examples, description="output sample value from swagger's spec"
+    ) as add_argument:
+        add_argument("src", nargs="?", default=None)
+        add_argument("--dst", default=None)
+        add_argument("-f", "--format", default="json", choices=formats)
+
+    args = parser.parse_args()
+    logging.basicConfig(level=getattr(logging, args.log))
+    return args.fn(args)
 
 
-@main.command(help="cut")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("refs", "--ref", default=None, multiple=True)
 def cut(src, dst, refs):
     d = loading.loadfile(src)
     accessor = Accessor(OrderedDict)
@@ -43,12 +58,6 @@ def cut(src, dst, refs):
     loading.dumpfile(d, dst)
 
 
-@main.command(help="deref")
-@click.option("--src", default=None, type=click.Path(exists=True))
-@click.option("--dst", default=None, type=click.Path())
-@click.option("refs", "--ref", default=None, multiple=True)
-@click.option("--unwrap", default=None)
-@click.option("--wrap", default=None)
 def deref(src, dst, refs, unwrap, wrap):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
@@ -72,9 +81,6 @@ def deref(src, dst, refs, unwrap, wrap):
     loading.dumpfile(d, dst)
 
 
-@main.command(help="bundle")
-@click.option("--src", default=None, type=click.Path(exists=True), required=True)
-@click.option("--dst", default=None, type=click.Path())
 def bundle(src, dst):
     resolver = get_resolver_from_filename(src)
     bundler = Bundler(resolver)
@@ -82,10 +88,6 @@ def bundle(src, dst):
     loading.dumpfile(d, dst)
 
 
-@main.command(help="output sample value from swagger's spec")
-@click.argument("src", type=click.Path(exists=True), default=None, required=False)
-@click.option("--ref", default=None)
-@click.option("-f", "--format", type=click.Choice(loading.get_formats()), default="json")
 def examples(src, ref, format):
     data = loading.loadfile(src)
     if ref is not None:

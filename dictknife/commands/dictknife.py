@@ -6,7 +6,6 @@ from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
 
 logger = logging.getLogger(__name__)
-loglevels = list(logging._nameToLevel.keys())
 
 
 def concat(files, dst, format, input_format, output_format, debug):
