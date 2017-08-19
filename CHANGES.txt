@@ -1,3 +1,10 @@
+0.6.0
+
+- drop click
+- many short options (e.g. -o for --output-format)
+- drop legacy LooseDictWalker and dictknife.chain
+- simply for lazy loading module, in dictknife.loading
+
 0.5.0
 
 - lazy loading for loading data (e.g. yaml, toml)
