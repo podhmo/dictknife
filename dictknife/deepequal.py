@@ -62,7 +62,7 @@ class _Atom:
     def __init__(self, value):
         self.value = value
 
-    @property
+    @reify
     def uid(self):
         return repr(self.value)
 
