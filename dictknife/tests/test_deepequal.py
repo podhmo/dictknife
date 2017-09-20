@@ -113,3 +113,17 @@ class DeepEqualTests(unittest.TestCase):
         ]
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
+
+    def test_it6(self):
+        d0 = [
+            [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+            [[10, 11, 12], [11, 12, 13], [12, 13, 14]],
+            [[100, 101, 102], [101, 102, 103], [102, 103, 104]],
+        ]
+        d1 = [
+            [[11, 12, 13], [12, 13, 14], [10, 11, 12]],
+            [[2, 3, 4], [1, 2, 3], [0, 1, 2]],
+            [[102, 103, 104], [100, 101, 102], [101, 102, 103]],
+        ]
+        self.assertNotEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))
