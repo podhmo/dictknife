@@ -25,7 +25,7 @@ class DeepEqualTests(unittest.TestCase):
                 "y": {
                     "j": ref(3)
                 }
-            }
+            },
         }
         d1 = {
             "a": ref(1),
@@ -36,7 +36,7 @@ class DeepEqualTests(unittest.TestCase):
                 "y": {
                     "j": ref(3)
                 }
-            }
+            },
         }
         self.assertEqual(ref(1), ref(1), msg="prepare")
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
@@ -67,5 +67,49 @@ class DeepEqualTests(unittest.TestCase):
     def test_it4(self):
         d0 = [[[1, 2, 3], [1]], [[1, 2], [2, 3], [3, 4]]]
         d1 = [[[1], [1, 2, 3]], [[1, 2], [3, 4], [2, 3]]]
+        self.assertNotEqual(d0, d1)
+        self.assertTrue(self._callFUT(d0, d1, normalize=True))
+
+    def test_it5(self):
+        d0 = [
+            {
+                "xs": [{
+                    "name": "i"
+                }, {
+                    "name": "j"
+                }, {
+                    "name": "k"
+                }]
+            },
+            {
+                "xs": [{
+                    "name": "x"
+                }, {
+                    "name": "y"
+                }, {
+                    "name": "z"
+                }]
+            },
+        ]
+        d1 = [
+            {
+                "xs": [{
+                    "name": "y"
+                }, {
+                    "name": "x"
+                }, {
+                    "name": "z"
+                }]
+            },
+            {
+                "xs": [{
+                    "name": "k"
+                }, {
+                    "name": "j"
+                }, {
+                    "name": "i"
+                }]
+            },
+        ]
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
