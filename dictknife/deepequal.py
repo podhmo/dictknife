@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 from .langhelpers import reify
 
 
@@ -65,7 +64,7 @@ class _Atom:
 
     @property
     def uid(self):
-        return self.value
+        return repr(self.value)
 
     @property
     def keys(self):
@@ -85,7 +84,7 @@ class _Collection:
 
     @reify
     def uid(self):
-        return tuple([v.uid for v in self.value])
+        return repr(tuple([v.uid for v in self.value]))
 
     def unwrap(self):
         return [v.unwrap() for v in self.value]
@@ -104,7 +103,7 @@ class _Dict:
 
     @reify
     def uid(self):
-        return tuple(self.value.get(k, _NONE).uid for k in self.keys)
+        return repr(tuple(self.value.get(k, _NONE).uid for k in self.keys))
 
     def unwrap(self):
         d = self.value
