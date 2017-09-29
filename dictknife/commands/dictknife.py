@@ -17,12 +17,12 @@ def concat(*, files, dst, format, input_format, output_format, debug):
             logger.debug("merge: %s", f)
             with open(f) as rf:
                 sd = loading.load(rf, format=input_format or format)
-            if isinstance(sd, (list, tuple)):
-                if not isinstance(d, (list, tuple)):
-                    d = [d] if d else []
-                d.extend(sd)
-            else:
-                d = deepmerge(d, sd)
+                if hasattr(sd, "keys"):
+                    d = deepmerge(d, sd)
+                else:
+                    if not isinstance(d, (list, tuple)):
+                        d = [d] if d else []
+                    d.extend(sd)
         loading.dumpfile(d, dst, format=output_format or format)
 
 
