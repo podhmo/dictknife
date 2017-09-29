@@ -39,7 +39,10 @@ class Loader:
             return self.load(sys.stdin, format=format)
         else:
             with open(filename) as rf:
-                return self.load(rf, format=format)
+                r = self.load(rf, format=format)
+                if not hasattr(r, "keys") and hasattr(r, "__iter__"):
+                    r = list(r)
+                return r
 
 
 class Dumper:
