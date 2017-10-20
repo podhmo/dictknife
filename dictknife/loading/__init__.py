@@ -8,6 +8,7 @@ from . import raw
 from . import env
 from . import yaml
 from . import toml
+from . import tsv
 
 logger = logging.getLogger(__name__)
 unknown = "(unknown)"
@@ -38,7 +39,10 @@ class Loader:
             return self.load(sys.stdin, format=format)
         else:
             with open(filename) as rf:
-                return self.load(rf, format=format)
+                r = self.load(rf, format=format)
+                if not hasattr(r, "keys") and hasattr(r, "__iter__"):
+                    r = list(r)
+                return r
 
 
 class Dumper:
@@ -102,6 +106,7 @@ dispather = Dispatcher()
 dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
 dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
 dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
+dispather.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
 dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])

@@ -13,6 +13,11 @@ class LoadingModule:
         return toml
 
     @reify
+    def csv(self):
+        import csv
+        return csv
+
+    @reify
     def yaml(self):
         from . import _yaml as yaml
         yaml.setup(yaml.Loader, yaml.Dumper)
