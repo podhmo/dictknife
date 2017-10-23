@@ -1,8 +1,9 @@
 import sys
 import logging
 import os.path
+from functools import partial
 from collections import OrderedDict
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
@@ -18,49 +19,50 @@ class Bundler(object):
         self.item_map = OrderedDict()  # localref -> item
         self.strict = strict
 
-    @reify
-    def scanner(self):
-        return Scanner(self.accessor, self.item_map, strict=self.strict)
+    def build_localref_fixer(self, doc):
+        if "components" in doc or doc.get("openapi", "").startswith("3"):
+            prefixes = ["definitions"]
+            return SwaggerLocalrefFixer(prefixes, "components/schemas")
+        else:
+            prefixes = set(["definitions", "paths", "responses", "parameters"])
+            return SwaggerLocalrefFixer(prefixes, "definitions")
 
-    @reify
-    def emitter(self):
-        return Emitter(self.accessor, self.item_map)
+    def build_fix_conflict(self):
+        if self.strict:
+            return error_on_conflict
+        else:
+            return partial(fix_on_conflict, self.item_map)
 
     def bundle(self, doc=None):
         doc = doc or self.resolver.doc
-        self.scanner.scan(doc)
-        return self.emitter.emit(self.resolver, doc)
+
+        localref_fixer = self.build_localref_fixer(doc)
+        fix_conflict = self.build_fix_conflict()
+        fixref_walker = FixRefWalker(self.accessor, localref_fixer, fix_conflict)
+        fixref_walker.walk(doc, self.item_map)
+
+        emitter = Emitter(self.accessor, self.item_map)
+        return emitter.emit(self.resolver, doc)
 
 
-class Scanner(object):
-    def __init__(self, accessor, item_map, strict=False):
+class FixRefWalker:
+    def __init__(self, accessor, localref_fixer, fix_conflict):
         self.accessor = accessor
-        self.item_map = item_map
-        self.strict = strict
+        self.localref_fixer = localref_fixer
+        self.fix_conflict = fix_conflict
+        self.ref_walking = DictWalker(["$ref"])
 
-    @reify
-    def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
-
-    @reify
-    def conflict_fixer(self):  # todo: rename
-        return SimpleConflictFixer(self.item_map, strict=self.strict)
-
-    @reify
-    def localref_fixer(self):  # todo: rename
-        return SwaggerLocalrefFixer()
-
-    def scan(self, doc):
+    def walk(self, doc, item_map):
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
                 item = self.localref_fixer.fix_localref(path, item)
-                if item.localref not in self.item_map:
-                    self.item_map[item.localref] = item
-                    self.scan(doc=item.data)
-                if item.globalref != self.item_map[item.localref].globalref:
-                    newitem = self.conflict_fixer.fix_conflict(self.item_map[item.localref], item)
-                    self.scan(doc=newitem.data)
+                if item.localref not in item_map:
+                    item_map[item.localref] = item
+                    self.walk(item.data, item_map)
+                if item.globalref != item_map[item.localref].globalref:
+                    newitem = self.fix_conflict(item_map[item.localref], item)
+                    self.walk(newitem.data, item_map)
             except RuntimeError:
                 raise
             except Exception as e:
@@ -77,7 +79,7 @@ class Emitter(object):
 
     @reify
     def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
+        return DictWalker(["$ref"])
 
     def get_item_by_globalref(self, globalref):
         return self.accessor.cache[globalref]
@@ -122,16 +124,18 @@ class Emitter(object):
 
 
 class SwaggerLocalrefFixer(object):  # todo: rename
-    prefixes = set(["definitions", "paths", "responses", "parameters"])
+    def __init__(self, prefixes, definition_prefix):
+        self.prefixes = prefixes
+        self.definition_prefix = definition_prefix
 
     def guess_prefix(self, path, item):
         for node in reversed(path):
             if node in self.prefixes:
                 return node
             if node == "schema":
-                return "definitions"
+                return self.definition_prefix
         logger.info("fix localref: prefix is not found from %s", path)
-        return "definitions"
+        return self.definition_prefix
 
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
@@ -158,23 +162,21 @@ class SwaggerLocalrefFixer(object):  # todo: rename
         return item
 
 
-class SimpleConflictFixer(object):  # todo: rename
-    def __init__(self, item_map, strict=False):
-        self.item_map = item_map
-        self.strict = strict
+def error_on_conflict(item_map, olditem, newitem):
+    msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
+    raise RuntimeError(msg)
 
-    def fix_conflict(self, olditem, newitem):
-        msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
-        if self.strict:
-            raise RuntimeError(msg)
-        sys.stderr.write(msg)
-        sys.stderr.write("\n")
-        i = 1
-        while True:
-            new_localref = "{}{}".format(newitem.localref, i)
-            if new_localref not in self.item_map:
-                newitem.localref = new_localref
-                break
-            i += 1
-        self.item_map[newitem.localref] = newitem
-        return newitem
+
+def fix_on_conflict(item_map, olditem, newitem):
+    msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
+    sys.stderr.write(msg)
+    sys.stderr.write("\n")
+    i = 1
+    while True:
+        new_localref = "{}{}".format(newitem.localref, i)
+        if new_localref not in item_map:
+            newitem.localref = new_localref
+            break
+        i += 1
+    item_map[newitem.localref] = newitem
+    return newitem

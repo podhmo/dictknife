@@ -114,3 +114,4 @@ def get_resolver_from_filename(filename, loader=loading, doc=None, onload=None):
         if doc:
             resolver.doc = doc
         return resolver
+
