@@ -1,0 +1,33 @@
+paths:
+  /products:
+    get:
+      summary: Product Types
+      description: The Products endpoint returns information about the Uber products offered at a given location. The response includes the display name and other details about each product, and lists the products in the proper display order.
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude component of location.
+          required: true
+          type: number
+          format: double
+        - name: longitude
+          in: query
+          description: Longitude component of location.
+          required: true
+          type: number
+          format: double
+      security:
+        - apikey: []
+      tags:
+        - Products
+      responses:
+        "200":
+          description: An array of products
+          schema:
+            type: array
+            items:
+              $ref: '../definitions.yaml#/definitions/Product'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '../definitions.yaml#/definitions/Error'
