@@ -104,3 +104,8 @@ class DictWalker(object):
 
 
 LooseDictWalkingIterator = DictWalker  # NOQA for backward comaptibility
+
+
+def walk(qs, d, *, handler=None, context_factory=None):
+    w = DictWalker(qs, handler=handler, context_factory=context_factory)
+    return w.walk(d)
