@@ -3,7 +3,7 @@ import unittest
 
 class Tests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
-        from dictknife.swaggerknife import Flattener
+        from dictknife.swaggerknife.flatten import Flattener
         return Flattener(*args, **kwargs)
 
     def test_it(self):
@@ -48,7 +48,7 @@ class Tests(unittest.TestCase):
 """
         d = json.loads(s)
         target = self._makeOne()
-        got = target.flatten(d["definitions"]["a"], "a")
+        got = target.flatten(d["definitions"])
 
         expected = json.loads(
             """

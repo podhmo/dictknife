@@ -37,6 +37,11 @@ class Flattener:
             self.emit_definition(name, definition)
         return self.doc
 
+    def flatten(self, d):
+        for name, sd in d.items():
+            self.replace(sd, name)
+        return self.doc
+
 
 def flatten(doc, *, position="#/definitions"):
     flattener = Flattener(doc, position=position)
