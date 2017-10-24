@@ -21,11 +21,17 @@ class Bundler(object):
 
     def build_localref_fixer(self, doc):
         if "components" in doc or doc.get("openapi", "").startswith("3"):
-            prefixes = ["definitions"]
-            return SwaggerLocalrefFixer(prefixes, "components/schemas")
+            prefixes = {"paths": "paths"}
+            return SwaggerLocalrefFixer(
+                prefixes,
+                "components/schemas",
+                failback=lambda path, item: "/".join(path[:2]) if path[0] == "components" else "components/schemas",
+            )
         else:
-            prefixes = set(["definitions", "paths", "responses", "parameters"])
-            return SwaggerLocalrefFixer(prefixes, "definitions")
+            prefixes = {k: k for k in ["definitions", "paths", "responses", "parameters"]}
+            return SwaggerLocalrefFixer(
+                prefixes, "definitions", failback=lambda path, item: "definitions"
+            )
 
     def build_fix_conflict(self):
         if self.strict:
@@ -124,18 +130,19 @@ class Emitter(object):
 
 
 class SwaggerLocalrefFixer(object):  # todo: rename
-    def __init__(self, prefixes, definition_prefix):
+    def __init__(self, prefixes, definition_prefix, failback):
         self.prefixes = prefixes
         self.definition_prefix = definition_prefix
+        self.failback = failback
 
     def guess_prefix(self, path, item):
         for node in reversed(path):
-            if node in self.prefixes:
-                return node
             if node == "schema":
                 return self.definition_prefix
+            if node in self.prefixes:
+                return self.prefixes[node]
         logger.info("fix localref: prefix is not found from %s", path)
-        return self.definition_prefix
+        return self.failback(path, item)
 
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
