@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from dictknife.langhelpers import reify
+from dictknife import DictWalker
 from dictknife.jsonknife.lifting import Extractor, LiftingState
 
 
@@ -37,11 +38,10 @@ class Flattener:
         return self.doc
 
 
-def flatten(data):
-    if "definitions" not in data:
-        return data
-    flattener = Flattener(data, position="definitions")
-    defs = data["definitions"]
-    for name in list(defs.keys()):
-        flattener.replace(defs[name], name)
-    return data
+def flatten(doc, *, position="#/definitions"):
+    flattener = Flattener(doc, position=position)
+    w = DictWalker(flattener.path)
+    for path, d in w.walk(doc):
+        for name, sd in d[path[-1]].items():
+            flattener.replace(sd, name)
+    return doc

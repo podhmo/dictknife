@@ -3,6 +3,7 @@ as command (swaggerknife)
 
 - json2swagger
 - flatten
+- bundle
 
 json2swagger
 ----------------------------------------
@@ -96,4 +97,57 @@ src/abc.yaml
 dst/abc.yaml
 
 .. literalinclude:: ../../examples/flatten/dst/abc.yaml
+   :language: yaml
+
+bundle
+----------------------------------------
+
+.. code-block:: bash
+
+  $ tree src
+  src/
+  ├── api
+  │   ├── me.json
+  │   └── user.json
+  ├── definitions
+  │   ├── primitive.json
+  │   └── user.json
+  └── main.json
+
+
+src/main.json
+
+.. literalinclude:: ../../examples/linker/src/main.json
+
+src/api/me.json
+
+.. literalinclude:: ../../examples/linker/src/api/me.json
+
+src/api/user.json
+
+.. literalinclude:: ../../examples/linker/src/api/user.json
+
+src/definitions/primitive.json
+
+.. literalinclude:: ../../examples/linker/src/definitions/primitive.json
+
+src/definitions/user.json
+
+.. literalinclude:: ../../examples/linker/src/definitions/user.json
+
+bundle output
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+bundle output is this.
+
+.. code-block:: bash
+
+   $ swaggerknife bundle --src src/main.json --dst bundle.yaml
+
+   # if you want json output
+   $ swaggerknife bundle --src src/main.json --dst bundle.json
+
+bundle.yaml
+
+.. literalinclude:: ../../examples/linker/bundle.yaml
    :language: yaml

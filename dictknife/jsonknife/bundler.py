@@ -9,7 +9,7 @@ from dictknife import Accessor
 from dictknife import deepmerge
 from .accessor import CachedItemAccessor
 
-logger = logging.getLogger("jsonknife.bundler")
+logger = logging.getLogger(__name__)
 
 
 class Bundler(object):

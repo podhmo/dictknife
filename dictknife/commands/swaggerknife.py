@@ -50,6 +50,12 @@ def flatten(src, dst):
     loading.dumpfile(d, dst)
 
 
+def bundle(*, src, dst):
+    from dictknife.swaggerknife.bundle import bundle
+    d = bundle(src)
+    loading.dumpfile(d, dst)
+
+
 def main():
     parser = SubCommandParser()
 
@@ -74,6 +80,10 @@ def main():
         flatten, description="flatten jsonschema sub definitions"
     ) as add_argument:
         add_argument("src", nargs="?", default=None)
+        add_argument("--dst", default=None)
+
+    with parser.subcommand(bundle) as add_argument:
+        add_argument("--src", default=None)
         add_argument("--dst", default=None)
 
     args = parser.parse_args()

@@ -1,4 +1,5 @@
-  assign:
+assign:
+
   OrderedDict([('a', OrderedDict([('b', OrderedDict([('c', 'v')]))]))])
   {
     "a": {
@@ -7,15 +8,18 @@
       }
     }
   }
-  
-  access: ["a", "b", "c"]
+
+access: ["a", "b", "c"]
+
   ['a', 'b', 'c'] v
-  
-  exists:
+
+exists:
+
   ['a', 'b', 'c'] True
   ['a', 'b', 'x'] False
-  
-  maybe_remove:
+
+maybe_remove:
+
   ['a', 'b', 'x'] None
   ['a', 'b', 'c'] None
   {
@@ -23,11 +27,13 @@
       "b": {}
     }
   }
-  
-  maybe_access_container:
+
+maybe_access_container:
+
   ['a', 'b', 'x'] None
   ['a', 'b', 'c'] OrderedDict([('c', 'v')])
-  
-  maybe_access:
+
+maybe_access:
+
   ['a', 'b', 'x'] None
   ['a', 'b', 'c'] v

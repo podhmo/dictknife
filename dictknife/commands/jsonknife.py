@@ -6,7 +6,6 @@ from dictknife import loading
 from dictknife import deepmerge
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
-from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import SampleValuePlotter
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
@@ -47,13 +46,6 @@ def deref(*, src, dst, refs, unwrap, wrap):
     loading.dumpfile(d, dst)
 
 
-def bundle(*, src, dst):
-    resolver = get_resolver_from_filename(src)
-    bundler = Bundler(resolver)
-    d = bundler.bundle()
-    loading.dumpfile(d, dst)
-
-
 def examples(*, src, ref, format):
     data = loading.loadfile(src)
     if ref is not None:
@@ -80,10 +72,6 @@ def main():
         add_argument("--ref", dest="refs", action="append")
         add_argument("--unwrap", default=None)
         add_argument("--wrap", default=None)
-
-    with parser.subcommand(bundle) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
 
     with parser.subcommand(
         examples, description="output sample value from swagger's spec"

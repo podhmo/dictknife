@@ -3,7 +3,6 @@ as command (jsonknife)
 
 Handling JSON data espencially swagger like structure.
 
-- bundle
 - cut
 - deref
 - examples
@@ -62,7 +61,7 @@ dst/00cut.yaml
    :language: yaml
 
 
-bundle and deref
+deref
 ----------------------------------------
 
 .. code-block:: bash
@@ -97,23 +96,6 @@ src/definitions/primitive.json
 src/definitions/user.json
 
 .. literalinclude:: ../../examples/linker/src/definitions/user.json
-
-bundle output
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-bundle output is this.
-
-.. code-block:: bash
-
-   $ jsonknife bundle --src src/main.json --dst bundle.yaml
-
-   # if you want json output
-   $ jsonknife bundle --src src/main.json --dst bundle.json
-
-bundle.yaml
-
-.. literalinclude:: ../../examples/linker/bundle.yaml
-   :language: yaml
 
 deref output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
