@@ -1,0 +1,99 @@
+paths:
+  /estimates/price:
+    get:
+      summary: Price Estimates
+      description: The Price Estimates endpoint returns an estimated price range for each product offered at a given location. The price estimate is provided as a formatted string with the full price range and the localized currency symbol.<br><br>The response also includes low and high estimates, and the [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217) currency code for situations requiring currency conversion. When surge is active for a particular product, its surge_multiplier will be greater than 1, but the price estimate already factors in this multiplier.
+      parameters:
+        - name: start_latitude
+          in: query
+          description: Latitude component of start location.
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: start_longitude
+          in: query
+          description: Longitude component of start location.
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: end_latitude
+          in: query
+          description: Latitude component of end location.
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: end_longitude
+          in: query
+          description: Longitude component of end location.
+          required: true
+          schema:
+            type: number
+            format: double
+      tags:
+        - Estimates
+      responses:
+        '200':
+          description: An array of price estimates by product
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../components/schemas.yaml#/components/schemas/PriceEstimate"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../components/schemas.yaml#/components/schemas/Error"
+  /estimates/time:
+    get:
+      summary: Time Estimates
+      description: The Time Estimates endpoint returns ETAs for all products offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
+      parameters:
+        - name: start_latitude
+          in: query
+          description: Latitude component of start location.
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: start_longitude
+          in: query
+          description: Longitude component of start location.
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: customer_uuid
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Unique customer identifier to be used for experience customization.
+        - name: product_id
+          in: query
+          schema:
+            type: string
+          description: Unique identifier representing a specific product for a given latitude & longitude.
+      tags:
+        - Estimates
+      responses:
+        '200':
+          description: An array of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "../components/schemas.yaml#/components/schemas/Product"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../components/schemas.yaml#/components/schemas/Error"
+

@@ -1,0 +1,6 @@
+components:
+  securitySchemes:
+    apikey:
+      type: apiKey
+      name: server_token
+      in: query

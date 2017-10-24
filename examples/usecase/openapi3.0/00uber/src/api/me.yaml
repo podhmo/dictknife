@@ -1,0 +1,20 @@
+paths:
+  /me:
+    get:
+      summary: User Profile
+      description: The User Profile endpoint returns information about the Uber user that has authorized with the application.
+      tags:
+        - User
+      responses:
+        '200':
+          description: Profile information for a user
+          content:
+            application/json:
+              schema:
+                $ref: "../components/schemas.yaml#/components/schemas/Profile"
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "../components/schemas.yaml#/components/schemas/Error"

@@ -1,0 +1,25 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+openapi: "3.0.0"
+info:
+  title: Uber API
+  description: Move your app forward with the Uber API
+  version: "1.0.0"
+servers:
+  - url: https://api.uber.com/v1
+paths:
+  /products:
+    $ref: 'api/products.yaml#/paths/~1products'
+  /estimates/price:
+    $ref: 'api/estimates.yaml#/paths/~1estimates~1price'
+  /estimates/time:
+    $ref: 'api/estimates.yaml#/paths/~1estimates~1time'
+  /me:
+    $ref: 'api/me.yaml#/paths/~1me'
+  /history:
+    $ref: 'api/history.yaml#/paths/~1history'
+
+components:
+  securitySchemes:
+    apikey:
+      $ref: 'components/securitySchemes.yaml#/components/securitySchemes/apikey'
