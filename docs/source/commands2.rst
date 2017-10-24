@@ -18,7 +18,7 @@ deref and cut
 
 src/colors.yaml
 
-.. literalinclude:: ../../examples/cut/src/colors.yaml
+.. literalinclude:: ../../examples/jsonknife/cut/src/colors.yaml
    :language: yaml
 
 deref
@@ -35,17 +35,17 @@ deref is unwrap function.
 
 dst/00deref.yaml with `--ref "#/rainbow/yellow"`
 
-.. literalinclude:: ../../examples/cut/dst/00deref.yaml
+.. literalinclude:: ../../examples/jsonknife/cut/dst/00deref.yaml
    :language: yaml
 
 dst/01deref.yaml with `--ref "#/rainbow/yellow@yellow"`
 
-.. literalinclude:: ../../examples/cut/dst/01deref.yaml
+.. literalinclude:: ../../examples/jsonknife/cut/dst/01deref.yaml
    :language: yaml
 
 dst/02deref.yaml with `--ref "#/rainbow/yellow@yellow" --ref "#/rainbow/indigo@indigo"`
 
-.. literalinclude:: ../../examples/cut/dst/02deref.yaml
+.. literalinclude:: ../../examples/jsonknife/cut/dst/02deref.yaml
    :language: yaml
 
 cut
@@ -57,7 +57,7 @@ cut
 
 dst/00cut.yaml
 
-.. literalinclude:: ../../examples/cut/dst/00cut.yaml
+.. literalinclude:: ../../examples/jsonknife/cut/dst/00cut.yaml
    :language: yaml
 
 
@@ -79,23 +79,23 @@ deref
 
 src/main.json
 
-.. literalinclude:: ../../examples/linker/src/main.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/main.json
 
 src/api/me.json
 
-.. literalinclude:: ../../examples/linker/src/api/me.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/api/me.json
 
 src/api/user.json
 
-.. literalinclude:: ../../examples/linker/src/api/user.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/api/user.json
 
 src/definitions/primitive.json
 
-.. literalinclude:: ../../examples/linker/src/definitions/primitive.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/definitions/primitive.json
 
 src/definitions/user.json
 
-.. literalinclude:: ../../examples/linker/src/definitions/user.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/definitions/user.json
 
 deref output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +111,7 @@ deref output is this.
 
 deref.yaml
 
-.. literalinclude:: ../../examples/linker/deref.yaml
+.. literalinclude:: ../../examples/jsonknife/deref/deref.yaml
    :language: yaml
 
 
@@ -130,20 +130,20 @@ examples
 
 src/person.yaml
 
-.. literalinclude:: ../../examples/deref/src/person.yaml
+.. literalinclude:: ../../examples/jsonknife/examples/src/person.yaml
    :language: yaml
 
 src/primitive.yaml
 
-.. literalinclude:: ../../examples/deref/src/primitive.yaml
+.. literalinclude:: ../../examples/jsonknife/examples/src/primitive.yaml
    :language: yaml
 
 dst/extracted.yaml
 
-.. literalinclude:: ../../examples/deref/dst/extracted.yaml
+.. literalinclude:: ../../examples/jsonknife/examples/dst/extracted.yaml
    :language: yaml
 
 dst/data.yaml
 
-.. literalinclude:: ../../examples/deref/dst/data.yaml
+.. literalinclude:: ../../examples/jsonknife/examples/dst/data.yaml
    :language: yaml

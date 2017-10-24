@@ -12,7 +12,7 @@ Generating swagger spec from data.
 
 input data
 
-.. literalinclude:: ../../examples/json2swagger/src/00config.json
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/src/00config.json
 
 .. code-block:: bash
 
@@ -20,7 +20,7 @@ input data
 
 config-spec.yaml
 
-.. literalinclude:: ../../examples/json2swagger/dst/00config-spec.yaml
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/dst/00config-spec.yaml
    :language: yaml
 
 with multiple sources
@@ -32,11 +32,11 @@ input data
 
 person-foo.json
 
-.. literalinclude:: ../../examples/json2swagger/src/01person-foo.json
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/src/01person-foo.json
 
 person-bar.json
 
-.. literalinclude:: ../../examples/json2swagger/src/01person-bar.json
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/src/01person-bar.json
 
 .. code-block:: bash
 
@@ -44,7 +44,7 @@ person-bar.json
 
 person-spec.yaml
 
-.. literalinclude:: ../../examples/json2swagger/dst/01person-spec.yaml
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/dst/01person-spec.yaml
    :language: yaml
 
 01person-bar.json doesn't have nickname and nickname is not reuired in generated spec.
@@ -58,12 +58,12 @@ with annotation file.
 
 with-annotations.yaml
 
-.. literalinclude:: ../../examples/json2swagger/src/02with-annotations.yaml
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/src/02with-annotations.yaml
    :language: yaml
 
 annotations.yaml
 
-.. literalinclude:: ../../examples/json2swagger/src/02annotations.yaml
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/src/02annotations.yaml
    :language: yaml
 
 .. code-block:: bash
@@ -72,7 +72,7 @@ annotations.yaml
 
 with-annotations-spec.yaml
 
-.. literalinclude:: ../../examples/json2swagger/dst/02with-annotations-spec.yaml
+.. literalinclude:: ../../examples/swaggerknife/json2swagger/dst/02with-annotations-spec.yaml
    :language: yaml
 
 flatten
@@ -91,12 +91,12 @@ only swagger like structure (toplevel is `#/definitions`).
 
 src/abc.yaml
 
-.. literalinclude:: ../../examples/flatten/src/abc.yaml
+.. literalinclude:: ../../examples/swaggerknife/flatten/src/abc.yaml
    :language: yaml
 
 dst/abc.yaml
 
-.. literalinclude:: ../../examples/flatten/dst/abc.yaml
+.. literalinclude:: ../../examples/swaggerknife/flatten/dst/abc.yaml
    :language: yaml
 
 bundle
@@ -117,23 +117,23 @@ bundle
 
 src/main.json
 
-.. literalinclude:: ../../examples/linker/src/main.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/main.json
 
 src/api/me.json
 
-.. literalinclude:: ../../examples/linker/src/api/me.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/api/me.json
 
 src/api/user.json
 
-.. literalinclude:: ../../examples/linker/src/api/user.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/api/user.json
 
 src/definitions/primitive.json
 
-.. literalinclude:: ../../examples/linker/src/definitions/primitive.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/definitions/primitive.json
 
 src/definitions/user.json
 
-.. literalinclude:: ../../examples/linker/src/definitions/user.json
+.. literalinclude:: ../../examples/jsonknife/deref/src/definitions/user.json
 
 bundle output
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -149,5 +149,5 @@ bundle output is this.
 
 bundle.yaml
 
-.. literalinclude:: ../../examples/linker/bundle.yaml
+.. literalinclude:: ../../examples/jsonknife/deref/bundle.yaml
    :language: yaml
