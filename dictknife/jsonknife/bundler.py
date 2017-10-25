@@ -12,7 +12,7 @@ from .accessor import CachedItemAccessor
 logger = logging.getLogger(__name__)
 
 
-class Bundler(object):
+class Bundler(object):  # backward compatibility (use jsonknife.bundle.Bundler)
     def __init__(self, resolver, strict=False):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
@@ -20,18 +20,10 @@ class Bundler(object):
         self.strict = strict
 
     def build_localref_fixer(self, doc):
-        if "components" in doc or doc.get("openapi", "").startswith("3"):
-            prefixes = {"paths": "paths"}
-            return SwaggerLocalrefFixer(
-                prefixes,
-                "components/schemas",
-                failback=lambda path, item: "/".join(path[:2]) if path[0] == "components" else "components/schemas",
-            )
-        else:
-            prefixes = {k: k for k in ["definitions", "paths", "responses", "parameters"]}
-            return SwaggerLocalrefFixer(
-                prefixes, "definitions", failback=lambda path, item: "definitions"
-            )
+        prefixes = {k: k for k in ["definitions", "paths", "responses", "parameters"]}
+        return SwaggerLocalrefFixer(
+            prefixes, "definitions", failback=lambda path, item: "definitions"
+        )
 
     def build_fix_conflict(self):
         if self.strict:
@@ -41,20 +33,21 @@ class Bundler(object):
 
     def bundle(self, doc=None):
         doc = doc or self.resolver.doc
-
-        localref_fixer = self.build_localref_fixer(doc)
+        fix_ref = self.build_localref_fixer(doc)
         fix_conflict = self.build_fix_conflict()
-        fixref_walker = FixRefWalker(self.accessor, localref_fixer, fix_conflict)
-        fixref_walker.walk(doc, self.item_map)
+        return self.bundle_doc(doc, fix_ref, fix_conflict)
 
+    def bundle_doc(self, doc, *, fix_ref, fix_conflict):
+        fixref_walker = FixRefWalker(self.accessor, fix_ref, fix_conflict)
+        fixref_walker.walk(doc, self.item_map)
         emitter = Emitter(self.accessor, self.item_map)
         return emitter.emit(self.resolver, doc)
 
 
 class FixRefWalker:
-    def __init__(self, accessor, localref_fixer, fix_conflict):
+    def __init__(self, accessor, fix_localref, fix_conflict):
         self.accessor = accessor
-        self.localref_fixer = localref_fixer
+        self.fix_localref = fix_localref
         self.fix_conflict = fix_conflict
         self.ref_walking = DictWalker(["$ref"])
 
@@ -62,7 +55,7 @@ class FixRefWalker:
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
-                item = self.localref_fixer.fix_localref(path, item)
+                item = self.fix_localref(path, item)
                 if item.localref not in item_map:
                     item_map[item.localref] = item
                     self.walk(item.data, item_map)
@@ -167,6 +160,8 @@ class SwaggerLocalrefFixer(object):  # todo: rename
         item.localref = "{}/{}".format(prefix, name)
         # print("changes: {} -> {}".format(localref, item.localref), file=sys.stderr)
         return item
+
+    __call__ = fix_localref
 
 
 def error_on_conflict(item_map, olditem, newitem):
