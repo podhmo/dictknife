@@ -1,7 +1,7 @@
 from dictknife.langhelpers import reify
 
 
-class OpenAPI2Inspector:
+class Inspector:
     def __init__(self, doc):
         self.doc = doc
 
