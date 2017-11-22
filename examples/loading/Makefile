@@ -7,6 +7,7 @@ default: 02 03
 	dictknife concat $< --dst dst/00output.yaml
 	dictknife concat $< --dst dst/00output.toml
 	dictknife concat $< --dst dst/00output.tsv
+	dictknife concat $< --dst dst/00output.csv
 
 # dump multi
 01: 01people.json
@@ -15,6 +16,7 @@ default: 02 03
 	dictknife concat $< --dst dst/01output.yaml
 	# dictknife concat $< --dst dst/01output.toml
 	dictknife concat $< --dst dst/01output.tsv
+	dictknife concat $< --dst dst/01output.csv
 
 # load single
 02: 00
@@ -23,6 +25,7 @@ default: 02 03
 	dictknife concat dst/00output.yaml --dst dst/02output.yaml.json
 	dictknife concat dst/00output.toml --dst dst/02output.toml.json
 	dictknife concat dst/00output.tsv --dst dst/02output.tsv.json
+	dictknife concat dst/00output.csv --dst dst/02output.csv.json
 
 # load multi
 03: 01
@@ -31,3 +34,4 @@ default: 02 03
 	dictknife concat dst/01output.yaml --dst dst/03output.yaml.json
 	# dictknife concat dst/01output.toml --dst dst/03output.toml.json
 	dictknife concat dst/01output.tsv --dst dst/03output.tsv.json
+	dictknife concat dst/01output.csv --dst dst/03output.csv.json
