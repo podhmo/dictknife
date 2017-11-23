@@ -1,3 +1,8 @@
+0.7.0
+
+- support loading csv and tsv
+- rename iterate() to walk() of DictWalker
+
 0.6.0
 
 - drop click
