@@ -1,5 +1,5 @@
 import json
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 
 # from: https://github.com/BigstickCarpet/json-schema-ref-parser
 d = json.loads(
@@ -23,8 +23,8 @@ d = json.loads(
 """
 )
 
-iterator = LooseDictWalkingIterator(["$ref"])
-refs = [("/".join(path[:]), sd["$ref"]) for path, sd in iterator.iterate(d)]
+walker = DictWalker(["$ref"])
+refs = [("/".join(path[:]), sd["$ref"]) for path, sd in walker.walk(d)]
 
 for path, ref in refs:
     print(path, ref)

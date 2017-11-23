@@ -1,18 +1,18 @@
 import os.path
 from dictknife.jsonknife.resolver import ExternalFileResolver
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 
 
 class Loader:
     def __init__(self, cwd=None):
         cwd = cwd or os.getcwd()
         self.resolver = ExternalFileResolver(os.path.join(cwd, "*root*"))
-        self.ref_walker = LooseDictWalkingIterator(["$include"])
+        self.ref_walker = DictWalker(["$include"])
 
     def load(self, filename, resolver=None):
         resolver = resolver or self.resolver
         subresolver, _ = resolver.resolve(filename)
-        for _, d, in self.ref_walker.iterate(subresolver.doc):
+        for _, d, in self.ref_walker.walk(subresolver.doc):
             subfilename = d.pop("$include")
             subdata = self.load(subfilename, resolver=subresolver)
             d.update(subdata)

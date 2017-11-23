@@ -1,12 +1,12 @@
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 from dictknife.jsonknife.resolver import ExternalFileResolver
 
 
 def load(filename):
-    ref_walker = LooseDictWalkingIterator(["$include"])
+    ref_walker = DictWalker(["$include"])
 
     def onload(data, resolver):
-        for _, d in ref_walker.iterate(data):
+        for _, d in ref_walker.walk(data):
             subresolver, _ = resolver.resolve(d.pop("$include"))
             d.update(subresolver.doc)
 
