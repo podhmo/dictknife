@@ -4,7 +4,7 @@ from collections import OrderedDict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife import deepmerge
-from dictknife.accessor import Accessor
+from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
 from dictknife.jsonknife import SampleValuePlotter

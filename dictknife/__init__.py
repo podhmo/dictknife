@@ -1,5 +1,6 @@
 from dictknife.walkers import LooseDictWalkingIterator, DictWalker  # NOQA
-from dictknife.accessor import Accessor  # NOQA
+from dictknife.accessing import Accessor  # NOQA
+from dictknife.accessing import dictmap  # NOQA
 from dictknife.deepmerge import deepmerge  # NOQA
 from dictknife.deepequal import deepequal  # NOQA
 from dictknife.diff import diff  # NOQA
