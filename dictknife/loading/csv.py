@@ -1,5 +1,6 @@
 from ._lazyimport import m
 from collections import OrderedDict
+from dictknife.guessing import guess
 
 
 def load(fp, *, loader=None, delimiter=",", **kwargs):
@@ -24,7 +25,7 @@ def load(fp, *, loader=None, delimiter=",", **kwargs):
             elif lf > lr:
                 for key in self.fieldnames[lr:]:
                     d[key] = self.restval
-            return d
+            return guess(d, mutable=True)
 
     reader = OrderedDictReader(fp, delimiter=delimiter)
     return reader
