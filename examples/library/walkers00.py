@@ -1,8 +1,8 @@
-import json
+from dictknife import loading
 from dictknife import DictWalker
 
 # from: https://github.com/BigstickCarpet/json-schema-ref-parser
-d = json.loads(
+d = loading.loads(
     """
 {
   "definitions": {
@@ -20,7 +20,8 @@ d = json.loads(
     }
   }
 }
-"""
+""",
+    format="json"
 )
 
 walker = DictWalker(["$ref"])
