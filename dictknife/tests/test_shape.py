@@ -55,7 +55,7 @@ class Tests(unittest.TestCase):
                     "name": "bar",
                     "age": 10
                 }]],
-                output=["[], ""[]/[]", "[]/[]/age", "[]/[]/name", "?[]/[]/nickname"],
+                output=["[]", "[]/[]", "[]/[]/age", "[]/[]/name", "?[]/[]/nickname"],
                 squash=False,
                 skiplist=False
             ),
