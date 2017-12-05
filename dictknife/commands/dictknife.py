@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def concat(*, files, dst, format, input_format, output_format, debug):
     from collections import OrderedDict
-    from .. import deepmerge
+    from dictknife import deepmerge
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
@@ -30,7 +30,7 @@ def transform(
     *, src, dst, config, config_file, code, function, input_format, output_format, format, debug
 ):
     from magicalimport import import_symbol
-    from .. import deepmerge
+    from dictknife import deepmerge
     with traceback_shortly(debug):
         if code is not None:
             transform = eval(code)
@@ -82,6 +82,24 @@ def linecat(*, src, dst, input_format, output_format, format, debug):
                 consume(iter(rf))
 
 
+def shape(*, files, input_format, format, squash, skiplist, debug):
+    from dictknife import shape
+    input_format = input_format or format
+    with traceback_shortly(debug):
+        if not files:
+            files = [None]
+        dataset = []
+        for f in files:
+            d = loading.loadfile(f)
+            if squash:
+                dataset.extend(d)
+            else:
+                dataset.append(d)
+        r = shape(dataset, squash=True, skiplist=skiplist)
+        for line in r:
+            print(line)
+
+
 def main():
     parser = SubCommandParser()
 
@@ -120,6 +138,14 @@ def main():
         add_argument("--dst", default=None)
         add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-o", "--output-format", default=None, choices=formats)
+        add_argument("-f", "--format", default=None, choices=formats)
+        add_argument("--debug", action="store_true")
+
+    with parser.subcommand(shape) as add_argument:
+        add_argument("files", nargs="*", default=sys.stdin)
+        add_argument("--squash", action="store_true")
+        add_argument("--skiplist", action="store_true")
+        add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-f", "--format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
 
