@@ -53,7 +53,7 @@ class Traverser:
         s.add(path)
 
 
-def convert_pathlist_from_state(s, *, squash=False, skiplist=False):
+def convert_pathlist_from_state(s, *, squash=False, skiplist=False, separator="/"):
     r = []
     for path in s.xs:
         if not path:
@@ -73,7 +73,7 @@ def convert_pathlist_from_state(s, *, squash=False, skiplist=False):
             path = path[1:]
             if not path:
                 continue
-        r.append(fmt.format("/".join(path)))
+        r.append(fmt.format(separator.join(map(str, path))))
     return r
 
 
@@ -82,6 +82,7 @@ def shape(
     traverse=Traverser().traverse,
     aggregate=convert_pathlist_from_state,
     squash=False,
-    skiplist=False
+    skiplist=False,
+    separator="/",
 ):
-    return aggregate(traverse(d), squash=squash, skiplist=skiplist)
+    return aggregate(traverse(d), squash=squash, skiplist=skiplist, separator=separator)
