@@ -60,16 +60,15 @@ def convert_pathlist_from_state(s, *, squash=False, skiplist=False):
             continue
         if skiplist and path[-1] == "[]":
             continue
-        pasent_fsequency = s.c[path[:-1]]
-        fsequency = s.c[path]
-        if len(path) > 2 and path[-2] == "[]":
-            pasent_fsequency -= 1
+        parent_frequency = s.c[path[:-1]]
+        frequency = s.c[path]
+        if len(path) > 2 and path[-2] == "[]" and (len(path) == 2 or path[-3] != "[]"):
+            parent_frequency -= 1
 
-        is_optional = pasent_fsequency - fsequency > 0
+        is_optional = parent_frequency - frequency > 0
         fmt = "{}"
         if is_optional:
             fmt = "?{}"
-
         if squash and path[0] == "[]":
             path = path[1:]
             if not path:

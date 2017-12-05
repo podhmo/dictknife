@@ -34,6 +34,32 @@ class Tests(unittest.TestCase):
                 skiplist=False
             ),
             C(
+                input=[{
+                    "name": "foo",
+                    "age": 10
+                }, {
+                    "nickname": "BIGb",
+                    "name": "bar",
+                    "age": 10
+                }],
+                output=["[]", "[]/age", "[]/name", "?[]/nickname"],
+                squash=False,
+                skiplist=False
+            ),
+            C(
+                input=[[{
+                    "name": "foo",
+                    "age": 10
+                }, {
+                    "nickname": "BIGb",
+                    "name": "bar",
+                    "age": 10
+                }]],
+                output=["[], ""[]/[]", "[]/[]/age", "[]/[]/name", "?[]/[]/nickname"],
+                squash=False,
+                skiplist=False
+            ),
+            C(
                 input={"person": {
                     "name": "foo",
                     "age": 10
