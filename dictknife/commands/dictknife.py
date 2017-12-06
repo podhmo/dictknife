@@ -82,7 +82,9 @@ def linecat(*, src, dst, input_format, output_format, format, debug):
                 consume(iter(rf))
 
 
-def shape(*, files, input_format, format, squash, skiplist, separator, debug):
+def shape(
+    *, files, input_format, format, squash, skiplist, separator, with_type, with_example, debug
+):
     from dictknife import shape
     input_format = input_format or format
     with traceback_shortly(debug):
@@ -96,8 +98,14 @@ def shape(*, files, input_format, format, squash, skiplist, separator, debug):
             else:
                 dataset.append(d)
         r = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
-        for line in r:
-            print(line)
+
+        for row in r:
+            buf = [row.path]
+            if with_type:
+                buf.append(row.type)
+            if with_example:
+                buf.append(row.example)
+            print(*buf)
 
 
 def main():
@@ -145,6 +153,8 @@ def main():
         add_argument("files", nargs="*", default=sys.stdin)
         add_argument("--squash", action="store_true")
         add_argument("--skiplist", action="store_true")
+        add_argument("--with-type", action="store_true")
+        add_argument("--with-example", action="store_true")
         add_argument("--separator", default="/")
         add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-f", "--format", default=None, choices=formats)

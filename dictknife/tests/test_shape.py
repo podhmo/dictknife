@@ -194,4 +194,5 @@ class Tests(unittest.TestCase):
         for c in candidates:
             with self.subTest(input=c.input, squash=c.squash, skiplist=c.skiplist):
                 got = self._callFUT(c.input, squash=c.squash, skiplist=c.skiplist)
+                got = [row.path for row in got]
                 self.assertEqual(c.output, got)
