@@ -79,11 +79,10 @@ def convert_pathlist_from_state(s, *, squash=False, skiplist=False, separator="/
             if not path:
                 continue
 
-        types = sorted(set([type(v).__name__ for v in s.examples[rawpath]]))
         r.append(
             Row(
                 path=fmt.format(separator.join(map(str, path))),
-                type=types[0] if len(types) == 1 else types,
+                type=sorted(set([type(v) for v in s.examples[rawpath]]), key=str),
                 example=s.examples[rawpath][0]
             )
         )

@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
+from collections import OrderedDict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
@@ -9,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 def concat(*, files, dst, format, input_format, output_format, debug):
-    from collections import OrderedDict
     from dictknife import deepmerge
     with traceback_shortly(debug):
         d = OrderedDict()
@@ -83,7 +83,17 @@ def linecat(*, src, dst, input_format, output_format, format, debug):
 
 
 def shape(
-    *, files, input_format, format, squash, skiplist, separator, with_type, with_example, debug
+    *,
+    files,
+    input_format,
+    output_format,
+    squash,
+    skiplist,
+    separator,
+    with_type,
+    with_example,
+    full,
+    debug,
 ):
     from dictknife import shape
     input_format = input_format or format
@@ -97,15 +107,29 @@ def shape(
                 dataset.extend(d)
             else:
                 dataset.append(d)
-        r = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
+        rows = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
 
-        for row in r:
-            buf = [row.path]
+        r = []
+        for row in rows:
+            d = OrderedDict()
+            d["path"] = row.path
             if with_type:
-                buf.append(row.type)
+                typenames = [t.__name__ for t in row.type]
+                d["type"] = typenames[0] if len(typenames) == 1 else typenames
             if with_example:
-                buf.append(row.example)
-            print(*buf)
+                if full:
+                    d["example"] = row.example
+                elif not any(t in (list, dict) for t in row.type):
+                    d["example"] = row.example
+                elif output_format in ("csv", "tsv"):
+                    d["example"] = ""  # xxx
+            r.append(d)
+
+        if output_format is None:
+            for d in r:
+                print(*d.values())
+        else:
+            loading.dumpfile(r, None, format=output_format)
 
 
 def main():
@@ -153,11 +177,12 @@ def main():
         add_argument("files", nargs="*", default=sys.stdin)
         add_argument("--squash", action="store_true")
         add_argument("--skiplist", action="store_true")
+        add_argument("--full", action="store_true")
         add_argument("--with-type", action="store_true")
         add_argument("--with-example", action="store_true")
         add_argument("--separator", default="/")
         add_argument("-i", "--input-format", default=None, choices=formats)
-        add_argument("-f", "--format", default=None, choices=formats)
+        add_argument("-o", "--output-format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
