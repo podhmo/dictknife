@@ -31,7 +31,7 @@ def load(fp, *, loader=None, delimiter=",", **kwargs):
     return reader
 
 
-def dump(rows, fp, *, delimiter=","):
+def dump(rows, fp, *, delimiter=",", sort_keys=False):
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):
@@ -40,6 +40,8 @@ def dump(rows, fp, *, delimiter=","):
     itr = iter(rows)
     first_row = next(itr)
     fields = list(first_row.keys())
+    if sort_keys:
+        fields = sorted(fields)
     writer = m.csv.DictWriter(
         fp, fields, delimiter=delimiter, lineterminator="\r\n", quoting=m.csv.QUOTE_ALL
     )

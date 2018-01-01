@@ -9,8 +9,14 @@ from dictknife.langhelpers import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
+
 def concat(*, files, dst, format, input_format, output_format, debug):
     from dictknife import deepmerge
+=======
+def concat(*, files, dst, format, input_format, output_format, debug, sort_keys):
+    from collections import OrderedDict
+    from .. import deepmerge
+>>>>>>> 1cd72b1... --sort-keys
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
@@ -23,11 +29,12 @@ def concat(*, files, dst, format, input_format, output_format, debug):
                     if not isinstance(d, (list, tuple)):
                         d = [d] if d else []
                     d.extend(sd)
-        loading.dumpfile(d, dst, format=output_format or format)
+        loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
 
 
 def transform(
-    *, src, dst, config, config_file, code, function, input_format, output_format, format, debug
+    *, src, dst, config, config_file, code, function, input_format, output_format, format, debug,
+    sort_keys
 ):
     from magicalimport import import_symbol
     from dictknife import deepmerge
@@ -48,7 +55,7 @@ def transform(
 
         data = loading.loadfile(src, input_format)
         result = transform(data, **kwargs)
-        loading.dumpfile(result, dst, format=output_format or format)
+        loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
 
 
 def diff(*, normalize, left, right, n, debug):
@@ -145,6 +152,7 @@ def main():
         add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-o", "--output-format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
+        add_argument("--sort-keys", action="store_true")
 
     with parser.subcommand(transform, description="transform dict") as add_argument:
         add_argument("--src", default=None)
@@ -157,6 +165,7 @@ def main():
         add_argument("-o", "--output-format", default=None, choices=formats)
         add_argument("-f", "--format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
+        add_argument("--sort-keys", action="store_true")
 
     with parser.subcommand(diff, description="diff dict") as add_argument:
         add_argument("--normalize", action="store_true")

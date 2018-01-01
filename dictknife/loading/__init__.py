@@ -59,27 +59,27 @@ class Dumper:
         self.dump(d, fp, *args, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, format=None):
+    def dump(self, d, fp, format=None, sort_keys=False):
         if format is not None:
             dumper = self.fn_map[format]
         else:
             fname = getattr(fp, "name", "(unknown)")
             dumper = self.dispatcher.dispatch(fname, self.fn_map)
-        return dumper(d, fp)
+        return dumper(d, fp, sort_keys=sort_keys)
 
-    def dumpfile(self, d, filename=None, format=None, _retry=False):
+    def dumpfile(self, d, filename=None, format=None, sort_keys=False, _retry=False):
         """dump file or stdout"""
         if filename is None:
-            return self.dump(d, sys.stdout, format=format)
+            return self.dump(d, sys.stdout, format=format, sort_keys=sort_keys)
         else:
             try:
                 with open(filename, "w") as wf:
-                    return self.dump(d, wf, format=format)
+                    return self.dump(d, wf, format=format, sort_keys=sort_keys)
             except FileNotFoundError:
                 if _retry:
                     raise
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
-                return self.dumpfile(d, filename, format=format, _retry=True)
+                return self.dumpfile(d, filename, format=format, sort_keys=sort_keys, _retry=True)
 
 
 class Dispatcher:

@@ -5,5 +5,5 @@ def load(fp, *, loader=None, **kwargs):
     return m.toml.load(fp, **kwargs)
 
 
-def dump(*args, **kwargs):
-    return m.toml.dump(*args, **kwargs)
+def dump(d, fp, *, sort_keys=False, **kwargs):
+    return m.toml.dump(d, fp, **kwargs)
