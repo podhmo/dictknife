@@ -1,3 +1,8 @@
+0.7.2
+
+- add `-sort-keys` option
+- shape command
+
 0.7.0
 
 - support loading csv and tsv
