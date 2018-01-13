@@ -9,14 +9,9 @@ from dictknife.langhelpers import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
-
-def concat(*, files, dst, format, input_format, output_format, debug):
-    from dictknife import deepmerge
-=======
 def concat(*, files, dst, format, input_format, output_format, debug, sort_keys):
     from collections import OrderedDict
-    from .. import deepmerge
->>>>>>> 1cd72b1... --sort-keys
+    from dictknife import deepmerge
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
@@ -90,17 +85,8 @@ def linecat(*, src, dst, input_format, output_format, format, debug):
 
 
 def shape(
-    *,
-    files,
-    input_format,
-    output_format,
-    squash,
-    skiplist,
-    separator,
-    with_type,
-    with_example,
-    full,
-    debug,
+    *, files, input_format, output_format, squash, skiplist, separator, with_type, with_example,
+    full, debug
 ):
     from dictknife import shape
     input_format = input_format or format
