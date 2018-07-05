@@ -9,14 +9,25 @@ from dictknife.langhelpers import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
-def concat(*, files, dst, format, input_format, output_format, debug, sort_keys):
+def concat(
+    *,
+    files,
+    dst,
+    format,
+    input_format,
+    output_format,
+    debug,
+    sort_keys,
+    encoding=None,
+    errors=None
+):
     from collections import OrderedDict
     from dictknife import deepmerge
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
             logger.debug("merge: %s", f)
-            with open(f) as rf:
+            with open(f, encoding=encoding, errors=errors) as rf:
                 sd = loading.load(rf, format=input_format or format)
                 if hasattr(sd, "keys"):
                     d = deepmerge(d, sd)
@@ -137,6 +148,16 @@ def main():
         add_argument("-f", "--format", default=None, choices=formats)
         add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-o", "--output-format", default=None, choices=formats)
+        add_argument("--encoding", default=None)
+        add_argument(
+            "--errors",
+            default=None,
+            choices=[
+                "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
+                "backslashreplace", "namereplace"
+            ],
+            help="see pydoc codecs.Codec",
+        )
         add_argument("--debug", action="store_true")
         add_argument("--sort-keys", action="store_true")
 

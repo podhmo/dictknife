@@ -35,3 +35,9 @@ default: 02 03
 	# dictknife concat dst/01output.toml --dst dst/03output.toml.json
 	dictknife concat dst/01output.tsv --dst dst/03output.tsv.json
 	dictknife concat dst/01output.csv --dst dst/03output.csv.json
+
+# load with ignore error
+04:
+	dictknife concat 02encoding-error.csv --errors=replace
+	dictknife concat 02encoding-error.csv --errors=ignore
+	dictknife concat 02encoding-error.csv

@@ -1,0 +1,3 @@
+id,name,encoding
+1,foo,ascii
+2,‚ ,cp932

@@ -34,12 +34,12 @@ class Loader:
             load = self.dispatcher.dispatch(fname, self.fn_map)
         return load(fp, loader=self)
 
-    def loadfile(self, filename=None, format=None):
+    def loadfile(self, filename=None, format=None, opener=open, encoding=None, errors=None):
         """load file or stdin"""
         if filename is None:
             return self.load(sys.stdin, format=format)
         else:
-            with open(filename) as rf:
+            with opener(filename, encoding=encoding, errors=errors) as rf:
                 r = self.load(rf, format=format)
                 if not hasattr(r, "keys") and hasattr(r, "__iter__"):
                     r = list(r)
