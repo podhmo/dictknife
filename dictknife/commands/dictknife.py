@@ -12,6 +12,13 @@ from dictknife.langhelpers import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
+def _open(f, encoding=None, errors=None):
+    if f == sys.stdin:
+        return contextlib.closing(f)
+    else:
+        return open(f, encoding=encoding, errors=errors)
+
+
 def concat(**kwargs):
     warnings.warn("concat() is deprecated, please using cat() instead of it.")
     return cat(**kwargs)
@@ -31,11 +38,12 @@ def cat(
     size=None
 ):
     from dictknife import deepmerge
+
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
             logger.debug("merge: %s", f)
-            with open(f, encoding=encoding, errors=errors) as rf:
+            with _open(f, encoding=encoding, errors=errors) as rf:
                 sd = loading.load(rf, format=input_format or format)
                 if size is not None:
                     sd = itertools.islice(sd, size)
@@ -99,11 +107,8 @@ def linecat(*, src, dst, input_format, output_format, format, debug):
         loading.dumpfile(r, dst, format=output_format)
 
     with traceback_shortly(debug):
-        if src is None:
-            consume(iter(sys.stdin))
-        else:
-            with open(src) as rf:
-                consume(iter(rf))
+        with _open(src) as rf:
+            consume(iter(rf))
 
 
 def shape(
@@ -111,17 +116,15 @@ def shape(
     full, debug
 ):
     from dictknife import shape
-    input_format = input_format or format
     with traceback_shortly(debug):
-        if not files:
-            files = [None]
         dataset = []
         for f in files:
-            d = loading.loadfile(f)
-            if squash:
-                dataset.extend(d)
-            else:
-                dataset.append(d)
+            with _open(f) as rf:
+                d = loading.load(rf, format=input_format)
+                if squash:
+                    dataset.extend(d)
+                else:
+                    dataset.append(d)
         rows = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
 
         r = []
@@ -158,7 +161,7 @@ def main():
 
     for cmd in [cat, concat]:
         with parser.subcommand(cmd, description="concat dicts") as add_argument:
-            add_argument("files", nargs="*", default=sys.stdin)
+            add_argument("files", nargs="*", default=[sys.stdin])
             add_argument("--size", type=int, default=None)
             add_argument("--dst", default=None)
             add_argument("-f", "--format", default=None, choices=formats)
@@ -198,7 +201,7 @@ def main():
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(linecat) as add_argument:
-        add_argument("files", nargs="*", default=sys.stdin)
+        add_argument("--src", nargs="?", default=sys.stdin)
         add_argument("--dst", default=None)
         add_argument("-i", "--input-format", default=None, choices=formats)
         add_argument("-o", "--output-format", default=None, choices=formats)
@@ -206,7 +209,7 @@ def main():
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(shape) as add_argument:
-        add_argument("files", nargs="*", default=sys.stdin)
+        add_argument("files", nargs="*", default=[sys.stdin])
         add_argument("--squash", action="store_true")
         add_argument("--skiplist", action="store_true")
         add_argument("--full", action="store_true")
