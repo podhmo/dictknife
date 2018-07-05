@@ -32,6 +32,7 @@ class LoadingModule:
             class _fake_yaml:
                 SortedDumper = None
                 Dumper = None
+                Loader = None
 
                 @classmethod
                 def load(cls, *args, Loader=None, **kwargs):
