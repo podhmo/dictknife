@@ -2,6 +2,7 @@
 import logging
 import sys
 import warnings
+import contextlib
 from collections import OrderedDict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
@@ -210,5 +211,11 @@ def main():
         add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log_level))
-    return args.fn(args)
+
+    with contextlib.ExitStack() as s:
+        if args.quiet:
+            args.log_level = logging._levelToName[logging.WARNING]
+            s.enter_context(warnings.catch_warnings())
+            warnings.simplefilter("ignore")
+        logging.basicConfig(level=getattr(logging, args.log_level))
+        return args.fn(args)
