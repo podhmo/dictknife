@@ -3,6 +3,7 @@ import logging
 import sys
 import warnings
 import contextlib
+import itertools
 from collections import OrderedDict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
@@ -27,8 +28,8 @@ def cat(
     sort_keys,
     encoding=None,
     errors=None,
+    size=None
 ):
-    from collections import OrderedDict
     from dictknife import deepmerge
     with traceback_shortly(debug):
         d = OrderedDict()
@@ -36,6 +37,9 @@ def cat(
             logger.debug("merge: %s", f)
             with open(f, encoding=encoding, errors=errors) as rf:
                 sd = loading.load(rf, format=input_format or format)
+                if size is not None:
+                    sd = itertools.islice(sd, size)
+
                 if hasattr(sd, "keys"):
                     d = deepmerge(d, sd)
                 else:
@@ -146,13 +150,16 @@ def shape(
 def main():
     parser = SubCommandParser()
 
-    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level")
+    parser.add_argument(
+        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+    )
     parser.add_argument("-q", "--quiet", action="store_true")
     formats = loading.get_formats()
 
     for cmd in [cat, concat]:
         with parser.subcommand(cmd, description="concat dicts") as add_argument:
             add_argument("files", nargs="*", default=sys.stdin)
+            add_argument("--size", type=int, default=None)
             add_argument("--dst", default=None)
             add_argument("-f", "--format", default=None, choices=formats)
             add_argument("-i", "--input-format", default=None, choices=formats)
