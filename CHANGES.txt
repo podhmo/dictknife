@@ -1,3 +1,8 @@
+0.7.5
+
+- add `errors` and `ignore` options, in loading.loadfile
+- when PyYAML is not installed, then, using fake yaml module(actually this is json module)
+
 0.7.2
 
 - add `-sort-keys` option
