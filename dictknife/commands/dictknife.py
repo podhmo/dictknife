@@ -20,7 +20,7 @@ def _open(f, encoding=None, errors=None):
 
 
 def concat(**kwargs):
-    warnings.warn("concat() is deprecated, please using cat() instead of it.")
+    warnings.warn("concat() is deprecated, please using `cat` instead of it.")
     return cat(**kwargs)
 
 
@@ -35,16 +35,22 @@ def cat(
     sort_keys,
     encoding=None,
     errors=None,
-    size=None
+    size=None,
+    slurp=False
 ):
     from dictknife import deepmerge
 
+    input_format = input_format or format
     with traceback_shortly(debug):
         d = OrderedDict()
         for f in files:
             logger.debug("merge: %s", f)
             with _open(f, encoding=encoding, errors=errors) as rf:
-                sd = loading.load(rf, format=input_format or format)
+                if slurp:
+                    sd = (loading.loads(line, format=input_format) for line in rf)
+                else:
+                    sd = loading.load(rf, format=input_format)
+
                 if size is not None:
                     sd = itertools.islice(sd, size)
 
@@ -96,19 +102,12 @@ def diff(*, normalize, left, right, n, debug):
             print(line)
 
 
-def linecat(*, src, dst, input_format, output_format, format, debug):
-    input_format = input_format or format
-    output_format = output_format or format
-
-    def consume(itr):
-        r = []
-        for line in itr:
-            r.append(loading.loads(line, format=input_format))
-        loading.dumpfile(r, dst, format=output_format)
-
-    with traceback_shortly(debug):
-        with _open(src) as rf:
-            consume(iter(rf))
+def linecat(src=None, **kwargs):
+    warnings.warn("concat() is deprecated, please using `cat --slurp` instead of it.")
+    if src is not None:
+        kwargs["files"] = [src]
+    kwargs["slurp"] = True
+    return cat(**kwargs)
 
 
 def shape(
@@ -159,9 +158,13 @@ def main():
     parser.add_argument("-q", "--quiet", action="store_true")
     formats = loading.get_formats()
 
-    for cmd in [cat, concat]:
+    for cmd in [cat, concat, linecat]:
         with parser.subcommand(cmd, description="concat dicts") as add_argument:
+            if cmd == linecat:
+                add_argument("--src", nargs="?", default=None)  # xxx: backward compatibility
             add_argument("files", nargs="*", default=[sys.stdin])
+            add_argument("--slurp", action="store_true")
+
             add_argument("--size", type=int, default=None)
             add_argument("--dst", default=None)
             add_argument("-f", "--format", default=None, choices=formats)
@@ -198,14 +201,6 @@ def main():
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
-        add_argument("--debug", action="store_true")
-
-    with parser.subcommand(linecat) as add_argument:
-        add_argument("--src", nargs="?", default=sys.stdin)
-        add_argument("--dst", default=None)
-        add_argument("-i", "--input-format", default=None, choices=formats)
-        add_argument("-o", "--output-format", default=None, choices=formats)
-        add_argument("-f", "--format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(shape) as add_argument:
