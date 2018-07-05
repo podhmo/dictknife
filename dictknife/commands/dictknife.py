@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import logging
 import sys
+import warnings
 from collections import OrderedDict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
@@ -9,7 +10,12 @@ from dictknife.langhelpers import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
-def concat(
+def concat(**kwargs):
+    warnings.warn("concat() is deprecated, please using cat() instead of it.")
+    return cat(**kwargs)
+
+
+def cat(
     *,
     files,
     dst,
@@ -19,7 +25,7 @@ def concat(
     debug,
     sort_keys,
     encoding=None,
-    errors=None
+    errors=None,
 ):
     from collections import OrderedDict
     from dictknife import deepmerge
@@ -139,27 +145,29 @@ def shape(
 def main():
     parser = SubCommandParser()
 
-    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level")
+    parser.add_argument("-q", "--quiet", action="store_true")
     formats = loading.get_formats()
 
-    with parser.subcommand(concat, description="concat dicts") as add_argument:
-        add_argument("files", nargs="*", default=sys.stdin)
-        add_argument("--dst", default=None)
-        add_argument("-f", "--format", default=None, choices=formats)
-        add_argument("-i", "--input-format", default=None, choices=formats)
-        add_argument("-o", "--output-format", default=None, choices=formats)
-        add_argument("--encoding", default=None)
-        add_argument(
-            "--errors",
-            default=None,
-            choices=[
-                "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
-                "backslashreplace", "namereplace"
-            ],
-            help="see pydoc codecs.Codec",
-        )
-        add_argument("--debug", action="store_true")
-        add_argument("--sort-keys", action="store_true")
+    for cmd in [cat, concat]:
+        with parser.subcommand(cmd, description="concat dicts") as add_argument:
+            add_argument("files", nargs="*", default=sys.stdin)
+            add_argument("--dst", default=None)
+            add_argument("-f", "--format", default=None, choices=formats)
+            add_argument("-i", "--input-format", default=None, choices=formats)
+            add_argument("-o", "--output-format", default=None, choices=formats)
+            add_argument("--encoding", default=None)
+            add_argument(
+                "--errors",
+                default=None,
+                choices=[
+                    "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
+                    "backslashreplace", "namereplace"
+                ],
+                help="see pydoc codecs.Codec",
+            )
+            add_argument("--debug", action="store_true")
+            add_argument("--sort-keys", action="store_true")
 
     with parser.subcommand(transform, description="transform dict") as add_argument:
         add_argument("--src", default=None)
@@ -202,5 +210,5 @@ def main():
         add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log))
+    logging.basicConfig(level=getattr(logging, args.log_level))
     return args.fn(args)
