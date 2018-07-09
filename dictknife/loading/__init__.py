@@ -40,7 +40,7 @@ class Loader:
             return self.load(sys.stdin, format=format)
         else:
             with opener(filename, encoding=encoding, errors=errors) as rf:
-                r = self.load(rf, format=format)
+                r = self.load(rf, format=format, errors=errors)
                 if not hasattr(r, "keys") and hasattr(r, "__iter__"):
                     r = list(r)
                 return r
