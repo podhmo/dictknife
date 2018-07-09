@@ -2,7 +2,7 @@ from collections import OrderedDict
 from ._lazyimport import m
 
 
-def load(fp, *, loader=None):
+def load(fp, *, loader=None, errors=None):
     return m.json.load(fp, object_pairs_hook=OrderedDict)
 
 

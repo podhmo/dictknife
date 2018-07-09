@@ -32,7 +32,7 @@ def parse_value(v, builtins=sys.modules["builtins"]):
         return name, getattr(builtins, fnname)
 
 
-def load(fp, *, loader=None, make_dict=OrderedDict, parse=parse_value):
+def load(fp, *, loader=None, make_dict=OrderedDict, parse=parse_value, errors=None):
     fname = getattr(fp, "name", "(unknown)")
     basename = os.path.splitext(fname)[0]
     load = loader.dispatcher.dispatch(basename, loader.fn_map)

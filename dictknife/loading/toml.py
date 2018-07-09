@@ -1,7 +1,7 @@
 from ._lazyimport import m
 
 
-def load(fp, *, loader=None, **kwargs):
+def load(fp, *, loader=None, errors=None, **kwargs):
     return m.toml.load(fp, **kwargs)
 
 

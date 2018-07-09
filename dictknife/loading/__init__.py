@@ -26,13 +26,13 @@ class Loader:
     def loads(self, s, *args, **kwargs):
         return load(StringIO(s), *args, **kwargs)
 
-    def load(self, fp, format=None):
+    def load(self, fp, format=None, errors=None):
         if format is not None:
             load = self.fn_map[format]
         else:
             fname = getattr(fp, "name", "(unknown)")
             load = self.dispatcher.dispatch(fname, self.fn_map)
-        return load(fp, loader=self)
+        return load(fp, loader=self, errors=errors)
 
     def loadfile(self, filename=None, format=None, opener=open, encoding=None, errors=None):
         """load file or stdin"""

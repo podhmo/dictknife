@@ -1,4 +1,4 @@
-def load(fp, *, loader=None):
+def load(fp, *, loader=None, errors=None):
     return fp.read()
 
 

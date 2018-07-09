@@ -1,7 +1,7 @@
 from ._lazyimport import m
 
 
-def load(fp, *, loader=None, **kwargs):
+def load(fp, *, loader=None, errors=None, **kwargs):
     return m.yaml.load(fp, Loader=m.yaml.Loader, **kwargs)
 
 
