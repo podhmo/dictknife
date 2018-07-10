@@ -46,7 +46,7 @@ def dump(rows, fp, *, delimiter=",", sort_keys=False):
     writer.writerows(itr)
 
 
-def _create_reader_class(csv, errors=None):
+def _create_reader_class(csv, errors=None, retry=10):
     if sys.version_info[:2] >= (3, 6):
         OrderedDictReader = csv.DictReader
     else:
@@ -77,13 +77,15 @@ def _create_reader_class(csv, errors=None):
     original_next = OrderedDictReader.__next__
     if errors == "ignore":
 
-        def __next__(self):
+        def __next__(self, retry=retry):
             try:
                 d = original_next(self)
+                return guess(d, mutable=True)
             except csv.Error as e:
                 logger.info("line=%d errors is occured, skipping err=%r", self.line_num, e)
-                d = original_next(self)
-            return guess(d, mutable=True)
+                if retry <= 0:
+                    raise
+                return self.__next__(retry=retry - 1)
 
         OrderedDictReader.__next__ = __next__
     else:
