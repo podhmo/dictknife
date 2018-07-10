@@ -1,3 +1,12 @@
+0.7.6
+
+- dictknife rename command concat -> cat
+- dictknife linecat command is deprecated
+- dictknife fake yaml module is broken when loading file
+- dictknife support stdin input
+- dictknife add --size option for dictknife.cat
+- dictknife add --quiet option
+
 0.7.5
 
 - add `errors` and `ignore` options, in loading.loadfile
