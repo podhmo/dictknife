@@ -7,7 +7,7 @@ from dictknife import deepmerge
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
-from dictknife.jsonknife import SampleValuePlotter
+from dictknife.jsonknife import extract_example
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
 
@@ -58,8 +58,7 @@ def examples(*, src, ref, format):
     data = loading.loadfile(src)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
-    plotter = SampleValuePlotter()
-    d = plotter.plot(data)
+    d = extract_example(data)
     loading.dumpfile(d, format=format)
 
 
