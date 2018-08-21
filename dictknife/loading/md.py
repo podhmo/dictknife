@@ -14,9 +14,10 @@ def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, **kwargs):
         line = next(fp)
         if "|" in line:
             maybe_nums = [
-                tok.rstrip().endswith(":") and tok.lstrip().startswith(":")
+                tok.rstrip().endswith(":") and not tok.lstrip().startswith(":")
                 for tok in line.strip("|\n").split("|")
             ]
+
     for line in fp:
         if "|" not in line:
             continue
