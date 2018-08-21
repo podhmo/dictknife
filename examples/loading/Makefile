@@ -1,46 +1,58 @@
-default: 02 03
+default: 00 01 02 03 06
 
 # dump single
 00: 00person.json
 	mkdir -p dst
-	dictknife concat $< --dst dst/00output.json
-	dictknife concat $< --dst dst/00output.yaml
-	dictknife concat $< --dst dst/00output.toml
-	dictknife concat $< --dst dst/00output.tsv
-	dictknife concat $< --dst dst/00output.csv
+	dictknife cat $< --dst dst/00output.json
+	dictknife cat $< --dst dst/00output.yaml
+	dictknife cat $< --dst dst/00output.toml
+	dictknife cat $< --dst dst/00output.tsv
+	dictknife cat $< --dst dst/00output.csv
+	dictknife cat $< --dst dst/00output.md
 
 # dump multi
 01: 01people.json
 	mkdir -p dst
-	dictknife concat $< --dst dst/01output.json
-	dictknife concat $< --dst dst/01output.yaml
-	# dictknife concat $< --dst dst/01output.toml
-	dictknife concat $< --dst dst/01output.tsv
-	dictknife concat $< --dst dst/01output.csv
+	dictknife cat $< --dst dst/01output.json
+	dictknife cat $< --dst dst/01output.yaml
+	# dictknife cat $< --dst dst/01output.toml
+	dictknife cat $< --dst dst/01output.tsv
+	dictknife cat $< --dst dst/01output.csv
+	dictknife cat $< --dst dst/01output.md
 
 # load single
 02: 00
 	mkdir -p dst
-	dictknife concat dst/00output.json --dst dst/02output.json.json
-	dictknife concat dst/00output.yaml --dst dst/02output.yaml.json
-	dictknife concat dst/00output.toml --dst dst/02output.toml.json
-	dictknife concat dst/00output.tsv --dst dst/02output.tsv.json
-	dictknife concat dst/00output.csv --dst dst/02output.csv.json
+	dictknife cat dst/00output.json --dst dst/02output.json.json
+	dictknife cat dst/00output.yaml --dst dst/02output.yaml.json
+	dictknife cat dst/00output.toml --dst dst/02output.toml.json
+	dictknife cat dst/00output.tsv --dst dst/02output.tsv.json
+	dictknife cat dst/00output.csv --dst dst/02output.csv.json
+	dictknife cat dst/00output.md --dst dst/02output.md.json
 
 # load multi
 03: 01
 	mkdir -p dst
-	dictknife concat dst/01output.json --dst dst/03output.json.json
-	dictknife concat dst/01output.yaml --dst dst/03output.yaml.json
-	# dictknife concat dst/01output.toml --dst dst/03output.toml.json
-	dictknife concat dst/01output.tsv --dst dst/03output.tsv.json
-	dictknife concat dst/01output.csv --dst dst/03output.csv.json
+	dictknife cat dst/01output.json --dst dst/03output.json.json
+	dictknife cat dst/01output.yaml --dst dst/03output.yaml.json
+	# dictknife cat dst/01output.toml --dst dst/03output.toml.json
+	dictknife cat dst/01output.tsv --dst dst/03output.tsv.json
+	dictknife cat dst/01output.csv --dst dst/03output.csv.json
+	dictknife cat dst/01output.md --dst dst/03output.md.json
 
 # load with ignore error
 04: 02encoding-error.csv
-	dictknife concat $< --errors=replace
-	dictknife concat $< --errors=ignore
-	dictknife concat $<
+	dictknife cat $< --errors=replace
+	dictknife cat $< --errors=ignore
+	dictknife cat $<
 05: 02quote-error.csv
-	dictknife concat $< --errors=ignore
+	dictknife cat $< --errors=ignore
 
+06: 06missing.json
+	mkdir -p dst
+	dictknife cat $< --dst dst/06output.json
+	dictknife cat $< --dst dst/06output.yaml
+	# dictknife cat $< --dst dst/06output.toml
+	# dictknife cat $< --dst dst/06output.tsv
+	# dictknife cat $< --dst dst/06output.csv
+	dictknife cat $< --dst dst/06output.md
