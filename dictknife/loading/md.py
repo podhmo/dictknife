@@ -8,25 +8,25 @@ def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, **kwargs):
     while keys is None:
         line = next(fp)
         if "|" in line:
-            keys = [tok.strip() for tok in line.strip("|").split("|")]
+            keys = [tok.strip() for tok in line.strip("|\n").split("|")]
     maybe_nums = None
     while maybe_nums is None:
         line = next(fp)
         if "|" in line:
             maybe_nums = [
                 tok.rstrip().endswith(":") and tok.lstrip().startswith(":")
-                for tok in line.strip("|").split("|")
+                for tok in line.strip("|\n").split("|")
             ]
     for line in fp:
         if "|" not in line:
             continue
         row = make_dict()
-        for name, maybe_num, tok in zip(keys, maybe_nums, line.strip("|").split("|")):
+        for name, maybe_num, tok in zip(keys, maybe_nums, line.strip("|\n").split("|")):
             val = tok.strip()
-            if maybe_num:
-                if not val:
-                    row[name] = None
-                elif "." in val:
+            if not val:
+                continue
+            elif maybe_num:
+                if "." in val:
                     row[name] = float(val)
                 else:
                     row[name] = int(val)
