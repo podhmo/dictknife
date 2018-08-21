@@ -1,7 +1,7 @@
 import sys
 import logging
 import os.path
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from dictknife import LooseDictWalkingIterator
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
@@ -15,7 +15,7 @@ class Bundler(object):
     def __init__(self, resolver, strict=False):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
-        self.item_map = OrderedDict()  # localref -> item
+        self.item_map = make_dict()  # localref -> item
         self.strict = strict
 
     @reify
@@ -87,7 +87,7 @@ class Emitter(object):
 
     def emit(self, resolver, doc):
         # side effect
-        d = OrderedDict()
+        d = make_dict()
         for path, sd in self.ref_walking.iterate(doc):
             self.replace_ref(resolver, sd)
 

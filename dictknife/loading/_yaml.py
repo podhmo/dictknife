@@ -1,5 +1,6 @@
 import yaml
-from collections import OrderedDict, defaultdict, ChainMap
+from collections import defaultdict, ChainMap
+from dictknife.langhelpers import make_dict
 
 load = yaml.load
 dump = yaml.dump
@@ -22,12 +23,12 @@ class Loader(yaml.Loader):
     pass
 
 
-def setup(Loader, Dumper, dict_classes=[OrderedDict, defaultdict, ChainMap]):
+def setup(Loader, Dumper, dict_classes=[make_dict, defaultdict, ChainMap]):
     def _represent_odict(dumper, instance):
         return dumper.represent_mapping('tag:yaml.org,2002:map', dumper._iterate_dict(instance))
 
     def _construct_odict(loader, node):
-        return OrderedDict(loader.construct_pairs(node))
+        return make_dict(loader.construct_pairs(node))
 
     def _represent_str(dumper, instance):
         if "\n" in instance:

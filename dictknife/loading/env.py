@@ -1,6 +1,6 @@
 import sys
 import os.path
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 
 
 def emit_environ(structure, make_dict, parse):
@@ -32,7 +32,7 @@ def parse_value(v, builtins=sys.modules["builtins"]):
         return name, getattr(builtins, fnname)
 
 
-def load(fp, *, loader=None, make_dict=OrderedDict, parse=parse_value, errors=None):
+def load(fp, *, loader=None, make_dict=make_dict, parse=parse_value, errors=None):
     fname = getattr(fp, "name", "(unknown)")
     basename = os.path.splitext(fname)[0]
     load = loader.dispatcher.dispatch(basename, loader.fn_map)

@@ -58,9 +58,9 @@ class DeepEqualTests(unittest.TestCase):
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it3(self):
-        from collections import OrderedDict
-        d0 = OrderedDict([('type', 'string'), ('enum', ['C', 'M', 'Y', 'K'])])
-        d1 = OrderedDict([('type', 'string'), ('enum', ['K', 'Y', 'M', 'C'])])
+        from dictknife.langhelpers import make_dict
+        d0 = make_dict([('type', 'string'), ('enum', ['C', 'M', 'Y', 'K'])])
+        d1 = make_dict([('type', 'string'), ('enum', ['K', 'Y', 'M', 'C'])])
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 

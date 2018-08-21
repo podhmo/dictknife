@@ -1,10 +1,9 @@
-# -*- coding:utf-8 -*-
 import logging
 import sys
 import warnings
 import contextlib
 import itertools
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
@@ -42,7 +41,7 @@ def cat(
 
     input_format = input_format or format
     with traceback_shortly(debug):
-        d = OrderedDict()
+        d = make_dict()
         for f in files:
             logger.debug("merge: %s", f)
             with _open(f, encoding=encoding, errors=errors) as rf:
@@ -128,7 +127,7 @@ def shape(
 
         r = []
         for row in rows:
-            d = OrderedDict()
+            d = make_dict()
             d["path"] = row.path
             if with_type:
                 typenames = [t.__name__ for t in row.type]

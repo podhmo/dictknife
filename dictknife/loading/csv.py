@@ -1,6 +1,6 @@
 import sys
 from ._lazyimport import m
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from dictknife.guessing import guess
 from logging import getLogger as get_logger
 
@@ -48,10 +48,10 @@ def dump(rows, fp, *, delimiter=",", sort_keys=False):
 
 def _create_reader_class(csv, errors=None, retry=10):
     if sys.version_info[:2] >= (3, 6):
-        OrderedDictReader = csv.DictReader
+        make_dictReader = csv.DictReader
     else:
 
-        class OrderedDictReader(csv.DictReader):
+        class make_dictReader(csv.DictReader):
             def __next__(self):
                 if self.line_num == 0:
                     # Used only for its side effect.
@@ -64,7 +64,7 @@ def _create_reader_class(csv, errors=None, retry=10):
                 # values
                 while row == []:
                     row = next(self.reader)
-                d = OrderedDict(zip(self.fieldnames, row))
+                d = make_dict(zip(self.fieldnames, row))
                 lf = len(self.fieldnames)
                 lr = len(row)
                 if lf < lr:
@@ -74,7 +74,7 @@ def _create_reader_class(csv, errors=None, retry=10):
                         d[key] = self.restval
                 return d
 
-    original_next = OrderedDictReader.__next__
+    original_next = make_dictReader.__next__
     if errors == "ignore":
 
         def __next__(self, retry=retry):
@@ -87,12 +87,12 @@ def _create_reader_class(csv, errors=None, retry=10):
                     raise
                 return self.__next__(retry=retry - 1)
 
-        OrderedDictReader.__next__ = __next__
+        make_dictReader.__next__ = __next__
     else:
 
         def __next__(self):
             d = original_next(self)
             return guess(d, mutable=True)
 
-        OrderedDictReader.__next__ = __next__
-    return OrderedDictReader
+        make_dictReader.__next__ = __next__
+    return make_dictReader

@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 
 
 class ExampleExtractor(object):
@@ -7,7 +7,7 @@ class ExampleExtractor(object):
     def extract(self, d):
         typ = d.get("type")
         if "properties" in d or typ == "object":
-            return self.extract_object(d.get("properties") or {}, OrderedDict())
+            return self.extract_object(d.get("properties") or {}, make_dict())
         elif typ == "array":
             return self.extract_array(d["items"], [])
         elif "example" in d:
