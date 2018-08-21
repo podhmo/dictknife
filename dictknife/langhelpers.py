@@ -1,7 +1,11 @@
-# -*- coding:utf-8 -*-
 import re
 import sys
 import contextlib
+
+if sys.version_info[:2] >= (3, 6):
+    make_dict = dict
+else:
+    from collections import OrderedDict as make_dict  # noqa
 
 
 def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
