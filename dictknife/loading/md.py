@@ -3,7 +3,7 @@ from collections import OrderedDict
 import itertools
 
 
-def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, **kwargs):
+def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, null_value="null", **kwargs):
     keys = None
     while keys is None:
         line = next(fp)
@@ -26,6 +26,8 @@ def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, **kwargs):
             val = tok.strip()
             if not val:
                 continue
+            elif val == null_value:
+                row[name] = None
             elif maybe_num:
                 if "." in val:
                     row[name] = float(val)
@@ -36,7 +38,7 @@ def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, **kwargs):
         yield row
 
 
-def dump(rows, fp, *, sort_keys=False, **kwargs):
+def dump(rows, fp, *, sort_keys=False, null_value="null", **kwargs):
     if not rows:
         return
     if hasattr(rows, "keys"):
@@ -66,6 +68,13 @@ def dump(rows, fp, *, sort_keys=False, **kwargs):
     )
     for row in slines:
         print(
-            "| {} |".format(" | ".join([("" if k not in row else str(row[k])) for k in keys])),
+            "| {} |".format(
+                " | ".join(
+                    [
+                        ("" if k not in row else str(null_value if row[k] is None else row[k]))
+                        for k in keys
+                    ]
+                )
+            ),
             file=fp
         )

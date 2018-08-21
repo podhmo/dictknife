@@ -9,6 +9,7 @@
     "nickname": "B"
   },
   {
-    "name": "boo"
+    "name": "boo",
+    "nickname": null
   }
 ]
