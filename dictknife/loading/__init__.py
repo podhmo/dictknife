@@ -10,6 +10,7 @@ from . import yaml
 from . import toml
 from . import tsv
 from . import csv
+from . import md
 
 logger = logging.getLogger(__name__)
 unknown = "(unknown)"
@@ -111,6 +112,7 @@ dispather.add_format("csv", csv.load, csv.dump, exts=(".csv", ))
 dispather.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
 dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
+dispather.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 # short cuts
