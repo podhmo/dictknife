@@ -88,17 +88,55 @@ def transform(
         loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
 
 
-def diff(*, normalize, left, right, n, debug):
+def diff(
+    *,
+    normalize: bool,
+    unsort: bool,
+    left: dict,
+    right: dict,
+    n: int,
+    debug: bool,
+    output_format: str = "diff"
+):
     from dictknife import diff
     with traceback_shortly(debug):
         with open(left) as rf:
             left_data = loading.load(rf)
         with open(right) as rf:
             right_data = loading.load(rf)
-        for line in diff(
-            left_data, right_data, fromfile=left, tofile=right, n=n, normalize=normalize
-        ):
-            print(line)
+
+        if output_format == "dict":
+            import difflib
+            rows = []
+
+            diff_key = "diff"
+            for k, lv in left_data.items():
+                rv = right_data.get(k)
+                row = {"name": k, left: lv, right: rv}
+                if lv is None or rv is None:
+                    row[diff_key] = None
+                elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
+                    row[diff_key] = rv - lv
+                else:
+                    lvs = str(lv)
+                    rvs = str(rv)
+                    if lvs == rvs:
+                        row[diff_key] = ""
+                    else:
+                        row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
+                rows.append(row)
+            loading.dumpfile(rows, format="json")
+        else:
+            for line in diff(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                n=n,
+                normalize=normalize,
+                unsort=unsort
+            ):
+                print(line)
 
 
 def linecat(src=None, **kwargs):
@@ -196,10 +234,12 @@ def main():
         add_argument("--sort-keys", action="store_true")
 
     with parser.subcommand(diff, description="diff dict") as add_argument:
+        add_argument("--unsort", action="store_true")
         add_argument("--normalize", action="store_true")
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
+        add_argument("-o", "--output-format", choices=["diff", "dict"])
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(shape) as add_argument:

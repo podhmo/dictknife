@@ -2,9 +2,9 @@ import difflib
 from .deepequal import sort_flexibly
 
 
-def _default_tostring(d, default=str):
+def _default_tostring(d, *, default=str, sort_keys=True):
     import json
-    return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=True, default=default)
+    return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=sort_keys, default=default)
 
 
 def _normalize_dict(d):  # side effect!
@@ -25,7 +25,8 @@ def diff(
     tofile="right",
     n=3,
     terminator="\n",
-    normalize=False
+    normalize=False,
+    unsort=False,
 ):
     """fancy diff"""
     if normalize:
@@ -33,8 +34,8 @@ def diff(
         d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
-    s0 = tostring(d0).split(terminator)
-    s1 = tostring(d1).split(terminator)
+    s0 = tostring(d0, sort_keys=not unsort).split(terminator)
+    s1 = tostring(d1, sort_keys=not unsort).split(terminator)
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
 
 
