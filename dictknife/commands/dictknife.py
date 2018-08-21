@@ -106,8 +106,25 @@ def diff(
             right_data = loading.load(rf)
 
         if output_format == "dict":
-            rows = diff_rows(left_data, right_data, fromfile=left, tofile=right, diff_key="diff")
+            rows = diff_rows(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                diff_key="diff",
+                normalize=normalize
+            )
             loading.dumpfile(rows, format="json")
+        elif output_format == "md":
+            rows = diff_rows(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                diff_key="diff",
+                normalize=normalize
+            )
+            loading.dumpfile(rows, format="md")
         else:
             for line in diff(
                 left_data,
@@ -221,7 +238,7 @@ def main():
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
-        add_argument("-o", "--output-format", choices=["diff", "dict"])
+        add_argument("-o", "--output-format", choices=["diff", "dict", "md"])
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(shape) as add_argument:

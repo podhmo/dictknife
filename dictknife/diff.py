@@ -39,15 +39,40 @@ def diff(
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
 
 
-def diff_rows(d0, d1, fromfile="left", tofile="right", diff_key="diff"):
+def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False):
+    if normalize:
+        d0 = sort_flexibly(d0)
+        d1 = sort_flexibly(d1)
+        _normalize_dict(d0)
+        _normalize_dict(d1)
+
     rows = []
+    if isinstance(d0, (list, tuple)):
+        for i, sd0 in enumerate(d0):
+            try:
+                sd1 = d1[i]
+            except IndexError:
+                sd1 = sd0.__class__()  # xxx
+            subrows = diff_rows(sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            for srow in subrows:
+                srow["name"] = "{}/{}".format(i, srow["name"])
+            rows.extend(subrows)
+        return rows
+
     for k, lv in d0.items():
         rv = d1.get(k)
         row = {"name": k, fromfile: lv, tofile: rv}
         if lv is None or rv is None:
             row[diff_key] = None
+            rows.append(row)
         elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
             row[diff_key] = rv - lv
+            rows.append(row)
+        elif hasattr(lv, "keys") or isinstance(lv, (list, tuple)):
+            subrows = diff_rows(lv, rv, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            for srow in subrows:
+                srow["name"] = "{}/{}".format(k, srow["name"])
+            rows.extend(subrows)
         else:
             lvs = str(lv)
             rvs = str(rv)
@@ -55,7 +80,7 @@ def diff_rows(d0, d1, fromfile="left", tofile="right", diff_key="diff"):
                 row[diff_key] = ""
             else:
                 row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
-        rows.append(row)
+            rows.append(row)
     return rows
 
 
