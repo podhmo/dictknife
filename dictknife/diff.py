@@ -1,4 +1,5 @@
 import difflib
+import itertools
 from .deepequal import sort_flexibly
 
 
@@ -48,20 +49,27 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
 
     rows = []
     if isinstance(d0, (list, tuple)):
-        for i, sd0 in enumerate(d0):
-            try:
-                sd1 = d1[i]
-            except IndexError:
-                sd1 = sd0.__class__()  # xxx
+        for i, (sd0, sd1) in enumerate(itertools.zip_longest(d0, d1 or [])):
+            if sd0 is None:
+                sd0 = sd1.__class__()
+            elif sd1 is None:
+                sd1 = sd0.__class__()
             subrows = diff_rows(sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
             for srow in subrows:
                 srow["name"] = "{}/{}".format(i, srow["name"])
             rows.extend(subrows)
         return rows
 
-    for k, lv in d0.items():
+    seen = set()
+    for k in itertools.chain(d0.keys(), d1.keys()):
+        if k in seen:
+            continue
+        seen.add(k)
+
+        lv = d0.get(k)
         rv = d1.get(k)
         row = {"name": k, fromfile: lv, tofile: rv}
+
         if lv is None or rv is None:
             row[diff_key] = None
             rows.append(row)
