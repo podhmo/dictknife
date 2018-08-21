@@ -39,6 +39,26 @@ def diff(
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
 
 
+def diff_rows(d0, d1, fromfile="left", tofile="right", diff_key="diff"):
+    rows = []
+    for k, lv in d0.items():
+        rv = d1.get(k)
+        row = {"name": k, fromfile: lv, tofile: rv}
+        if lv is None or rv is None:
+            row[diff_key] = None
+        elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
+            row[diff_key] = rv - lv
+        else:
+            lvs = str(lv)
+            rvs = str(rv)
+            if lvs == rvs:
+                row[diff_key] = ""
+            else:
+                row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
+        rows.append(row)
+    return rows
+
+
 if __name__ == "__main__":
     import datetime
     d0 = {"x": datetime.date(2000, 1, 1), "y": {"a": 1, "b": 10}}

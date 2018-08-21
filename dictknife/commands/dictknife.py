@@ -98,7 +98,7 @@ def diff(
     debug: bool,
     output_format: str = "diff"
 ):
-    from dictknife import diff
+    from dictknife.diff import diff, diff_rows
     with traceback_shortly(debug):
         with open(left) as rf:
             left_data = loading.load(rf)
@@ -106,25 +106,7 @@ def diff(
             right_data = loading.load(rf)
 
         if output_format == "dict":
-            import difflib
-            rows = []
-
-            diff_key = "diff"
-            for k, lv in left_data.items():
-                rv = right_data.get(k)
-                row = {"name": k, left: lv, right: rv}
-                if lv is None or rv is None:
-                    row[diff_key] = None
-                elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
-                    row[diff_key] = rv - lv
-                else:
-                    lvs = str(lv)
-                    rvs = str(rv)
-                    if lvs == rvs:
-                        row[diff_key] = ""
-                    else:
-                        row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
-                rows.append(row)
+            rows = diff_rows(left_data, right_data, fromfile=left, tofile=right, diff_key="diff")
             loading.dumpfile(rows, format="json")
         else:
             for line in diff(
