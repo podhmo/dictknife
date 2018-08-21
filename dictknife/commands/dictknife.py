@@ -105,27 +105,7 @@ def diff(
         with open(right) as rf:
             right_data = loading.load(rf)
 
-        if output_format == "dict":
-            rows = diff_rows(
-                left_data,
-                right_data,
-                fromfile=left,
-                tofile=right,
-                diff_key="diff",
-                normalize=normalize
-            )
-            loading.dumpfile(rows, format="json")
-        elif output_format == "md":
-            rows = diff_rows(
-                left_data,
-                right_data,
-                fromfile=left,
-                tofile=right,
-                diff_key="diff",
-                normalize=normalize
-            )
-            loading.dumpfile(rows, format="md")
-        else:
+        if output_format == "diff":
             for line in diff(
                 left_data,
                 right_data,
@@ -136,6 +116,18 @@ def diff(
                 unsort=unsort
             ):
                 print(line)
+        else:
+            if output_format == "dict":
+                output_format = "json"
+            rows = diff_rows(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                diff_key="diff",
+                normalize=normalize
+            )
+            loading.dumpfile(rows, format=output_format)
 
 
 def linecat(src=None, **kwargs):
@@ -238,7 +230,7 @@ def main():
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
-        add_argument("-o", "--output-format", choices=["diff", "dict", "md"])
+        add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"])
         add_argument("--debug", action="store_true")
 
     with parser.subcommand(shape) as add_argument:
