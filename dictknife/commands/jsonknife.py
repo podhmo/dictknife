@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife import deepmerge
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def cut(*, src, dst, refs):
     d = loading.loadfile(src)
-    accessor = Accessor(OrderedDict)
+    accessor = Accessor(make_dict)
     for ref in refs:
         if ref.startswith("#/"):
             ref = ref[2:]
@@ -34,7 +34,7 @@ def deref(*, src, dst, refs, unwrap, wrap):
     if not refs:
         d = expander.expand()
     else:
-        d = OrderedDict()
+        d = make_dict()
         for ref in refs:
             ref_wrap = wrap
             if "@" in ref:

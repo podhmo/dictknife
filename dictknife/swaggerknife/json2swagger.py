@@ -1,5 +1,5 @@
 import logging
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from prestring import NameStore
 
 logger = logging.getLogger(__name__)
@@ -38,10 +38,10 @@ class Detector:
     resolve_type = staticmethod(resolve_type)
 
     def make_info(self):
-        return {"freq": 0, "freq2": 0, "type": "any", "children": OrderedDict(), "values": []}
+        return {"freq": 0, "freq2": 0, "type": "any", "children": make_dict(), "values": []}
 
     def detect(self, d, name, info=None):
-        s = OrderedDict()
+        s = make_dict()
         s[name] = info or self.make_info()
         path = [name]
         self._detect(d, s[name], name, path=path)
@@ -83,7 +83,7 @@ class Detector:
 
 class Emitter:
     def __init__(self, annotations):
-        self.doc = OrderedDict(definitions=OrderedDict())
+        self.doc = make_dict(definitions=make_dict())
         self.definitions = self.doc["definitions"]
 
         self.ns = NameStore()
@@ -114,7 +114,7 @@ class Emitter:
 
     def make_array_schema(self, info, parent):
         self.cw.write(info["name"] + "[]", info, parent=parent)
-        d = OrderedDict(type="array")
+        d = make_dict(type="array")
         d["items"] = self.make_schema(info, parent=info, fromarray=True)
         schema_name = self.resolve_name(info, suffix="[]")
         self.definitions[schema_name] = d
@@ -127,8 +127,8 @@ class Emitter:
         if not fromarray:
             self.cw.write(info["name"], info, parent=parent)
 
-        d = OrderedDict(type="object")
-        d["properties"] = OrderedDict()
+        d = make_dict(type="object")
+        d["properties"] = make_dict()
         props = d["properties"]
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
@@ -149,7 +149,7 @@ class Emitter:
         return {"$ref": "#/definitions/{name}".format(name=schema_name)}
 
     def make_primitive_schema(self, info):
-        d = OrderedDict(type=info["type"])
+        d = make_dict(type=info["type"])
         if "format" in info:
             d["format"] = info["format"]
         if info["values"]:

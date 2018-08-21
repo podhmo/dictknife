@@ -1,12 +1,12 @@
 import copy
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 from dictknife.langhelpers import titleize
 
 
 class Handler:
     def __init__(self, path, r=None):
         self.path = path
-        self.r = r or OrderedDict()
+        self.r = r or make_dict()
 
     def full_name(self):
         return "".join(self.path)

@@ -1,9 +1,9 @@
 # markdown table format
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 import itertools
 
 
-def load(fp, *, loader=None, errors=None, make_dict=OrderedDict, null_value="null", **kwargs):
+def load(fp, *, loader=None, errors=None, make_dict=make_dict, null_value="null", **kwargs):
     keys = None
     while keys is None:
         line = next(fp)

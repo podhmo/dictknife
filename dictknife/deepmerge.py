@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import copy
-from collections import OrderedDict
+from dictknife.langhelpers import make_dict
 
 
 def _deepmerge(left, right):
@@ -45,7 +45,7 @@ def _deepmerge_override(left, right):
         return right
 
 
-def deepmerge(*ds, override=False, make_dict=OrderedDict):
+def deepmerge(*ds, override=False, make_dict=make_dict):
     if override:
         merge = _deepmerge_override
     else:
