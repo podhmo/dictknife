@@ -91,7 +91,7 @@ def transform(
 def diff(
     *,
     normalize: bool,
-    unsort: bool,
+    sort_keys: bool,
     left: dict,
     right: dict,
     n: int,
@@ -113,7 +113,7 @@ def diff(
                 tofile=right,
                 n=n,
                 normalize=normalize,
-                unsort=unsort
+                sort_keys=sort_keys,
             ):
                 print(line)
         else:
@@ -209,7 +209,7 @@ def main():
                 help="see pydoc codecs.Codec",
             )
             add_argument("--debug", action="store_true")
-            add_argument("--sort-keys", action="store_true")
+            add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(transform, description="transform dict") as add_argument:
         add_argument("--src", default=None)
@@ -222,16 +222,16 @@ def main():
         add_argument("-o", "--output-format", default=None, choices=formats)
         add_argument("-f", "--format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
-        add_argument("--sort-keys", action="store_true")
+        add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(diff, description="diff dict") as add_argument:
-        add_argument("--unsort", action="store_true")
         add_argument("--normalize", action="store_true")
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
-        add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"])
+        add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff")
         add_argument("--debug", action="store_true")
+        add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(shape) as add_argument:
         add_argument("files", nargs="*", default=[sys.stdin])

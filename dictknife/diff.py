@@ -27,7 +27,7 @@ def diff(
     n=3,
     terminator="\n",
     normalize=False,
-    unsort=False,
+    sort_keys=False,
 ):
     """fancy diff"""
     if normalize:
@@ -35,8 +35,8 @@ def diff(
         d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
-    s0 = tostring(d0, sort_keys=not unsort).split(terminator)
-    s1 = tostring(d1, sort_keys=not unsort).split(terminator)
+    s0 = tostring(d0, sort_keys=sort_keys).split(terminator)
+    s1 = tostring(d1, sort_keys=sort_keys).split(terminator)
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
 
 

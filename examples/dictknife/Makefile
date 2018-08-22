@@ -1,4 +1,4 @@
-default: concat transform diff
+default: concat transform diff diff2
 
 concat:
 	mkdir -p dst/00concat
@@ -16,7 +16,7 @@ transform:
 
 diff:
 	mkdir -p dst/02diff
-	dictknife diff src/02diff/left.yaml src/02diff/right.json > dst/02diff/person.diff
+	dictknife diff -S src/02diff/left.yaml src/02diff/right.json > dst/02diff/person.diff
 
 linecat:
 	mkdir -p dst/04linecat
