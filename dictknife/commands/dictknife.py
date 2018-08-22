@@ -92,6 +92,7 @@ def diff(
     *,
     normalize: bool,
     sort_keys: bool,
+    skip_empty: bool,
     left: dict,
     right: dict,
     n: int,
@@ -119,14 +120,17 @@ def diff(
         else:
             if output_format == "dict":
                 output_format = "json"
+            diff_key = "diff"
             rows = diff_rows(
                 left_data,
                 right_data,
                 fromfile=left,
                 tofile=right,
-                diff_key="diff",
+                diff_key=diff_key,
                 normalize=normalize
             )
+            if skip_empty:
+                rows = [row for row in rows if row[diff_key] != ""]
             loading.dumpfile(rows, format=output_format)
 
 
@@ -229,6 +233,7 @@ def main():
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
+        add_argument("--skip-empty", action="store_true")
         add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff")
         add_argument("--debug", action="store_true")
         add_argument("-S", "--sort-keys", action="store_true")
