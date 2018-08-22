@@ -1,3 +1,8 @@
+0.8.0
+
+- adding dictknife diff --output-format dict option
+- support loading markdown table format
+
 0.7.6
 
 - dictknife rename command concat -> cat
