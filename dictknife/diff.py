@@ -1,10 +1,11 @@
 import difflib
+import itertools
 from .deepequal import sort_flexibly
 
 
-def _default_tostring(d, default=str):
+def _default_tostring(d, *, default=str, sort_keys=True):
     import json
-    return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=True, default=default)
+    return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=sort_keys, default=default)
 
 
 def _normalize_dict(d):  # side effect!
@@ -25,7 +26,8 @@ def diff(
     tofile="right",
     n=3,
     terminator="\n",
-    normalize=False
+    normalize=False,
+    sort_keys=False,
 ):
     """fancy diff"""
     if normalize:
@@ -33,9 +35,61 @@ def diff(
         d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
-    s0 = tostring(d0).split(terminator)
-    s1 = tostring(d1).split(terminator)
+    s0 = tostring(d0, sort_keys=sort_keys).split(terminator)
+    s1 = tostring(d1, sort_keys=sort_keys).split(terminator)
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
+
+
+def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False):
+    if normalize:
+        d0 = sort_flexibly(d0)
+        d1 = sort_flexibly(d1)
+        _normalize_dict(d0)
+        _normalize_dict(d1)
+
+    rows = []
+    if isinstance(d0, (list, tuple)):
+        for i, (sd0, sd1) in enumerate(itertools.zip_longest(d0, d1 or [])):
+            if sd0 is None:
+                sd0 = sd1.__class__()
+            elif sd1 is None:
+                sd1 = sd0.__class__()
+            subrows = diff_rows(sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            for srow in subrows:
+                srow["name"] = "{}/{}".format(i, srow["name"])
+            rows.extend(subrows)
+        return rows
+
+    seen = set()
+    for k in itertools.chain(d0.keys(), d1.keys()):
+        if k in seen:
+            continue
+        seen.add(k)
+
+        lv = d0.get(k)
+        rv = d1.get(k)
+        row = {"name": k, fromfile: lv, tofile: rv}
+
+        if lv is None or rv is None:
+            row[diff_key] = None
+            rows.append(row)
+        elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
+            row[diff_key] = rv - lv
+            rows.append(row)
+        elif hasattr(lv, "keys") or isinstance(lv, (list, tuple)):
+            subrows = diff_rows(lv, rv, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            for srow in subrows:
+                srow["name"] = "{}/{}".format(k, srow["name"])
+            rows.extend(subrows)
+        else:
+            lvs = str(lv)
+            rvs = str(rv)
+            if lvs == rvs:
+                row[diff_key] = ""
+            else:
+                row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
+            rows.append(row)
+    return rows
 
 
 if __name__ == "__main__":

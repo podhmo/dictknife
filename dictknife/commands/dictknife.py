@@ -88,17 +88,46 @@ def transform(
         loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
 
 
-def diff(*, normalize, left, right, n, debug):
-    from dictknife import diff
+def diff(
+    *,
+    normalize: bool,
+    sort_keys: bool,
+    left: dict,
+    right: dict,
+    n: int,
+    debug: bool,
+    output_format: str = "diff"
+):
+    from dictknife.diff import diff, diff_rows
     with traceback_shortly(debug):
         with open(left) as rf:
             left_data = loading.load(rf)
         with open(right) as rf:
             right_data = loading.load(rf)
-        for line in diff(
-            left_data, right_data, fromfile=left, tofile=right, n=n, normalize=normalize
-        ):
-            print(line)
+
+        if output_format == "diff":
+            for line in diff(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                n=n,
+                normalize=normalize,
+                sort_keys=sort_keys,
+            ):
+                print(line)
+        else:
+            if output_format == "dict":
+                output_format = "json"
+            rows = diff_rows(
+                left_data,
+                right_data,
+                fromfile=left,
+                tofile=right,
+                diff_key="diff",
+                normalize=normalize
+            )
+            loading.dumpfile(rows, format=output_format)
 
 
 def linecat(src=None, **kwargs):
@@ -180,7 +209,7 @@ def main():
                 help="see pydoc codecs.Codec",
             )
             add_argument("--debug", action="store_true")
-            add_argument("--sort-keys", action="store_true")
+            add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(transform, description="transform dict") as add_argument:
         add_argument("--src", default=None)
@@ -193,14 +222,16 @@ def main():
         add_argument("-o", "--output-format", default=None, choices=formats)
         add_argument("-f", "--format", default=None, choices=formats)
         add_argument("--debug", action="store_true")
-        add_argument("--sort-keys", action="store_true")
+        add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(diff, description="diff dict") as add_argument:
         add_argument("--normalize", action="store_true")
         add_argument("left")
         add_argument("right")
         add_argument("--n", default=3, type=int)
+        add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff")
         add_argument("--debug", action="store_true")
+        add_argument("-S", "--sort-keys", action="store_true")
 
     with parser.subcommand(shape) as add_argument:
         add_argument("files", nargs="*", default=[sys.stdin])
