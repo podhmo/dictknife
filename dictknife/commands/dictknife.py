@@ -103,35 +103,35 @@ def diff(
     with traceback_shortly(debug):
         with open(left) as rf:
             left_data = loading.load(rf)
-        with open(right) as rf:
-            right_data = loading.load(rf)
+            with open(right) as rf:
+                right_data = loading.load(rf)
 
-        if output_format == "diff":
-            for line in diff(
-                left_data,
-                right_data,
-                fromfile=left,
-                tofile=right,
-                n=n,
-                normalize=normalize,
-                sort_keys=sort_keys,
-            ):
-                print(line)
-        else:
-            if output_format == "dict":
-                output_format = "json"
-            diff_key = "diff"
-            rows = diff_rows(
-                left_data,
-                right_data,
-                fromfile=left,
-                tofile=right,
-                diff_key=diff_key,
-                normalize=normalize
-            )
-            if skip_empty:
-                rows = [row for row in rows if row[diff_key] != ""]
-            loading.dumpfile(rows, format=output_format)
+                if output_format == "diff":
+                    for line in diff(
+                        left_data,
+                        right_data,
+                        fromfile=left,
+                        tofile=right,
+                        n=n,
+                        normalize=normalize,
+                        sort_keys=sort_keys,
+                    ):
+                        print(line)
+                else:
+                    if output_format == "dict":
+                        output_format = "json"
+                    diff_key = "diff"
+                    rows = diff_rows(
+                        left_data,
+                        right_data,
+                        fromfile=left,
+                        tofile=right,
+                        diff_key=diff_key,
+                        normalize=normalize
+                    )
+                    if skip_empty:
+                        rows = [row for row in rows if row[diff_key] != ""]
+                    loading.dumpfile(rows, format=output_format)
 
 
 def linecat(src=None, **kwargs):

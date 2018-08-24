@@ -35,6 +35,13 @@ def diff(
         d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
+
+    # iterator?
+    if hasattr(d0, "__next__"):
+        d0 = list(d0)
+    if hasattr(d1, "__next__"):
+        d1 = list(d1)
+
     s0 = tostring(d0, sort_keys=sort_keys).split(terminator)
     s1 = tostring(d1, sort_keys=sort_keys).split(terminator)
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
@@ -46,6 +53,12 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
         d1 = sort_flexibly(d1)
         _normalize_dict(d0)
         _normalize_dict(d1)
+
+    # iterator?
+    if hasattr(d0, "__next__"):
+        d0 = list(d0)
+    if hasattr(d1, "__next__"):
+        d1 = list(d1)
 
     rows = []
     if isinstance(d0, (list, tuple)):
