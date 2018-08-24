@@ -1,0 +1,13 @@
+--- 010people.tsv
++++ 011people.tsv
+@@ -5,8 +5,8 @@
+     "type": "person"
+   },
+   {
+-    "age": 21,
+-    "name": "bar",
++    "age": 20,
++    "name": "foo",
+     "type": "person"
+   }
+ ]

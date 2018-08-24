@@ -1,0 +1,10 @@
+--- 000person.json
++++ 001person.json
+@@ -1,5 +1,5 @@
+ {
+-  "age": 20,
+-  "name": "foo",
++  "age": 21,
++  "name": "bar",
+   "type": "person"
+ }
