@@ -130,7 +130,7 @@ def diff(
                         normalize=normalize
                     )
                     if skip_empty:
-                        rows = [row for row in rows if row[diff_key] != ""]
+                        rows = [row for row in rows if row[diff_key] not in ("", 0)]
                     loading.dumpfile(rows, format=output_format)
 
 
