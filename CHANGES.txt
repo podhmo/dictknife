@@ -1,3 +1,13 @@
+0.8.2
+
+- fix bug of dictknife diff, broken output is appeared, when input file is csv
+- fix bug of dictknife diff, 0 is not treated as empty
+
+0.8.1
+
+- suport markdown table format
+- support dictknife diff with --output (default is diff)
+
 0.8.0
 
 - adding dictknife diff --output-format dict option
