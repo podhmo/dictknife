@@ -44,7 +44,7 @@ def cat(
         d = make_dict()
         for f in files:
             logger.debug("merge: %s", f)
-            opener = loading.get_opener(input_format, default=_open)
+            opener = loading.get_opener(filename=f, format=input_format, default=_open)
             with opener(f, encoding=encoding, errors=errors) as rf:
                 if slurp:
                     sd = (loading.loads(line, format=input_format) for line in rf)

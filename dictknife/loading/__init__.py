@@ -97,9 +97,12 @@ class Dispatcher:
         self.dumper = self.dumper_factory(self)
         self.exts_matching = {}
 
-    def dispatch(self, filename, fn_map, default=unknown):
+    def detect_format(self, filename, *, default=unknown):
         _, ext = os.path.splitext(filename)
-        fmt = self.exts_matching.get(ext) or default
+        return self.exts_matching.get(ext) or default
+
+    def dispatch(self, filename, fn_map, default=unknown):
+        fmt = self.detect_format(filename, default=default)
         return fn_map[fmt]
 
     def add_format(self, fmt, load, dump, *, exts=[], opener=None):
@@ -130,8 +133,11 @@ dumps = dispather.dumper.dumps
 dumpfile = dispather.dumper.dumpfile
 
 
-def get_opener(format, default=open, _dispather=dispather):
-    opener = _dispather.loader.opener_map.get(format)
+def get_opener(*, format=None, filename=None, default=open, dispather=dispather):
+    if format is None and filename is not None:
+        format = dispather.detect_format(filename)
+
+    opener = dispather.loader.opener_map.get(format)
     if opener is None:
         return default
     return opener
