@@ -20,6 +20,18 @@ class LoadingModule:
         return csv
 
     @reify
+    def gsuite(self):
+        try:
+            from . import _gsuite as gsuite
+            return gsuite
+        except ImportError as e:
+            logger.info(
+                "google-api-python-client package is not found (original exception is %r)", e
+            )
+            import sys
+            sys.exit(1)
+
+    @reify
     def yaml(self):
         try:
             from . import _yaml as yaml
