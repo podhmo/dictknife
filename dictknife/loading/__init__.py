@@ -11,6 +11,7 @@ from . import toml
 from . import tsv
 from . import csv
 from . import md
+from . import spreadsheet  # optional
 
 logger = logging.getLogger(__name__)
 unknown = "(unknown)"
@@ -20,9 +21,12 @@ class Loader:
     def __init__(self, dispatcher):
         self.dispatcher = dispatcher
         self.fn_map = {}
+        self.opener_map = {}
 
-    def add_format(self, fmt, fn):
+    def add_format(self, fmt, fn, *, opener=None):
         self.fn_map[fmt] = fn
+        if opener is not None:
+            self.opener_map[fmt] = opener
 
     def loads(self, s, *args, **kwargs):
         return load(StringIO(s), *args, **kwargs)
@@ -35,11 +39,12 @@ class Loader:
             load = self.dispatcher.dispatch(fname, self.fn_map)
         return load(fp, loader=self, errors=errors)
 
-    def loadfile(self, filename=None, format=None, opener=open, encoding=None, errors=None):
+    def loadfile(self, filename=None, format=None, opener=None, encoding=None, errors=None):
         """load file or stdin"""
         if filename is None:
             return self.load(sys.stdin, format=format)
         else:
+            opener = opener or self.opener_map.get(format) or open
             with opener(filename, encoding=encoding, errors=errors) as rf:
                 r = self.load(rf, format=format, errors=errors)
                 if not hasattr(r, "keys") and hasattr(r, "__iter__"):
@@ -97,8 +102,8 @@ class Dispatcher:
         fmt = self.exts_matching.get(ext) or default
         return fn_map[fmt]
 
-    def add_format(self, fmt, load, dump, exts):
-        self.loader.add_format(fmt, load)
+    def add_format(self, fmt, load, dump, *, exts=[], opener=None):
+        self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
             self.exts_matching[ext] = fmt
@@ -113,6 +118,7 @@ dispather.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
 dispather.add_format("raw", raw.load, raw.dump, exts=[])
 dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispather.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
+dispather.add_format("spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open)
 dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 # short cuts
@@ -122,6 +128,13 @@ loadfile = dispather.loader.loadfile
 dump = dispather.dumper.dump
 dumps = dispather.dumper.dumps
 dumpfile = dispather.dumper.dumpfile
+
+
+def get_opener(format, default=open, _dispather=dispather):
+    opener = _dispather.loader.opener_map.get(format)
+    if opener is None:
+        return default
+    return opener
 
 
 def get_formats(dispather=dispather):
