@@ -78,7 +78,7 @@ def parse(pattern: str) -> t.Tuple[str, str]:
     """e.g. '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms#/Class Data!A2:E' """
     splitted = pattern.split("#/", 1)
     if len(splitted) == 1:
-        return splitted[0], ""
+        return splitted[0], None
     else:
         return splitted
 
@@ -98,8 +98,15 @@ class Loader:
 
     def load_sheet(self, pattern):
         sheet_id, range_name = parse(pattern)
-        params = {"spreadsheetId": sheet_id}
-        if range_name:
-            params["range"] = range_name
-        result = self.service.spreadsheets().values().get(**params).execute()
-        return result.get("values")
+        resource = self.service.spreadsheets()
+        if range_name is None:
+            result = resource.get(spreadsheetId=sheet_id).execute()
+            return [
+                {
+                    "title": sheet["properties"]["title"],
+                    **sheet["properties"]["gridProperties"]
+                } for sheet in result.get("sheets") or []
+            ]
+        else:
+            result = resource.values().get(spreadsheetId=sheet_id, range=range_name).execute()
+            return result.get("values")
