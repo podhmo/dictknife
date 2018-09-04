@@ -19,14 +19,12 @@ SCOPE_READONLY = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 
 
 def get_credentials(
-    config_path: t.Optional[str] = None,
+    config_path: str,
     *,
     cache_path: t.Optional[str] = None,
     scopes: t.Sequence[str],
     logger: t.Any = logger,
 ) -> OAuth2Credentials:
-    if config_path is None:
-        config_path = DEFAULT_CREDENTIALS_PATH
     config_path = os.path.expanduser(config_path)
     if cache_path is None:
         cache_path = os.path.join(os.path.dirname(config_path), "token.json")
@@ -41,12 +39,12 @@ def get_credentials(
         logger.info("credentials are invalid (or not found). %s", cache_path)
         logger.debug("see: %s", config_path)
         flow = client.flow_from_clientsecrets(config_path, scopes)
-        flags = tools.argparser.parse_args(["--logging_level=DEBUG"])
+        flags = tools.argparser.parse_args(["--logging_level=DEBUG", "--noauth_local_webserver"])
         credentials = tools.run_flow(flow, store, flags=flags)
     return credentials
 
 
-def get_credentials_failback_webrowser(
+def get_credentials_failback_webbrowser(
     config_path: str,
     *,
     cache_path: t.Optional[str] = None,
@@ -54,23 +52,23 @@ def get_credentials_failback_webrowser(
     logger: t.Any = logger,
 ) -> OAuth2Credentials:
     if scopes is None:
-        import webrowser
+        import webbrowser
         url = "https://developers.google.com/identity/protocols/googlescopes"
         print(
             "please passing scopes: (e.g. 'https://www.googleapis.com/auth/spreadsheets.readonly')\nopening {}...".
             format(url),
-            file=sys.stder
+            file=sys.stderr
         )
-        webrowser.open(url, new=1, autoraise=True)
+        webbrowser.open(url, new=1, autoraise=True)
         sys.exit(1)
     while True:
         try:
             return get_credentials(config_path, scopes=scopes, cache_path=cache_path, logger=logger)
         except InvalidClientSecretsError as e:
-            import webrowser
+            import webbrowser
             url = "https://console.cloud.google.com/apis/credentials"
-            print("please save credentials.json at {!r}.".format(config_path), file=sys.stder)
-            webrowser.open(url, new=1, autoraise=True)
+            print("please save credentials.json at {!r}.".format(config_path), file=sys.stderr)
+            webbrowser.open(url, new=1, autoraise=True)
             input("saved? (if saved, please typing enter key)")
 
 
@@ -84,14 +82,22 @@ def parse(pattern: str) -> t.Tuple[str, str]:
 
 
 class Loader:
-    def __init__(self, *, scopes=[SCOPE], get_credentials=get_credentials, http=None):
+    def __init__(
+        self,
+        *,
+        config_path=DEFAULT_CREDENTIALS_PATH,
+        scopes=[SCOPE],
+        get_credentials=get_credentials_failback_webbrowser,
+        http=None
+    ):
+        self.config_path = config_path
         self.scopes = scopes
         self.get_credentials = get_credentials
         self.http = http or httplib2.Http()
 
     @reify
     def service(self):
-        credentials = self.get_credentials(scopes=self.scopes)
+        credentials = self.get_credentials(self.config_path, scopes=self.scopes)
         return googleapiclient.discovery.build(
             'sheets', 'v4', http=credentials.authorize(self.http)
         )

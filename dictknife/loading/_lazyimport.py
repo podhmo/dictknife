@@ -22,13 +22,12 @@ class LoadingModule:
     @reify
     def gsuite(self):
         try:
+            import sys
             from . import _gsuite as gsuite
             return gsuite
         except ImportError as e:
-            logger.info(
-                "google-api-python-client package is not found (original exception is %r)", e
-            )
-            import sys
+            msg = "google-api-python-client package is not found (original exception is {!r})".format(e)
+            print(msg, file=sys.stderr)
             sys.exit(1)
 
     @reify
