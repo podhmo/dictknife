@@ -50,7 +50,6 @@ def cat(
                     sd = (loading.loads(line, format=input_format) for line in rf)
                 else:
                     sd = loading.load(rf, format=input_format, errors=errors)
-
                 if size is not None:
                     sd = itertools.islice(sd, size)
 
