@@ -1,4 +1,4 @@
-default: 00 01 02 03 06
+default: 00 01 02 03 06 07
 
 # dump single
 00: 00person.json
@@ -56,3 +56,11 @@ default: 00 01 02 03 06
 	# dictknife cat $< --dst dst/06output.tsv
 	# dictknife cat $< --dst dst/06output.csv
 	dictknife cat $< --dst dst/06output.md
+
+# size
+07: 07alphabets.csv
+	mkdir -p dst
+	dictknife cat $< --size=5 --dst dst/07output.json
+	dictknife cat $< --size=5 --dst dst/07output.yaml
+	dictknife cat $< --size=5 --dst dst/07output.tsv
+	dictknife cat $< --size=5 --dst dst/07output.md
