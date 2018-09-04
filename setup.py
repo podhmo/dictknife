@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import os
 import fastentrypoints
 
@@ -23,6 +22,11 @@ docs_extras = [
 load_extras = [
     "PyYAML",
     "toml",
+]
+
+spreadsheet_extrs = [
+    "google-api-python-client",
+    "oauth2client",
 ]
 
 command_extras = [
@@ -59,6 +63,7 @@ setup(
         'docs': docs_extras,
         'load': load_extras,
         'command': command_extras,
+        'spreadsheet': spreadsheet_extrs,
     },
     tests_require=tests_require,
     test_suite="dictknife.tests",

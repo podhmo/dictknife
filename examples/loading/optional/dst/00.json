@@ -1,0 +1,212 @@
+[
+  {
+    "Student Name": "Alexandra",
+    "Gender": "Female",
+    "Class Level": "4. Senior",
+    "Home State": "CA",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Andrew",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "SD",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Anna",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "NC",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Becky",
+    "Gender": "Female",
+    "Class Level": "2. Sophomore",
+    "Home State": "SD",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Benjamin",
+    "Gender": "Male",
+    "Class Level": "4. Senior",
+    "Home State": "WI",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Carl",
+    "Gender": "Male",
+    "Class Level": "3. Junior",
+    "Home State": "MD",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Carrie",
+    "Gender": "Female",
+    "Class Level": "3. Junior",
+    "Home State": "NE",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Dorothy",
+    "Gender": "Female",
+    "Class Level": "4. Senior",
+    "Home State": "MD",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Dylan",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "MA",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Edward",
+    "Gender": "Male",
+    "Class Level": "3. Junior",
+    "Home State": "FL",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Ellen",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "WI",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Fiona",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "MA",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "John",
+    "Gender": "Male",
+    "Class Level": "3. Junior",
+    "Home State": "CA",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Jonathan",
+    "Gender": "Male",
+    "Class Level": "2. Sophomore",
+    "Home State": "SC",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Joseph",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "AK",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Josephine",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "NY",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Karen",
+    "Gender": "Female",
+    "Class Level": "2. Sophomore",
+    "Home State": "NH",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Kevin",
+    "Gender": "Male",
+    "Class Level": "2. Sophomore",
+    "Home State": "NE",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Lisa",
+    "Gender": "Female",
+    "Class Level": "3. Junior",
+    "Home State": "SC",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Mary",
+    "Gender": "Female",
+    "Class Level": "2. Sophomore",
+    "Home State": "AK",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Maureen",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "CA",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Nick",
+    "Gender": "Male",
+    "Class Level": "4. Senior",
+    "Home State": "NY",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Olivia",
+    "Gender": "Female",
+    "Class Level": "4. Senior",
+    "Home State": "NC",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Pamela",
+    "Gender": "Female",
+    "Class Level": "3. Junior",
+    "Home State": "RI",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Patrick",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "NY",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Robert",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "CA",
+    "Major": "English"
+  },
+  {
+    "Student Name": "Sean",
+    "Gender": "Male",
+    "Class Level": "1. Freshman",
+    "Home State": "NH",
+    "Major": "Physics"
+  },
+  {
+    "Student Name": "Stacy",
+    "Gender": "Female",
+    "Class Level": "1. Freshman",
+    "Home State": "NY",
+    "Major": "Math"
+  },
+  {
+    "Student Name": "Thomas",
+    "Gender": "Male",
+    "Class Level": "2. Sophomore",
+    "Home State": "RI",
+    "Major": "Art"
+  },
+  {
+    "Student Name": "Will",
+    "Gender": "Male",
+    "Class Level": "4. Senior",
+    "Home State": "FL",
+    "Major": "Math"
+  }
+]
