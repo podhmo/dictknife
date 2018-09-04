@@ -112,46 +112,46 @@ class Dispatcher:
             self.exts_matching[ext] = fmt
 
 
-dispather = Dispatcher()
-dispather.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
-dispather.add_format("json", json.load, json.dump, exts=(".json", ".js"))
-dispather.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
-dispather.add_format("csv", csv.load, csv.dump, exts=(".csv", ))
-dispather.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
-dispather.add_format("raw", raw.load, raw.dump, exts=[])
-dispather.add_format("env", env.load, None, exts=(".env", ".environ"))
-dispather.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
-dispather.add_format("spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open)
-dispather.add_format(unknown, yaml.load, yaml.dump, exts=[])
+dispatcher = Dispatcher()
+dispatcher.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
+dispatcher.add_format("json", json.load, json.dump, exts=(".json", ".js"))
+dispatcher.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
+dispatcher.add_format("csv", csv.load, csv.dump, exts=(".csv", ))
+dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
+dispatcher.add_format("raw", raw.load, raw.dump, exts=[])
+dispatcher.add_format("env", env.load, None, exts=(".env", ".environ"))
+dispatcher.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
+dispatcher.add_format("spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open)
+dispatcher.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 # short cuts
-load = dispather.loader.load
-loads = dispather.loader.loads
-loadfile = dispather.loader.loadfile
-dump = dispather.dumper.dump
-dumps = dispather.dumper.dumps
-dumpfile = dispather.dumper.dumpfile
+load = dispatcher.loader.load
+loads = dispatcher.loader.loads
+loadfile = dispatcher.loader.loadfile
+dump = dispatcher.dumper.dump
+dumps = dispatcher.dumper.dumps
+dumpfile = dispatcher.dumper.dumpfile
 
 
-def get_opener(*, format=None, filename=None, default=open, dispather=dispather):
+def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatcher):
     if format is None and filename is not None:
-        format = dispather.guess_format(filename)
+        format = dispatcher.guess_format(filename)
 
-    opener = dispather.loader.opener_map.get(format)
+    opener = dispatcher.loader.opener_map.get(format)
     if opener is None:
         return default
     return opener
 
 
-def get_formats(dispather=dispather):
-    return [fmt for fmt in dispather.loader.fn_map.keys() if fmt != unknown]
+def get_formats(dispatcher=dispatcher):
+    return [fmt for fmt in dispatcher.loader.fn_map.keys() if fmt != unknown]
 
 
-def setup(input=None, output=None, dispather=dispather, unknown=unknown):
+def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):
     global loading_config
     if input is not None:
         logger.debug("setup input format: %s", input)
-        dispather.loader.add_format(unknown, input)
+        dispatcher.loader.add_format(unknown, input)
     if output is not None:
         logger.debug("setup output format: %s", output)
-        dispather.dumper.add_format(unknown, output)
+        dispatcher.dumper.add_format(unknown, output)
