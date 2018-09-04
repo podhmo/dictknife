@@ -102,22 +102,31 @@ class Loader:
 
     def load_sheet(self, guessed, *, with_header=True):
         resource = self.service.spreadsheets()
-        if guessed.range is None:
+
+        range_value = guessed.range
+        if range_value is None:
             result = resource.get(spreadsheetId=guessed.spreadsheet_id).execute()
-            return [
-                {
-                    "title": sheet["properties"]["title"],
-                    **sheet["properties"]["gridProperties"]
-                } for sheet in result.get("sheets") or []
-            ]
-        else:
-            result = resource.values().get(
-                spreadsheetId=guessed.spreadsheet_id, range=guessed.range
-            ).execute()
-            values = result.get("values")
-            if not with_header:
-                return values
-            if not values:
-                return values
-            headers = values[0]
-            return [{k: v for k, v in zip(headers, row)} for row in values[1:]]
+            for sheet in result.get("sheets"):
+                if str(sheet["properties"]["sheetId"]) == guessed.sheet_id:
+                    range_value = sheet["properties"]["title"]
+                    break
+            if range_value is None:
+                return [
+                    {
+                        "title": sheet["properties"]["title"],
+                        **sheet["properties"]["gridProperties"]
+                    } for sheet in result.get("sheets") or []
+                ]
+
+        result = resource.values().get(
+            spreadsheetId=guessed.spreadsheet_id, range=range_value
+        ).execute()
+        values = result.get("values")
+        if not with_header:
+            return values
+        if not values:
+            return values
+        headers = values[0]
+        return [{k: v for k, v in zip(headers, row)} for row in values[1:]]
+
+        result = resource.get(spreadsheetId=guessed.spreadsheet_id).execute()
