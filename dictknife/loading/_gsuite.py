@@ -14,6 +14,13 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 DEFAULT_CREDENTIALS_PATH = "~/.config/dictknife/credentials.json"
+
+# Authorize using one of the following scopes:
+#     'https://www.googleapis.com/auth/drive'
+#     'https://www.googleapis.com/auth/drive.file'
+#     'https://www.googleapis.com/auth/drive.readonly'
+#     'https://www.googleapis.com/auth/spreadsheets'
+#     'https://www.googleapis.com/auth/spreadsheets.readonly'
 SCOPE = 'https://www.googleapis.com/auth/spreadsheets'
 SCOPE_READONLY = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 
@@ -72,15 +79,6 @@ def get_credentials_failback_webbrowser(
             input("saved? (if saved, please typing enter key)")
 
 
-def parse(pattern: str) -> t.Tuple[str, str]:
-    """e.g. '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms#/Class Data!A2:E' """
-    splitted = pattern.split("#/", 1)
-    if len(splitted) == 1:
-        return splitted[0], None
-    else:
-        return splitted
-
-
 class Loader:
     def __init__(
         self,
@@ -102,11 +100,10 @@ class Loader:
             'sheets', 'v4', http=credentials.authorize(self.http)
         )
 
-    def load_sheet(self, pattern, *, with_header=True):
-        sheet_id, range_name = parse(pattern)
+    def load_sheet(self, guessed, *, with_header=True):
         resource = self.service.spreadsheets()
-        if range_name is None:
-            result = resource.get(spreadsheetId=sheet_id).execute()
+        if guessed.range is None:
+            result = resource.get(spreadsheetId=guessed.spreadsheet_id).execute()
             return [
                 {
                     "title": sheet["properties"]["title"],
@@ -114,7 +111,9 @@ class Loader:
                 } for sheet in result.get("sheets") or []
             ]
         else:
-            result = resource.values().get(spreadsheetId=sheet_id, range=range_name).execute()
+            result = resource.values().get(
+                spreadsheetId=guessed.spreadsheet_id, range=guessed.range
+            ).execute()
             values = result.get("values")
             if not with_header:
                 return values
