@@ -102,7 +102,7 @@ class Loader:
             'sheets', 'v4', http=credentials.authorize(self.http)
         )
 
-    def load_sheet(self, pattern):
+    def load_sheet(self, pattern, *, with_header=True):
         sheet_id, range_name = parse(pattern)
         resource = self.service.spreadsheets()
         if range_name is None:
@@ -115,4 +115,10 @@ class Loader:
             ]
         else:
             result = resource.values().get(spreadsheetId=sheet_id, range=range_name).execute()
-            return result.get("values")
+            values = result.get("values")
+            if not with_header:
+                return values
+            if not values:
+                return values
+            headers = values[0]
+            return [{k: v for k, v in zip(headers, row)} for row in values[1:]]
