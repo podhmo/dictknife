@@ -75,6 +75,9 @@ class Dumper:
 
     def dumpfile(self, d, filename=None, format=None, sort_keys=False, _retry=False):
         """dump file or stdout"""
+        if hasattr(d, "__next__"):  # iterator
+            d = list(d)
+
         if filename is None:
             return self.dump(d, sys.stdout, format=format, sort_keys=sort_keys)
         else:
@@ -121,6 +124,7 @@ dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
 dispatcher.add_format("raw", raw.load, raw.dump, exts=[])
 dispatcher.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispatcher.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
+dispatcher.add_format("markdown", md.load, md.dump, exts=[])
 dispatcher.add_format("spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open)
 dispatcher.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
