@@ -1,17 +1,19 @@
 import typing as t
 import sys
 import os.path
+import logging
 import httplib2
 from oauth2client import file, client
 from oauth2client import tools
 from oauth2client.clientsecrets import InvalidClientSecretsError
 from oauth2client.client import OAuth2Credentials
 from dictknife.langhelpers import reify
+from googleapiclient.discovery_cache import LOGGER as noisy_logger
+# supress stderr message of 'ImportError: file_cache is unavailable when using oauth2client >= 4.0.0 or google-auth' # noqa
+noisy_logger.setLevel(logging.ERROR)  # noqa
 import googleapiclient.discovery
 
-from logging import getLogger
-
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 DEFAULT_CREDENTIALS_PATH = "~/.config/dictknife/credentials.json"
 
