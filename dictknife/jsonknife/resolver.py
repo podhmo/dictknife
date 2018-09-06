@@ -3,7 +3,7 @@ import logging
 import os.path
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit
-
+from . import relpath
 logger = logging.getLogger("jsonknife.resolver")
 
 
@@ -35,7 +35,7 @@ class ExternalFileResolver(object):
         format=None
     ):
         self.rawfilename = rawfilename or filename
-        self.filename = self.normpath(filename)
+        self.filename = os.path.normpath(os.path.abspath(filename))
         self.cache = cache or {}  # filename -> resolver
         self.loader = loader or loading
         self.history = history or [ROOT]
@@ -65,9 +65,6 @@ class ExternalFileResolver(object):
             self.onload(doc, self)
         return doc
 
-    def normpath(self, filename):
-        return os.path.normpath(os.path.abspath(filename))
-
     def new(self, filename, doc=None, rawfilename=None, format=None):
         rawfilename = rawfilename or filename
         history = self.history[:]
@@ -87,8 +84,7 @@ class ExternalFileResolver(object):
         filepath, query = pairrsplit(query, "#")
         if filepath == "":
             return self.filename, self.filename, query
-        curdir = os.path.dirname(self.filename)
-        fullpath = self.normpath(os.path.join(curdir, filepath))
+        fullpath = relpath.normpath(filepath, where=os.path.dirname(self.filename))
         return fullpath, filepath, query
 
     def resolve(self, query, format=None):

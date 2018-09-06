@@ -5,8 +5,8 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 class fixRelpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from dictknife.jsonknife.filepath import fix_relpath
-        return fix_relpath(*args, **kwargs)
+        from dictknife.jsonknife.relpath import relpath
+        return relpath(*args, **kwargs)
 
     def test_it(self):
         from collections import namedtuple
@@ -38,7 +38,7 @@ class fixRelpathTests(unittest.TestCase):
 
 class NormpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
-        from dictknife.jsonknife.filepath import normpath
+        from dictknife.jsonknife.relpath import normpath
         return normpath(*args, **kwargs)
 
     def test_it(self):
