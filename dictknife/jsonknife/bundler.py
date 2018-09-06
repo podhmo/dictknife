@@ -2,7 +2,7 @@ import sys
 import logging
 import os.path
 from dictknife.langhelpers import make_dict
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
@@ -40,7 +40,7 @@ class Scanner(object):
 
     @reify
     def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
+        return DictWalker(["$ref"])
 
     @reify
     def conflict_fixer(self):  # todo: rename
@@ -77,7 +77,7 @@ class Emitter(object):
 
     @reify
     def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
+        return DictWalker(["$ref"])
 
     def get_item_by_globalref(self, globalref):
         return self.accessor.cache[globalref]

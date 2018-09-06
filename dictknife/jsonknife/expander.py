@@ -1,4 +1,4 @@
-from dictknife import LooseDictWalkingIterator
+from dictknife import DictWalker
 from dictknife.langhelpers import reify
 from .accessor import StackedAccessor
 
@@ -25,7 +25,7 @@ class Expander(object):
 
     @reify
     def ref_walking(self):
-        return LooseDictWalkingIterator(["$ref"])
+        return DictWalker(["$ref"])
 
     def access(self, ref):
         return self.accessor.access(ref)
