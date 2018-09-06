@@ -4,7 +4,6 @@ import os.path
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit
 
-
 logger = logging.getLogger("jsonknife.resolver")
 
 
@@ -24,7 +23,17 @@ class OneDocResolver(object):
 
 
 class ExternalFileResolver(object):
-    def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None, onload=None, format=None):
+    def __init__(
+        self,
+        filename,
+        cache=None,
+        loader=None,
+        history=None,
+        doc=None,
+        rawfilename=None,
+        onload=None,
+        format=None
+    ):
         self.rawfilename = rawfilename or filename
         self.filename = self.normpath(filename)
         self.cache = cache or {}  # filename -> resolver
@@ -46,7 +55,10 @@ class ExternalFileResolver(object):
 
     @reify
     def doc(self):
-        logger.debug("load file[%s]: %r (where=%r)", len(self.history), self.rawfilename, self.history[-1].filename)
+        logger.debug(
+            "load file[%s]: %r (where=%r)", len(self.history), self.rawfilename,
+            self.history[-1].filename
+        )
         with open(self.filename) as rf:
             doc = self.loader.load(rf, format=self.format)
         if self.onload is not None:
@@ -95,7 +107,9 @@ class ExternalFileResolver(object):
                 return cached
             else:
                 return self.new(filename, doc=cached.doc, rawfilename=rawfilename, format=format)
-        subresolver = self.cache[filename] = self.new(filename, rawfilename=rawfilename, format=format)
+        subresolver = self.cache[filename] = self.new(
+            filename, rawfilename=rawfilename, format=format
+        )
         return subresolver
 
 
