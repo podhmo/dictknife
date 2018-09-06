@@ -3,8 +3,7 @@ import logging
 import os.path
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit
-
-
+from . import relpath
 logger = logging.getLogger("jsonknife.resolver")
 
 
@@ -24,9 +23,19 @@ class OneDocResolver(object):
 
 
 class ExternalFileResolver(object):
-    def __init__(self, filename, cache=None, loader=None, history=None, doc=None, rawfilename=None, onload=None, format=None):
+    def __init__(
+        self,
+        filename,
+        cache=None,
+        loader=None,
+        history=None,
+        doc=None,
+        rawfilename=None,
+        onload=None,
+        format=None
+    ):
         self.rawfilename = rawfilename or filename
-        self.filename = self.normpath(filename)
+        self.filename = os.path.normpath(os.path.abspath(filename))
         self.cache = cache or {}  # filename -> resolver
         self.loader = loader or loading
         self.history = history or [ROOT]
@@ -46,15 +55,15 @@ class ExternalFileResolver(object):
 
     @reify
     def doc(self):
-        logger.debug("load file[%s]: %r (where=%r)", len(self.history), self.rawfilename, self.history[-1].filename)
+        logger.debug(
+            "load file[%s]: %r (where=%r)", len(self.history), self.rawfilename,
+            self.history[-1].filename
+        )
         with open(self.filename) as rf:
             doc = self.loader.load(rf, format=self.format)
         if self.onload is not None:
             self.onload(doc, self)
         return doc
-
-    def normpath(self, filename):
-        return os.path.normpath(os.path.abspath(filename))
 
     def new(self, filename, doc=None, rawfilename=None, format=None):
         rawfilename = rawfilename or filename
@@ -75,8 +84,7 @@ class ExternalFileResolver(object):
         filepath, query = pairrsplit(query, "#")
         if filepath == "":
             return self.filename, self.filename, query
-        curdir = os.path.dirname(self.filename)
-        fullpath = self.normpath(os.path.join(curdir, filepath))
+        fullpath = relpath.normpath(filepath, where=os.path.dirname(self.filename))
         return fullpath, filepath, query
 
     def resolve(self, query, format=None):
@@ -95,7 +103,9 @@ class ExternalFileResolver(object):
                 return cached
             else:
                 return self.new(filename, doc=cached.doc, rawfilename=rawfilename, format=format)
-        subresolver = self.cache[filename] = self.new(filename, rawfilename=rawfilename, format=format)
+        subresolver = self.cache[filename] = self.new(
+            filename, rawfilename=rawfilename, format=format
+        )
         return subresolver
 
 
