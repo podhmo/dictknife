@@ -3,8 +3,8 @@ import unittest
 
 class IteratorTests(unittest.TestCase):
     def _getTargetClass(self):
-        from dictknife import LooseDictWalkingIterator
-        return LooseDictWalkingIterator
+        from dictknife import DictWalker
+        return DictWalker
 
     def _makeOne(self, *args, **kwargs):
         return self._getTargetClass()(*args, **kwargs)
