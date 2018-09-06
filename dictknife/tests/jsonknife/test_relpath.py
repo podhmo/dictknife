@@ -49,6 +49,31 @@ class fixRelpathTests(unittest.TestCase):
                     self.assertEqual(got, c.expected)
 
 
+class fixRefTests(unittest.TestCase):
+    def _callFUT(self, *args, **kwargs):
+        from dictknife.jsonknife.relpath import fixref
+        return fixref(*args, **kwargs)
+
+    def test_it(self):
+        from collections import namedtuple
+
+        C = namedtuple("C", "ref, where, to, expected")
+        with _curdir(here):
+            # yapf: disable
+            candidates = [
+                C(ref="a.html#/definitions/foo", expected="a.html#/definitions/foo", where="foo/bar/b.html", to="foo/bar/c.html"),
+                C(ref="#/definitions/foo", expected="b.html#/definitions/foo", where="foo/bar/b.html", to="foo/bar/c.html"),
+                C(ref="../a.html#/definitions/foo", expected="../a.html#/definitions/foo", where="foo/bar/b.html", to="foo/bar/c.html"),
+                C(ref="../a.html#/definitions/foo", expected="a.html#/definitions/foo", where="foo/bar/b.html", to="foo/c.html"),
+                C(ref="../a.html#/definitions/foo", expected="foo/a.html#/definitions/foo", where="foo/bar/b.html", to="c.html"),
+            ]
+            # yapf: enable
+            for c in candidates:
+                with self.subTest(ref=c.ref, where=c.where, to=c.to):
+                    got = self._callFUT(c.ref, where=c.where, to=c.to)
+                    self.assertEqual(got, c.expected)
+
+
 class NormpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import normpath
