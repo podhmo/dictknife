@@ -29,5 +29,16 @@ def fixref(ref, *, where, to):
         return ref.replace(fpath, filepath)
 
 
+def relref(ref, *, where):
+    fpath, jsref = pairrsplit(ref, "#")
+    return relpath(fpath, where=where), jsref
+
+
+def relpath(fpath, *, where):
+    if not fpath:
+        return where
+    return os.path.normpath(os.path.join(os.path.dirname(where), fpath))
+
+
 def normpath(relpath, *, where):
     return os.path.normpath(os.path.abspath(os.path.join(where, relpath)))

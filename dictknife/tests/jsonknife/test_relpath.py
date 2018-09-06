@@ -74,6 +74,29 @@ class fixRefTests(unittest.TestCase):
                     self.assertEqual(got, c.expected)
 
 
+class relRefTests(unittest.TestCase):
+    def _callFUT(self, *args, **kwargs):
+        from dictknife.jsonknife.relpath import relref
+        return relref(*args, **kwargs)
+
+    def test_it(self):
+        from collections import namedtuple
+
+        C = namedtuple("C", "ref, where, expected")
+        with _curdir(here):
+            # yapf: disable
+            candidates = [
+                C(ref="a.html#/definitions/foo", expected=("foo/bar/a.html", "/definitions/foo"), where="foo/bar/b.html"),
+                C(ref="#/definitions/foo", expected=("foo/bar/b.html", "/definitions/foo"), where="foo/bar/b.html"),
+                C(ref="../a.html#/definitions/foo", expected=("foo/a.html", "/definitions/foo"), where="foo/bar/b.html")
+            ]
+            # yapf: enable
+            for c in candidates:
+                with self.subTest(ref=c.ref, where=c.where):
+                    got = self._callFUT(c.ref, where=c.where)
+                    self.assertEqual(got, c.expected)
+
+
 class NormpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import normpath
