@@ -4,21 +4,39 @@ from .accessing import Accessor
 from .langhelpers import make_dict
 
 
-def mkdict(line, *, separator="/", accessor=Accessor(make_dict), guess=guess):
-    d = make_dict()
+def mkdict(line, *, separator="/", delimiter=";", accessor=Accessor(make_dict), guess=guess):
     tokens = iter(tokenize(line))
-    return _mkdict(d, tokens, separator=separator, accessor=accessor, guess=guess)
+    return _mkdict(
+        tokens,
+        separator=separator,
+        delimiter=delimiter,
+        accessor=accessor,
+        guess=guess,
+    )
 
 
-def _mkdict(d, tokens, *, separator, accessor, guess):
+def _mkdict(tokens, *, separator, delimiter, accessor, guess):
+    L = []
+    d = accessor.make_dict()
     while True:
         try:
-            k = next(tokens)
+            tk = next(tokens)
+            if tk == delimiter:
+                L.append(d)
+                d = accessor.make_dict()
+                continue
+            k = tk
             v = next(tokens)
             accessor.assign(d, k.split(separator), guess(v))
         except StopIteration:
             break
-    return d
+
+    if tk != delimiter:
+        L.append(d)
+
+    if len(L) == 1:
+        return L[0]
+    return L
 
 
 def tokenize(line):

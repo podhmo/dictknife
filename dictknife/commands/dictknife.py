@@ -182,6 +182,7 @@ def mkdict(
     *,
     output_format: str,
     separator: str,
+    delimiter: str,
     sort_keys: bool,
     extra,
 ):
@@ -328,6 +329,7 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("-o", "--output-format", default="json", choices=formats)
     sparser.add_argument("--separator", default="/")
+    sparser.add_argument("--delimiter", default=";")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # for mkdict, using parse_known_args() instead of parse_args()
