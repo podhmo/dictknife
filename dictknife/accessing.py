@@ -1,5 +1,8 @@
+from .langhelpers import make_dict
+
+
 class Accessor:
-    def __init__(self, make_dict=dict):
+    def __init__(self, make_dict=make_dict):
         self.make_dict = make_dict
 
     def assign(self, d, path, value):

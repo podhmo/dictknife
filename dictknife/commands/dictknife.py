@@ -175,7 +175,27 @@ def shape(
         for d in r:
             print(*d.values())
     else:
-        loading.dumpfile(r, None, format=output_format)
+        loading.dumpfile(r, format=output_format)
+
+
+def mkdict(
+    *,
+    output_format: str,
+    separator: str,
+    delimiter: str,
+    sort_keys: bool,
+    squash: bool,
+    extra,
+):
+    from dictknife.mkdict import mkdict
+    r = mkdict(" ".join(extra), separator=separator)
+    if squash:
+        for row in r:
+            loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
+            sys.stdout.write("\n")
+    else:
+        loading.dumpfile(r, format=output_format, sort_keys=sort_keys)
+        sys.stdout.write("\n")
 
 
 def main():
@@ -309,10 +329,28 @@ def main():
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
-    args = parser.parse_args()
+    # mkdict
+    fn = mkdict
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--squash", action="store_true")
+    sparser.add_argument("-o", "--output-format", default="json", choices=formats)
+    sparser.add_argument("--separator", default="/")
+    sparser.add_argument("--delimiter", default=";")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # for mkdict, using parse_known_args() instead of parse_args()
+    args, extra = parser.parse_known_args()
+    params = vars(args)
+    if extra:
+        if args.subcommand != mkdict:
+            from gettext import gettext as _
+            msg = _('unrecognized arguments: %s')
+            return parser.error(msg % ' '.join(extra))
+        else:
+            params["extra"] = extra
 
     with contextlib.ExitStack() as s:
-        params = vars(args)
         if params.pop("quiet"):
             args.log_level = logging._levelToName[logging.WARNING]
             s.enter_context(warnings.catch_warnings())
