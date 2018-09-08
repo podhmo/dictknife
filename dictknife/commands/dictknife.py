@@ -30,7 +30,6 @@ def cat(
     format,
     input_format,
     output_format,
-    debug,
     sort_keys,
     encoding=None,
     errors=None,
@@ -40,53 +39,50 @@ def cat(
     from dictknife import deepmerge
 
     input_format = input_format or format
-    with traceback_shortly(debug):
-        d = make_dict()
-        for f in files:
-            logger.debug("merge: %s", f)
-            opener = loading.get_opener(filename=f, format=input_format, default=_open)
-            with opener(f, encoding=encoding, errors=errors) as rf:
-                if slurp:
-                    sd = (loading.loads(line, format=input_format) for line in rf)
-                else:
-                    sd = loading.load(rf, format=input_format, errors=errors)
-                if size is not None:
-                    sd = itertools.islice(sd, size)
+    d = make_dict()
+    for f in files:
+        logger.debug("merge: %s", f)
+        opener = loading.get_opener(filename=f, format=input_format, default=_open)
+        with opener(f, encoding=encoding, errors=errors) as rf:
+            if slurp:
+                sd = (loading.loads(line, format=input_format) for line in rf)
+            else:
+                sd = loading.load(rf, format=input_format, errors=errors)
+            if size is not None:
+                sd = itertools.islice(sd, size)
 
-                if hasattr(sd, "keys"):
-                    d = deepmerge(d, sd)
-                else:
-                    if not isinstance(d, (list, tuple)):
-                        d = [d] if d else []
-                    d.extend(sd)
-        loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
+            if hasattr(sd, "keys"):
+                d = deepmerge(d, sd)
+            else:
+                if not isinstance(d, (list, tuple)):
+                    d = [d] if d else []
+                d.extend(sd)
+    loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
 
 
 def transform(
-    *, src, dst, config, config_file, code, function, input_format, output_format, format, debug,
-    sort_keys
+    *, src, dst, config, config_file, code, function, input_format, output_format, format, sort_keys
 ):
     """transform dict"""
     from magicalimport import import_symbol
     from dictknife import deepmerge
-    with traceback_shortly(debug):
-        if code is not None:
-            transform = eval(code)
-        elif function is not None:
-            transform = import_symbol(function)
-        else:
-            transform = lambda x: x  # NOQA
+    if code is not None:
+        transform = eval(code)
+    elif function is not None:
+        transform = import_symbol(function)
+    else:
+        transform = lambda x: x  # NOQA
 
-        input_format = input_format or format
-        kwargs = loading.loads(config, format=input_format)
+    input_format = input_format or format
+    kwargs = loading.loads(config, format=input_format)
 
-        if config_file:
-            with open(config_file) as rf:
-                kwargs = deepmerge(kwargs, loading.load(rf, format=input_format))
+    if config_file:
+        with open(config_file) as rf:
+            kwargs = deepmerge(kwargs, loading.load(rf, format=input_format))
 
-        data = loading.loadfile(src, input_format)
-        result = transform(data, **kwargs)
-        loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
+    data = loading.loadfile(src, input_format)
+    result = transform(data, **kwargs)
+    loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
 
 
 def diff(
@@ -97,43 +93,41 @@ def diff(
     left: dict,
     right: dict,
     n: int,
-    debug: bool,
     output_format: str = "diff"
 ):
     """diff dict"""
     from dictknife.diff import diff, diff_rows
-    with traceback_shortly(debug):
-        with open(left) as rf:
-            left_data = loading.load(rf)
-            with open(right) as rf:
-                right_data = loading.load(rf)
+    with open(left) as rf:
+        left_data = loading.load(rf)
+        with open(right) as rf:
+            right_data = loading.load(rf)
 
-                if output_format == "diff":
-                    for line in diff(
-                        left_data,
-                        right_data,
-                        fromfile=left,
-                        tofile=right,
-                        n=n,
-                        normalize=normalize,
-                        sort_keys=sort_keys,
-                    ):
-                        print(line)
-                else:
-                    if output_format == "dict":
-                        output_format = "json"
-                    diff_key = "diff"
-                    rows = diff_rows(
-                        left_data,
-                        right_data,
-                        fromfile=left,
-                        tofile=right,
-                        diff_key=diff_key,
-                        normalize=normalize
-                    )
-                    if skip_empty:
-                        rows = [row for row in rows if row[diff_key] not in ("", 0)]
-                    loading.dumpfile(rows, format=output_format)
+            if output_format == "diff":
+                for line in diff(
+                    left_data,
+                    right_data,
+                    fromfile=left,
+                    tofile=right,
+                    n=n,
+                    normalize=normalize,
+                    sort_keys=sort_keys,
+                ):
+                    print(line)
+            else:
+                if output_format == "dict":
+                    output_format = "json"
+                diff_key = "diff"
+                rows = diff_rows(
+                    left_data,
+                    right_data,
+                    fromfile=left,
+                    tofile=right,
+                    diff_key=diff_key,
+                    normalize=normalize
+                )
+                if skip_empty:
+                    rows = [row for row in rows if row[diff_key] not in ("", 0)]
+                loading.dumpfile(rows, format=output_format)
 
 
 def linecat(src=None, **kwargs):
@@ -147,42 +141,41 @@ def linecat(src=None, **kwargs):
 
 def shape(
     *, files, input_format, output_format, squash, skiplist, separator, with_type, with_example,
-    full, debug
+    full
 ):
     """shape"""
     from dictknife import shape
-    with traceback_shortly(debug):
-        dataset = []
-        for f in files:
-            with _open(f) as rf:
-                d = loading.load(rf, format=input_format)
-                if squash:
-                    dataset.extend(d)
-                else:
-                    dataset.append(d)
-        rows = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
+    dataset = []
+    for f in files:
+        with _open(f) as rf:
+            d = loading.load(rf, format=input_format)
+            if squash:
+                dataset.extend(d)
+            else:
+                dataset.append(d)
+    rows = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
 
-        r = []
-        for row in rows:
-            d = make_dict()
-            d["path"] = row.path
-            if with_type:
-                typenames = [t.__name__ for t in row.type]
-                d["type"] = typenames[0] if len(typenames) == 1 else typenames
-            if with_example:
-                if full:
-                    d["example"] = row.example
-                elif not any(t in (list, dict) for t in row.type):
-                    d["example"] = row.example
-                elif output_format in ("csv", "tsv"):
-                    d["example"] = ""  # xxx
-            r.append(d)
+    r = []
+    for row in rows:
+        d = make_dict()
+        d["path"] = row.path
+        if with_type:
+            typenames = [t.__name__ for t in row.type]
+            d["type"] = typenames[0] if len(typenames) == 1 else typenames
+        if with_example:
+            if full:
+                d["example"] = row.example
+            elif not any(t in (list, dict) for t in row.type):
+                d["example"] = row.example
+            elif output_format in ("csv", "tsv"):
+                d["example"] = ""  # xxx
+        r.append(d)
 
-        if output_format is None:
-            for d in r:
-                print(*d.values())
-        else:
-            loading.dumpfile(r, None, format=output_format)
+    if output_format is None:
+        for d in r:
+            print(*d.values())
+    else:
+        loading.dumpfile(r, None, format=output_format)
 
 
 def main():
@@ -195,6 +188,7 @@ def main():
         "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
     )
     parser.add_argument("-q", "--quiet", action="store_true")
+    parser.add_argument("--debug", action="store_true")
 
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
@@ -221,7 +215,6 @@ def main():
         ],
         help="see pydoc codecs.Codec",
     )
-    sparser.add_argument("--debug", action="store_true")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # concat (deprecated)
@@ -246,7 +239,6 @@ def main():
         ],
         help="see pydoc codecs.Codec",
     )
-    sparser.add_argument("--debug", action="store_true")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # linecat
@@ -272,7 +264,6 @@ def main():
         ],
         help="see pydoc codecs.Codec",
     )
-    sparser.add_argument("--debug", action="store_true")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # transform
@@ -288,7 +279,6 @@ def main():
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("--debug", action="store_true")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # diff
@@ -303,7 +293,6 @@ def main():
     sparser.add_argument(
         "-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff"
     )
-    sparser.add_argument("--debug", action="store_true")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
     # shape
@@ -319,7 +308,6 @@ def main():
     sparser.add_argument("--separator", default="/")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
 
@@ -330,4 +318,5 @@ def main():
             s.enter_context(warnings.catch_warnings())
             warnings.simplefilter("ignore")
         logging.basicConfig(level=getattr(logging, params.pop("log_level")))
-        return params.pop("subcommand")(**params)
+        with traceback_shortly(params.pop("debug")):
+            return params.pop("subcommand")(**params)

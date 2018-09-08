@@ -4,6 +4,7 @@ import warnings
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
+from dictknife.langhelpers import traceback_shortly
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler
@@ -73,6 +74,7 @@ def main():
         "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
     )
     parser.add_argument("-q", "--quiet", action="store_true")
+    parser.add_argument("--debug", action="store_true")
 
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
@@ -119,4 +121,5 @@ def main():
             s.enter_context(warnings.catch_warnings())
             warnings.simplefilter("ignore")
         logging.basicConfig(level=getattr(logging, params.pop("log_level")))
-        return params.pop("subcommand")(**params)
+        with traceback_shortly(params.pop("debug")):
+            return params.pop("subcommand")(**params)
