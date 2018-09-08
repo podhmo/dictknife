@@ -1,0 +1,15 @@
+{
+  "name": "foo",
+  "age": 20
+}
+{
+  "name": "bar",
+  "age": 21
+}
+{
+  "name": "foo bar boo",
+  "age": 20,
+  "x": {
+    "nickname": "x"
+  }
+}

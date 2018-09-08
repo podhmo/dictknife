@@ -188,7 +188,19 @@ def mkdict(
     extra,
 ):
     from dictknife.mkdict import mkdict
-    r = mkdict(" ".join(extra), separator=separator)
+    if not extra:
+        r = []
+        for code in sys.stdin:
+            d = mkdict(code, separator=separator)
+            if isinstance(d, list):
+                r.extend(d)
+            else:
+                r.append(d)
+        if len(r) == 1:
+            r = r[0]
+    else:
+        code = " ".join(extra)
+        r = mkdict(code, separator=separator)
     if squash:
         for row in r:
             loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
@@ -342,13 +354,12 @@ def main():
     # for mkdict, using parse_known_args() instead of parse_args()
     args, extra = parser.parse_known_args()
     params = vars(args)
-    if extra:
-        if args.subcommand != mkdict:
-            from gettext import gettext as _
-            msg = _('unrecognized arguments: %s')
-            return parser.error(msg % ' '.join(extra))
-        else:
-            params["extra"] = extra
+    if args.subcommand == mkdict:
+        params["extra"] = extra
+    elif extra:
+        from gettext import gettext as _
+        msg = _('unrecognized arguments: %s')
+        return parser.error(msg % ' '.join(extra))
 
     with contextlib.ExitStack() as s:
         if params.pop("quiet"):
