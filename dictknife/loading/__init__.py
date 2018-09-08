@@ -139,6 +139,8 @@ dumpfile = dispatcher.dumper.dumpfile
 
 def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatcher):
     if format is None and filename is not None:
+        if hasattr(filename, "name"):
+            filename = filename.name  # IO
         format = dispatcher.guess_format(filename)
 
     opener = dispatcher.loader.opener_map.get(format)
