@@ -184,12 +184,18 @@ def mkdict(
     separator: str,
     delimiter: str,
     sort_keys: bool,
+    squash: bool,
     extra,
 ):
     from dictknife.mkdict import mkdict
     r = mkdict(" ".join(extra), separator=separator)
-    loading.dumpfile(r, format=output_format, sort_keys=sort_keys)
-    sys.stdout.write("\n")
+    if squash:
+        for row in r:
+            loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
+            sys.stdout.write("\n")
+    else:
+        loading.dumpfile(r, format=output_format, sort_keys=sort_keys)
+        sys.stdout.write("\n")
 
 
 def main():
@@ -327,6 +333,7 @@ def main():
     fn = mkdict
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--squash", action="store_true")
     sparser.add_argument("-o", "--output-format", default="json", choices=formats)
     sparser.add_argument("--separator", default="/")
     sparser.add_argument("--delimiter", default=";")
