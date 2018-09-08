@@ -4,7 +4,6 @@ import warnings
 import contextlib
 import itertools
 from dictknife.langhelpers import make_dict
-from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife.langhelpers import traceback_shortly
 
@@ -19,6 +18,7 @@ def _open(f, encoding=None, errors=None):
 
 
 def concat(**kwargs):
+    """concat dicts"""
     warnings.warn("concat() is deprecated, please using `cat` instead of it.")
     return cat(**kwargs)
 
@@ -66,6 +66,7 @@ def transform(
     *, src, dst, config, config_file, code, function, input_format, output_format, format, debug,
     sort_keys
 ):
+    """transform dict"""
     from magicalimport import import_symbol
     from dictknife import deepmerge
     with traceback_shortly(debug):
@@ -99,6 +100,7 @@ def diff(
     debug: bool,
     output_format: str = "diff"
 ):
+    """diff dict"""
     from dictknife.diff import diff, diff_rows
     with traceback_shortly(debug):
         with open(left) as rf:
@@ -135,6 +137,7 @@ def diff(
 
 
 def linecat(src=None, **kwargs):
+    """concat dicts --slurp"""
     warnings.warn("concat() is deprecated, please using `cat --slurp` instead of it.")
     if src is not None:
         kwargs["files"] = [src]
@@ -146,6 +149,7 @@ def shape(
     *, files, input_format, output_format, squash, skiplist, separator, with_type, with_example,
     full, debug
 ):
+    """shape"""
     from dictknife import shape
     with traceback_shortly(debug):
         dataset = []
@@ -182,80 +186,148 @@ def shape(
 
 
 def main():
-    parser = SubCommandParser()
+    import argparse
+    formats = loading.get_formats()
 
+    parser = argparse.ArgumentParser()
+    parser.print_usage = parser.print_help  # hack
     parser.add_argument(
         "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
     )
     parser.add_argument("-q", "--quiet", action="store_true")
-    formats = loading.get_formats()
 
-    for cmd in [cat, concat, linecat]:
-        with parser.subcommand(cmd, description="concat dicts") as add_argument:
-            if cmd == linecat:
-                add_argument("--src", nargs="?", default=None)  # xxx: backward compatibility
-            add_argument("files", nargs="*", default=[sys.stdin])
-            add_argument("--slurp", action="store_true")
+    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers.required = True
 
-            add_argument("--size", type=int, default=None)
-            add_argument("--dst", default=None)
-            add_argument("-f", "--format", default=None, choices=formats)
-            add_argument("-i", "--input-format", default=None, choices=formats)
-            add_argument("-o", "--output-format", default=None, choices=formats)
-            add_argument("--encoding", default=None)
-            add_argument(
-                "--errors",
-                default=None,
-                choices=[
-                    "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
-                    "backslashreplace", "namereplace"
-                ],
-                help="see pydoc codecs.Codec",
-            )
-            add_argument("--debug", action="store_true")
-            add_argument("-S", "--sort-keys", action="store_true")
+    # cat
+    fn = cat
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin])
+    sparser.add_argument("--slurp", action="store_true")
 
-    with parser.subcommand(transform, description="transform dict") as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--config", default="{}")
-        add_argument("--config-file", default=None)
-        add_argument("--code", default=None)
-        add_argument("--function", default=None)
-        add_argument("-i", "--input-format", default=None, choices=formats)
-        add_argument("-o", "--output-format", default=None, choices=formats)
-        add_argument("-f", "--format", default=None, choices=formats)
-        add_argument("--debug", action="store_true")
-        add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument("--size", type=int, default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--encoding", default=None)
+    sparser.add_argument(
+        "--errors",
+        default=None,
+        choices=[
+            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
+            "backslashreplace", "namereplace"
+        ],
+        help="see pydoc codecs.Codec",
+    )
+    sparser.add_argument("--debug", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
 
-    with parser.subcommand(diff, description="diff dict") as add_argument:
-        add_argument("--normalize", action="store_true")
-        add_argument("left")
-        add_argument("right")
-        add_argument("--n", default=3, type=int)
-        add_argument("--skip-empty", action="store_true")
-        add_argument("-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff")
-        add_argument("--debug", action="store_true")
-        add_argument("-S", "--sort-keys", action="store_true")
+    # concat (deprecated)
+    fn = concat
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin])
+    sparser.add_argument("--slurp", action="store_true")
 
-    with parser.subcommand(shape) as add_argument:
-        add_argument("files", nargs="*", default=[sys.stdin])
-        add_argument("--squash", action="store_true")
-        add_argument("--skiplist", action="store_true")
-        add_argument("--full", action="store_true")
-        add_argument("--with-type", action="store_true")
-        add_argument("--with-example", action="store_true")
-        add_argument("--separator", default="/")
-        add_argument("-i", "--input-format", default=None, choices=formats)
-        add_argument("-o", "--output-format", default=None, choices=formats)
-        add_argument("--debug", action="store_true")
+    sparser.add_argument("--size", type=int, default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--encoding", default=None)
+    sparser.add_argument(
+        "--errors",
+        default=None,
+        choices=[
+            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
+            "backslashreplace", "namereplace"
+        ],
+        help="see pydoc codecs.Codec",
+    )
+    sparser.add_argument("--debug", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # linecat
+    fn = linecat
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", nargs="?", default=None)  # xxx: backward compatibility
+    sparser.add_argument("files", nargs="*", default=[sys.stdin])
+    sparser.add_argument("--slurp", action="store_true")
+
+    sparser.add_argument("--size", type=int, default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--encoding", default=None)
+    sparser.add_argument(
+        "--errors",
+        default=None,
+        choices=[
+            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
+            "backslashreplace", "namereplace"
+        ],
+        help="see pydoc codecs.Codec",
+    )
+    sparser.add_argument("--debug", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # transform
+    fn = transform
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--config", default="{}")
+    sparser.add_argument("--config-file", default=None)
+    sparser.add_argument("--code", default=None)
+    sparser.add_argument("--function", default=None)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("--debug", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # diff
+    fn = diff
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--normalize", action="store_true")
+    sparser.add_argument("left")
+    sparser.add_argument("right")
+    sparser.add_argument("--n", default=3, type=int)
+    sparser.add_argument("--skip-empty", action="store_true")
+    sparser.add_argument(
+        "-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff"
+    )
+    sparser.add_argument("--debug", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # shape
+    fn = shape
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin])
+    sparser.add_argument("--squash", action="store_true")
+    sparser.add_argument("--skiplist", action="store_true")
+    sparser.add_argument("--full", action="store_true")
+    sparser.add_argument("--with-type", action="store_true")
+    sparser.add_argument("--with-example", action="store_true")
+    sparser.add_argument("--separator", default="/")
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--debug", action="store_true")
 
     args = parser.parse_args()
 
     with contextlib.ExitStack() as s:
-        if args.quiet:
+        params = vars(args)
+        if params.pop("quiet"):
             args.log_level = logging._levelToName[logging.WARNING]
             s.enter_context(warnings.catch_warnings())
             warnings.simplefilter("ignore")
-        logging.basicConfig(level=getattr(logging, args.log_level))
-        return args.fn(args)
+        logging.basicConfig(level=getattr(logging, params.pop("log_level")))
+        return params.pop("subcommand")(**params)

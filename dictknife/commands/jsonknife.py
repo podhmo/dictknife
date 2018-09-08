@@ -1,7 +1,7 @@
-# -*- coding:utf-8 -*-
 import logging
+import contextlib
+import warnings
 from dictknife.langhelpers import make_dict
-from dictknife.commandline import SubCommandParser
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.accessing import Accessor
@@ -55,6 +55,7 @@ def bundle(*, src, dst):
 
 
 def examples(*, src, ref, format):
+    """output sample value from swagger's spec"""
     data = loading.loadfile(src)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
@@ -63,34 +64,59 @@ def examples(*, src, ref, format):
 
 
 def main():
-    parser = SubCommandParser()
-
-    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    import argparse
     formats = loading.get_formats()
 
-    with parser.subcommand(cut) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--ref", dest="refs", action="append")
+    parser = argparse.ArgumentParser()
+    parser.print_usage = parser.print_help  # hack
+    parser.add_argument(
+        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+    )
+    parser.add_argument("-q", "--quiet", action="store_true")
 
-    with parser.subcommand(deref) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--ref", dest="refs", action="append")
-        add_argument("--unwrap", default=None)
-        add_argument("--wrap", default=None)
+    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers.required = True
 
-    with parser.subcommand(bundle) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
+    # cut
+    fn = cut
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--ref", dest="refs", action="append")
 
-    with parser.subcommand(
-        examples, description="output sample value from swagger's spec"
-    ) as add_argument:
-        add_argument("src", nargs="?", default=None)
-        add_argument("--ref", dest="ref", default=None)
-        add_argument("-f", "--format", default="json", choices=formats)
+    # deref
+    fn = deref
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--ref", dest="refs", action="append")
+    sparser.add_argument("--unwrap", default=None)
+    sparser.add_argument("--wrap", default=None)
+
+    # bundle
+    fn = bundle
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+
+    # examples
+    fn = examples
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("src", nargs="?", default=None)
+    sparser.add_argument("--ref", dest="ref", default=None)
+    sparser.add_argument("-f", "--format", default="json", choices=formats)
 
     args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log))
-    return args.fn(args)
+
+    with contextlib.ExitStack() as s:
+        params = vars(args)
+        if params.pop("quiet"):
+            args.log_level = logging._levelToName[logging.WARNING]
+            s.enter_context(warnings.catch_warnings())
+            warnings.simplefilter("ignore")
+        logging.basicConfig(level=getattr(logging, params.pop("log_level")))
+        return params.pop("subcommand")(**params)

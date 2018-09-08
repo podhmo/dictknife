@@ -1,7 +1,7 @@
-# -*- coding:utf-8 -*-
 import logging
+import warnings
+import contextlib
 from dictknife import loading
-from dictknife.commandline import SubCommandParser
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,7 @@ def json2swagger(files, dst, name, detector, emitter, annotate, emit, with_minim
 
 
 def flatten(src, dst):
+    """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
     data = loading.loadfile(src)
     d = flatten(data)
@@ -51,31 +52,50 @@ def flatten(src, dst):
 
 
 def main():
-    parser = SubCommandParser()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.print_usage = parser.print_help  # hack
+    parser.add_argument(
+        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+    )
+    parser.add_argument("-q", "--quiet", action="store_true")
 
-    parser.add_argument("--log", choices=list(logging._nameToLevel.keys()), default="INFO")
+    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers.required = True
 
-    with parser.subcommand(tojsonschema) as add_argument:
-        add_argument("--src", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--name", default="top")
+    # tojsonschema
+    fn = tojsonschema
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--name", default="top")
 
-    with parser.subcommand(json2swagger) as add_argument:
-        add_argument("files", nargs="*", default=None)
-        add_argument("--dst", default=None)
-        add_argument("--name", default="top")
-        add_argument("--detector", default="Detector")
-        add_argument("--emitter", default="Emitter")
-        add_argument("--annotate", default=None)
-        add_argument("--emit", default="schema", choices=["schema", "info"])
-        add_argument("--with-minimap", action="store_true")
+    # json2swagger
+    fn = json2swagger
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.add_argument("files", nargs="*", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--name", default="top")
+    sparser.add_argument("--detector", default="Detector")
+    sparser.add_argument("--emitter", default="Emitter")
+    sparser.add_argument("--annotate", default=None)
+    sparser.add_argument("--emit", default="schema", choices=["schema", "info"])
+    sparser.add_argument("--with-minimap", action="store_true")
 
-    with parser.subcommand(
-        flatten, description="flatten jsonschema sub definitions"
-    ) as add_argument:
-        add_argument("src", nargs="?", default=None)
-        add_argument("--dst", default=None)
+    # flatten
+    fn = flatten
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.add_argument("src", nargs="?", default=None)
+    sparser.add_argument("--dst", default=None)
 
     args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log))
-    return args.fn(args)
+
+    with contextlib.ExitStack() as s:
+        params = vars(args)
+        if params.pop("quiet"):
+            args.log_level = logging._levelToName[logging.WARNING]
+            s.enter_context(warnings.catch_warnings())
+            warnings.simplefilter("ignore")
+        logging.basicConfig(level=getattr(logging, params.pop("log_level")))
+        return params.pop("subcommand")(**params)
