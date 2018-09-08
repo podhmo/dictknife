@@ -1,7 +1,7 @@
 default: 00 01 02 03 04 05 06 07 08
 00:
 	mkdir -p output
-	dictknife mkdict --name foo | tee output/00.json
+	dictknife mkdict --name "foo bar" | tee output/00.json
 01:
 	mkdir -p output
 	dictknife mkdict --name foo --age 20 | tee output/01.json
@@ -22,8 +22,7 @@ default: 00 01 02 03 04 05 06 07 08
 	dictknife mkdict --separator=. name foo age 20 father.name X mother.name Y | tee output/06.json
 07:
 	mkdir -p output
-	# hmm
-	dictknife mkdict --message='"foo --age 20"' | tee output/07.json
+	dictknife mkdict --message='foo --age 20' | tee output/07.json
 08:
 	mkdir -p output
 	cat 08input.txt | dictknife mkdict --squash | tee output/08.json

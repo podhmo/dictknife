@@ -199,8 +199,15 @@ def mkdict(
         if len(r) == 1:
             r = r[0]
     else:
-        code = " ".join(extra)
-        r = mkdict(code, separator=separator)
+        args = []
+        for x in extra:
+            if "=" not in x:
+                args.append(repr(x))
+            else:
+                for e in x.split("=", 1):
+                    if e:
+                        args.append(repr(e))
+        r = mkdict(" ".join(args), separator=separator)
     if squash:
         for row in r:
             loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
