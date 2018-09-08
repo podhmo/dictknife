@@ -205,8 +205,7 @@ def mkdict(
                 args.append(repr(x))
             else:
                 for e in x.split("=", 1):
-                    if e:
-                        args.append(repr(e))
+                    args.append(repr(e))
         r = mkdict(" ".join(args), separator=separator)
     if squash:
         for row in r:
