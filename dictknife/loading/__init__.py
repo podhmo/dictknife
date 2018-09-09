@@ -135,6 +135,7 @@ loadfile = dispatcher.loader.loadfile
 dump = dispatcher.dumper.dump
 dumps = dispatcher.dumper.dumps
 dumpfile = dispatcher.dumper.dumpfile
+guess_format = dispatcher.guess_format
 
 
 def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatcher):

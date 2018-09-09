@@ -1,3 +1,4 @@
+import sys
 import logging
 import contextlib
 import warnings
@@ -13,6 +14,14 @@ from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
 
 logger = logging.getLogger(__name__)
+
+
+def _open(f=None, encoding=None, errors=None):
+    f = f or sys.stdin
+    if f == sys.stdin:
+        return contextlib.closing(f)
+    else:
+        return open(f, encoding=encoding, errors=errors)
 
 
 def cut(*, src, dst, refs):
@@ -64,6 +73,25 @@ def examples(*, src, ref, format):
     loading.dumpfile(d, format=format)
 
 
+def unescape(*, src, dst, input_format, output_format):
+    """load data from escaped string expression"""
+    with _open(src) as rf:
+        s = rf.read()
+    input_format = input_format or loading.guess_format(src or "")
+
+    s = s.encode("utf-8").decode("unicode-escape").strip()
+    if s.startswith("'") and s.endswith("'"):
+        s = s[1:-1]
+    elif s.startswith('"') and s.endswith('"'):
+        s = s[1:-1]
+    s = s.strip()
+
+    d = loading.loads(s, format=input_format)
+
+    output_format = output_format or input_format
+    loading.dumpfile(d, dst, format=output_format)
+
+
 def main():
     import argparse
     formats = loading.get_formats()
@@ -111,6 +139,15 @@ def main():
     sparser.add_argument("src", nargs="?", default=None)
     sparser.add_argument("--ref", dest="ref", default=None)
     sparser.add_argument("-f", "--format", default="json", choices=formats)
+
+    # unescape
+    fn = unescape
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("src", nargs="?", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     args = parser.parse_args()
 
