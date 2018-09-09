@@ -1,4 +1,4 @@
-default: 00 01 02 03 04 05 06 07 08
+default: 00 01 02 03 04 05 06 07 08 09 10
 00:
 	mkdir -p output
 	dictknife mkdict --name "foo bar" | tee output/00.json
@@ -26,3 +26,9 @@ default: 00 01 02 03 04 05 06 07 08
 08:
 	mkdir -p output
 	cat 08input.txt | dictknife mkdict --squash | tee output/08.json
+09:
+	mkdir -p output
+	dictknife mkdict @ob/name foo @ob/age 40 name bar age 20 parent "&ob" ";" name boo age 18 parent "&ob" | tee output/09.json
+10:
+	mkdir -p output
+	dictknife mkdict @x val use "&x" dont-ref "&&x" @@dont-assign "v" | tee output/10.json

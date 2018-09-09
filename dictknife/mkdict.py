@@ -19,6 +19,7 @@ def mkdict(line, *, separator="/", delimiter=";", accessor=Accessor(make_dict), 
 def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     L = []
     d = accessor.make_dict()
+    variables = {}
     while True:
         try:
             tk = next(tokens)
@@ -26,9 +27,25 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
                 L.append(d)
                 d = accessor.make_dict()
                 continue
-            k = tk
+
+            k = str(tk)
             v = next(tokens)
-            accessor.assign(d, k.split(separator), guess(v))
+
+            if not hasattr(v, "encode"):
+                pass
+            elif v.startswith("&&"):  # escaped
+                v = v[1:]
+            elif v.startswith("&"):
+                # reference:
+                v = accessor.maybe_access(variables, v[1:].split(separator))
+
+            if k.startswith("@@"):  # escaped
+                accessor.assign(d, k[1:].split(separator), guess(v))
+            elif k.startswith("@"):
+                # assigning variable:
+                accessor.assign(variables, k[1:].split(separator), guess(v))
+            else:
+                accessor.assign(d, k.split(separator), guess(v))
         except StopIteration:
             break
 

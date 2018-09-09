@@ -1,0 +1,5 @@
+{
+  "use": "val",
+  "dont-ref": "&x",
+  "@dont-assign": "v"
+}

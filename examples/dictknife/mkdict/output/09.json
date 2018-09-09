@@ -1,0 +1,18 @@
+[
+  {
+    "name": "bar",
+    "age": 20,
+    "parent": {
+      "name": "foo",
+      "age": 40
+    }
+  },
+  {
+    "name": "boo",
+    "age": 18,
+    "parent": {
+      "name": "foo",
+      "age": 40
+    }
+  }
+]
