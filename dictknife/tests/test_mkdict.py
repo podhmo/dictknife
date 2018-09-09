@@ -33,7 +33,7 @@ class MkDictTests(unittest.TestCase):
         return _mkdict
 
     def _callFUT(self, tokens):
-        from dictknife.accessing import Accessor
+        from dictknife.mkdict import _AccessorSupportList as Accessor
         from dictknife.guessing import guess
         return self._getTarget()(
             iter(tokens), delimiter=";", separator="/", accessor=Accessor(), guess=guess
@@ -65,13 +65,36 @@ class MkDictTests(unittest.TestCase):
                   {"name": "bar", "age": 20, "parent": {"name": "foo", "age": 40}},
                   {"name": "boo", "age": 18, "parent": {"name": "foo", "age": 40}},
               ]),
+            # array
+            C(tokens=["xs/", "a", "xs/", "b", "xs/", "c"],
+              expected={"xs": ["a", "b", "c"]}),
+            C(tokens=["xs//name", "a", "xs//name", "b", "xs//name", "c"],
+              expected={"xs": [{"name": "a"}, {"name": "b"}, {"name": "c"}]}),
+            C(tokens=["xs//name", "a", "xs/-1/age", 20, "xs//name", "b", "xs/-1/age", 10],
+              expected={"xs": [{"name": "a", "age": 20}, {"name": "b", "age": 10}]}),
+            C(tokens=["xs//name", "a", "xs/0/age", 20, "xs//name", "b", "xs/1/age", 10],
+              expected={"xs": [{"name": "a", "age": 20}, {"name": "b", "age": 10}]}),
+            C(tokens=["xs/0/name", "a", "xs/0/age", 20, "xs/1/name", "b", "xs/1/age", 10],
+              expected={"xs": [{"name": "a", "age": 20}, {"name": "b", "age": 10}]}),
+            C(tokens=["xs//name", "a", "xs//age", 20, "xs//name", "b", "xs//age", 10],
+              expected={"xs": [{"name": "a"}, {"age": 20}, {"name": "b"}, {"age": 10}]}),
+            C(tokens=["xs//name", "a", "xs/-1/age", 20, "xs/-1/name", "b", "xs/-1/age", 10],
+              expected={"xs": [{"name": "b", "age": 10}]}),
+            C(tokens=[
+                "@xs/", "a", "@xs/", "b", "@xs/", "c",
+                "ys", "&xs",
+                "zs/0", "&xs/0", "zs/1", "&xs/-1"],
+              expected={"ys": ["a", "b", "c"], "zs": ["a", "c"]}),
+            C(tokens=[
+                "@xs/0/name", "a", "@xs/0/age", 20, "@xs/1/name", "b", "@xs/1/age", 10,
+                "names/", "&xs/0/name", "names/", "&xs/1/name"],
+              expected={"names": ["a", "b"]}),
         ]
         # yapf: enable
         for c in candidates:
             with self.subTest(tokens=c.tokens):
                 got = self._callFUT(c.tokens)
-                # self.assertEqual(_to_dict(got), c.expected)
-                print(got)
+                self.assertEqual(_to_dict(got), c.expected)
 
 
 def _to_dict(d):

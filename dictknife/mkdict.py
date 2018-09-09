@@ -1,11 +1,85 @@
 import shlex
 import sys
 from .guessing import guess
-from .accessing import Accessor
 from .langhelpers import make_dict
+from .accessing import Accessor
 
 
-def mkdict(line, *, separator="/", delimiter=";", accessor=Accessor(make_dict), guess=guess):
+class _AccessorSupportList(Accessor):
+    def __init__(self, make_dict=make_dict):
+        self.make_dict = make_dict
+
+    def assign(self, d, path, value):
+        hist = [d]
+        seen = []
+        for name in path[:-1]:
+            if name == "":
+                if hasattr(d, "keys"):
+                    hist[-2][seen[-1]] = [d]
+                else:
+                    d.append(self.make_dict())
+                    d = d[-1]
+            elif name.isdigit():
+                if hasattr(d, "keys"):
+                    d = hist[-2][seen[-1]] = []
+                try:
+                    d = d[int(name)]
+                except IndexError:
+                    p = hist[-2][seen[-1]]
+                    for i in range(len(p), int(name) + 1):
+                        p.append(self.make_dict())
+                    d = p[int(name)]
+            elif (name.startswith("-") and name[1:].isdigit()):
+                d = d[int(name)]
+            else:
+                if name not in d:
+                    d[name] = self.make_dict()
+                d = d[name]
+            hist.append(d)
+            seen.append(name)
+
+        name = path[-1]
+        if name == "":
+            if hasattr(d, "keys"):
+                hist[-2][seen[-1]] = [value]
+            else:
+                d.append(value)
+        elif name.isdigit():
+            if hasattr(d, "keys"):
+                d = hist[-2][seen[-1]] = []
+            try:
+                d[int(name)] = value
+            except IndexError:
+                for i in range(len(d), int(name) + 1):
+                    d.append(self.make_dict())
+                d[int(name)] = value
+        else:
+            d[name] = value
+
+    def maybe_access(self, d, path):
+        for name in path[:-1]:
+            if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
+                name = int(name)
+            try:
+                d = d[name]
+            except KeyError:
+                return None
+
+        if not d:
+            return None
+
+        name = path[-1]
+        if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
+            try:
+                return d[int(name)]
+            except IndexError:
+                return None
+        return d.get(name)
+
+
+def mkdict(
+    line, *, separator="/", delimiter=";", accessor=_AccessorSupportList(make_dict), guess=guess
+):
     tokens = iter(tokenize(line))
     return _mkdict(
         tokens,
