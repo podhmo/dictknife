@@ -87,8 +87,8 @@ def unescape(*, src, dst, input_format, output_format):
     s = s.strip()
 
     d = loading.loads(s, format=input_format)
-
-    output_format = output_format or input_format
+    if dst is None:
+        output_format = output_format or input_format
     loading.dumpfile(d, dst, format=output_format)
 
 
