@@ -1,0 +1,27 @@
+tb:
+- |2
+    File "VENV/bin/dictknife", line 12, in <module>
+      sys.exit(main())
+- |2
+    File "VENV/dictknife/dictknife/commands/dictknife.py", line 377, in main
+      return params.pop("subcommand")(**params)
+- |2
+    File "VENV/dictknife/dictknife/commands/dictknife.py", line 50, in cat
+      sd = loading.load(rf, format=input_format, errors=errors)
+- |2
+    File "VENV/dictknife/dictknife/loading/__init__.py", line 40, in load
+      return load(fp, loader=self, errors=errors)
+- |2
+    File "VENV/dictknife/dictknife/loading/json.py", line 7, in load
+      d = {"tb": traceback.format_stack()}
+tb2: |2
+    File "VENV/bin/dictknife", line 12, in <module>
+      sys.exit(main())
+    File "VENV/dictknife/dictknife/commands/dictknife.py", line 377, in main
+      return params.pop("subcommand")(**params)
+    File "VENV/dictknife/dictknife/commands/dictknife.py", line 50, in cat
+      sd = loading.load(rf, format=input_format, errors=errors)
+    File "VENV/dictknife/dictknife/loading/__init__.py", line 40, in load
+      return load(fp, loader=self, errors=errors)
+   File "VENV/dictknife/dictknife/loading/json.py", line 7, in load
+      d = {"tb": traceback.format_stack()}
