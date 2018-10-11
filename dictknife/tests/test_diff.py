@@ -1,8 +1,10 @@
 import unittest
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 
 
 class DiffRowsTests(unittest.TestCase):
+    maxDiff = None
+
     def _callFUT(self, d0, right):
         from dictknife.diff import diff_rows
         return diff_rows(d0, right)
@@ -44,24 +46,44 @@ class DiffRowsTests(unittest.TestCase):
                 self.assertListEqual(got, c.expected)
 
     def test_it(self):
-        left = {
-            "x": 10,
-            "y": 100,
-            "nested": {
-                "v1": 0,
-                "v2": 1,
-                "vs": [0, 1, 2, 3],
-            },
-        }
-        right = {
-            "x": 10,
-            "y": 110,
-            "nested": {
-                "v1": 10,
-                "v2": -1,
-                "vs": [0, 2, 2, 2],
-            },
-        }
+        left = OrderedDict(
+            [
+                ("x", 10),
+                ("y", 100),
+                (
+                    "nested",
+                    OrderedDict(
+                        [
+                            ("v1", 0),
+                            ("v2", 1),
+                            ("vs", [0, 1, 2, 3]),
+                            ("vs2", [{
+                                "z": "foo"
+                            }]),
+                        ]
+                    )
+                ),
+            ]
+        )
+        right = OrderedDict(
+            [
+                ("x", 10),
+                ("y", 110),
+                (
+                    "nested",
+                    OrderedDict(
+                        [
+                            ("v1", 10),
+                            ("v2", -1),
+                            ("vs", [0, 2, 2, 2]),
+                            ("vs2", [{
+                                "z": "bar"
+                            }]),
+                        ]
+                    )
+                ),
+            ]
+        )
         got = self._callFUT(left, right)
         # yapf: disable
         expected = [
@@ -72,7 +94,8 @@ class DiffRowsTests(unittest.TestCase):
             {'name': 'nested/vs/0', 'left': 0, 'right': 0, 'diff': 0},
             {'name': 'nested/vs/1', 'left': 1, 'right': 2, 'diff': 1},
             {'name': 'nested/vs/2', 'left': 2, 'right': 2, 'diff': 0},
-            {'name': 'nested/vs/3', 'left': 3, 'right': 2, 'diff': -1}
+            {'name': 'nested/vs/3', 'left': 3, 'right': 2, 'diff': -1},
+            {'name': 'nested/vs2/0/z', 'left': "foo", 'right': "bar", 'diff': '- f- o- o+ b+ a+ r'},
         ]
         # yapf: enable
         self.assertListEqual(got, expected)
