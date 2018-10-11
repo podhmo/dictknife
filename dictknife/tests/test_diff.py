@@ -1,5 +1,5 @@
 import unittest
-from collections import namedtuple, OrderedDict
+from collections import namedtuple
 
 
 class DiffRowsTests(unittest.TestCase):
