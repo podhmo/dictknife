@@ -10,3 +10,5 @@ doc
 ----------------------------------------
 
 http://dictknife.readthedocs.io
+
+(:warning: this document is obsoleted)
