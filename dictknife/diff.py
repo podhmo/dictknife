@@ -1,6 +1,6 @@
 import difflib
 import itertools
-from .deepequal import sort_flexibly
+from dictknife.deepequal import sort_flexibly
 
 
 def _default_tostring(d, *, default=str, sort_keys=True):
@@ -60,8 +60,12 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
     if hasattr(d1, "__next__"):
         d1 = list(d1)
 
-    rows = []
-    if isinstance(d0, (list, tuple)):
+    if d0 is None or d1 is None:
+        return [{"name": "", fromfile: d0, tofile: d1, diff_key: None}]
+    elif isinstance(d0, (int, float)) and isinstance(d1, (int, float)):
+        return [{"name": "", fromfile: d0, tofile: d1, diff_key: d1 - d0}]
+    elif isinstance(d0, (list, tuple)):
+        rows = []
         for i, (sd0, sd1) in enumerate(itertools.zip_longest(d0, d1 or [])):
             if sd0 is None:
                 sd0 = sd1.__class__()
@@ -69,39 +73,27 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
                 sd1 = sd0.__class__()
             subrows = diff_rows(sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
             for srow in subrows:
-                srow["name"] = "{}/{}".format(i, srow["name"])
+                srow["name"] = "{}/{}".format(i, srow["name"]) if srow["name"] else str(i)
             rows.extend(subrows)
         return rows
-
-    seen = set()
-    for k in itertools.chain(d0.keys(), d1.keys()):
-        if k in seen:
-            continue
-        seen.add(k)
-
-        lv = d0.get(k)
-        rv = d1.get(k)
-        row = {"name": k, fromfile: lv, tofile: rv}
-
-        if lv is None or rv is None:
-            row[diff_key] = None
-            rows.append(row)
-        elif isinstance(lv, (int, float)) and isinstance(rv, (int, float)):
-            row[diff_key] = rv - lv
-            rows.append(row)
-        elif hasattr(lv, "keys") or isinstance(lv, (list, tuple)):
+    elif hasattr(d0, "keys") or hasattr(d1, "keys"):
+        seen = set()
+        rows = []
+        for k in itertools.chain((d0 or {}).keys(), (d1 or {}).keys()):
+            if k in seen:
+                continue
+            seen.add(k)
+            lv = d0.get(k)
+            rv = d1.get(k)
             subrows = diff_rows(lv, rv, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
             for srow in subrows:
-                srow["name"] = "{}/{}".format(k, srow["name"])
+                srow["name"] = "{}/{}".format(k, srow["name"]) if srow["name"] else k
             rows.extend(subrows)
-        else:
-            lvs = str(lv)
-            rvs = str(rv)
-            if lvs == rvs:
-                row[diff_key] = ""
-            else:
-                row[diff_key] = "".join(difflib.ndiff(lvs, rvs))
-            rows.append(row)
+    else:  # str
+        lvs = str(d0)
+        rvs = str(d1)
+        diff_value = "" if lvs == rvs else "".join(difflib.ndiff(lvs, rvs))
+        return [{"name": "", fromfile: d0, tofile: d1, diff_key: diff_value}]
     return rows
 
 
