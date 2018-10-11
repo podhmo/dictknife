@@ -60,13 +60,9 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
     if hasattr(d1, "__next__"):
         d1 = list(d1)
 
-    if d0 is None or d1 is None:
-        return [{"name": "", fromfile: d0, tofile: d1, diff_key: None}]
-    elif isinstance(d0, (int, float)) and isinstance(d1, (int, float)):
-        return [{"name": "", fromfile: d0, tofile: d1, diff_key: d1 - d0}]
-    elif isinstance(d0, (list, tuple)):
+    if isinstance(d0, (list, tuple)) or isinstance(d1, (list, tuple)):
         rows = []
-        for i, (sd0, sd1) in enumerate(itertools.zip_longest(d0, d1 or [])):
+        for i, (sd0, sd1) in enumerate(itertools.zip_longest(d0 or [], d1 or [])):
             if sd0 is None:
                 sd0 = sd1.__class__()
             elif sd1 is None:
@@ -79,7 +75,9 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
     elif hasattr(d0, "keys") or hasattr(d1, "keys"):
         seen = set()
         rows = []
-        for k in itertools.chain((d0 or {}).keys(), (d1 or {}).keys()):
+        d0 = d0 or {}
+        d1 = d1 or {}
+        for k in itertools.chain(d0.keys(), d1.keys()):
             if k in seen:
                 continue
             seen.add(k)
@@ -89,6 +87,10 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
             for srow in subrows:
                 srow["name"] = "{}/{}".format(k, srow["name"]) if srow["name"] else k
             rows.extend(subrows)
+    elif d0 is None or d1 is None:
+        return [{"name": "", fromfile: d0, tofile: d1, diff_key: None}]
+    elif isinstance(d0, (int, float)) and isinstance(d1, (int, float)):
+        return [{"name": "", fromfile: d0, tofile: d1, diff_key: d1 - d0}]
     else:  # str
         lvs = str(d0)
         rvs = str(d1)
