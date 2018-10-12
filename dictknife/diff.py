@@ -47,6 +47,30 @@ def diff(
     return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
 
 
+def _all_keys(xs, ys):
+    if not xs:
+        return ys
+    if not ys:
+        return xs
+
+    seen = set(xs)
+    pre = []
+    r = [[x] for x in xs]
+    i = 0
+    first = True
+    for y in ys:
+        if y in seen:
+            first = False
+            while r[i][0] != y:
+                i += 1
+        else:
+            if first:
+                pre.append(y)
+            else:
+                r[i].append(y)
+    return itertools.chain(pre, *r)
+
+
 def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False):
     if normalize:
         d0 = sort_flexibly(d0)
@@ -77,7 +101,7 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
         rows = []
         d0 = d0 or {}
         d1 = d1 or {}
-        for k in itertools.chain(d0.keys(), d1.keys()):
+        for k in _all_keys(list(d0.keys()), list(d1.keys())):
             if k in seen:
                 continue
             seen.add(k)
@@ -87,6 +111,7 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
             for srow in subrows:
                 srow["name"] = "{}/{}".format(k, srow["name"]) if srow["name"] else k
             rows.extend(subrows)
+        return rows
     elif d0 is None or d1 is None:
         return [{"name": "", fromfile: d0, tofile: d1, diff_key: None}]
     elif isinstance(d0, (int, float)) and isinstance(d1, (int, float)):
@@ -96,7 +121,6 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
         rvs = str(d1)
         diff_value = "" if lvs == rvs else "".join(difflib.ndiff(lvs, rvs))
         return [{"name": "", fromfile: d0, tofile: d1, diff_key: diff_value}]
-    return rows
 
 
 if __name__ == "__main__":
