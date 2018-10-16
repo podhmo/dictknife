@@ -19,3 +19,16 @@ def flatten(d, *, sep="/"):
         return flatten(list(d), sep=sep)
     else:
         return {None: d}
+
+
+def only_number(d):
+    return {
+        k: v
+        for k, v in d.items()
+        if isinstance(v,
+                      (int, float)) or (hasattr(v, "isdigit") and v.isdigit())
+    }
+
+
+def only_str(d):
+    return {k: v for k, v in d.items() if isinstance(v, str)}
