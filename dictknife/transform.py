@@ -7,7 +7,7 @@ def _make_key(k0, k1, *, sep="/"):
 def flatten(d, *, sep="/"):
     if isinstance(d, (list, tuple)):
         return {
-            _make_key(k, i, sep=sep): v
+            _make_key(i, k, sep=sep): v
             for i, row in enumerate(d) for k, v in flatten(row).items()
         }
     elif hasattr(d, "get"):
@@ -25,7 +25,7 @@ def rows(d, *, kname="name", vname="value"):
     return [{kname: k, vname: v} for k, v in d.items()]
 
 
-def only_number(d):
+def only_num(d):
     return {
         k: v
         for k, v in d.items() if (isinstance(v,
