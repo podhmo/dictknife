@@ -21,6 +21,10 @@ def flatten(d, *, sep="/"):
         return {None: d}
 
 
+def rows(d, *, kname="name", vname="value"):
+    return [{kname: k, vname: v} for k, v in d.items()]
+
+
 def only_number(d):
     return {
         k: v
