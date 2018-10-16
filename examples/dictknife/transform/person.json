@@ -10,5 +10,8 @@
     "age": 40
   },
   "skills": [{"name": "x"}, {"name": "y"}, {"name": "z"}],
-  "groups": [1, 11]
+  "groups": [1, 11],
+  "paths": {
+    "/foo/bar/{id}": "hello"
+  }
 }

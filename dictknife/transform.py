@@ -1,7 +1,13 @@
+def _as_jsonpointer(k):
+    if "/" not in k:
+        return k
+    return k.replace("~", "~0").replace("/", "~1")
+
+
 def _make_key(k0, k1, *, sep="/"):
     if k1 is None:
-        return k0
-    return "{}{}{}".format(k0, sep, k1)
+        return _as_jsonpointer(str(k0))
+    return "{}{}{}".format(_as_jsonpointer(str(k0)), sep, k1)
 
 
 def flatten(d, *, sep="/"):
@@ -18,7 +24,7 @@ def flatten(d, *, sep="/"):
     elif hasattr(d, "__next__"):
         return flatten(list(d), sep=sep)
     else:
-        return {None: d}
+        return {None: _as_jsonpointer(str(d))}
 
 
 def rows(d, *, kname="name", vname="value"):
