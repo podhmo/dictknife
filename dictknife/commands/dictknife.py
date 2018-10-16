@@ -314,6 +314,23 @@ def main():
     # transform
     fn = transform
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+
+    def print_help(*, file=None, self=sparser):
+        if file is None:
+            file = sys.stdout
+        # overwrite help
+        for ac in self._actions:
+            if ac.dest == "functions":
+                import dictknife.transform as m
+                callables = [
+                    k for k, v in m.__dict__.items() if not k.startswith("_") and callable(v)
+                ]
+                ac.help = "(e.g. {}, ... or <module>:<fn name> (e.g. dictknife.transform:flatten))".format(
+                    ", ".join(sorted(callables))
+                )
+        self._print_message(self.format_help(), file)
+
+    sparser.print_help = print_help
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
