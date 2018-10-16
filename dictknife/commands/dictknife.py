@@ -320,7 +320,7 @@ def main():
     sparser.add_argument("--config", default="{}")
     sparser.add_argument("--config-file", default=None)
     sparser.add_argument("--code", default=None)
-    sparser.add_argument("--function", default=[], action="append", dest="functions")
+    sparser.add_argument("--fn", "--function", default=[], action="append", dest="functions")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
