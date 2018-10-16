@@ -61,15 +61,22 @@ def cat(
 
 
 def transform(
-    *, src, dst, config, config_file, code, function, input_format, output_format, format, sort_keys
+    *, src, dst, config, config_file, code, functions, input_format, output_format, format,
+    sort_keys
 ):
     """transform dict"""
     from magicalimport import import_symbol
     from dictknife import deepmerge
     if code is not None:
         transform = eval(code)
-    elif function is not None:
-        transform = import_symbol(function)
+    elif functions:
+
+        def transform(d):
+            for fn in functions:
+                if "." not in fn:
+                    fn = "dictknife.transform:{}".format(fn)
+                d = import_symbol(fn)(d)
+            return d
     else:
         transform = lambda x: x  # NOQA
 
@@ -313,7 +320,7 @@ def main():
     sparser.add_argument("--config", default="{}")
     sparser.add_argument("--config-file", default=None)
     sparser.add_argument("--code", default=None)
-    sparser.add_argument("--function", default=None)
+    sparser.add_argument("--function", default=[], action="append", dest="functions")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
