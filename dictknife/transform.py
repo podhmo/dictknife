@@ -24,9 +24,9 @@ def flatten(d, *, sep="/"):
 def only_number(d):
     return {
         k: v
-        for k, v in d.items()
-        if isinstance(v,
-                      (int, float)) or (hasattr(v, "isdigit") and v.isdigit())
+        for k, v in d.items() if (isinstance(v,
+                                             (int, float)) and not isinstance(v, bool)) or
+        (hasattr(v, "isdigit") and v.isdigit())
     }
 
 
