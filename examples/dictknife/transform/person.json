@@ -1,0 +1,17 @@
+{
+  "name": "foo",
+  "age": 20,
+  "father": {
+    "name": "bar",
+    "age": 40
+  },
+  "mother": {
+    "name": "boo",
+    "age": 40
+  },
+  "skills": [{"name": "x"}, {"name": "y"}, {"name": "z"}],
+  "groups": [1, 11],
+  "paths": {
+    "/foo/bar/{id}": "hello"
+  }
+}

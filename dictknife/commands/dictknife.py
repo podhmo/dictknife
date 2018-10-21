@@ -61,15 +61,22 @@ def cat(
 
 
 def transform(
-    *, src, dst, config, config_file, code, function, input_format, output_format, format, sort_keys
+    *, src, dst, config, config_file, code, functions, input_format, output_format, format,
+    sort_keys
 ):
     """transform dict"""
     from magicalimport import import_symbol
     from dictknife import deepmerge
     if code is not None:
         transform = eval(code)
-    elif function is not None:
-        transform = import_symbol(function)
+    elif functions:
+
+        def transform(d):
+            for fn in functions:
+                if "." not in fn:
+                    fn = "dictknife.transform:{}".format(fn)
+                d = import_symbol(fn)(d)
+            return d
     else:
         transform = lambda x: x  # NOQA
 
@@ -307,13 +314,30 @@ def main():
     # transform
     fn = transform
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+
+    def print_help(*, file=None, self=sparser):
+        if file is None:
+            file = sys.stdout
+        # overwrite help
+        for ac in self._actions:
+            if ac.dest == "functions":
+                import dictknife.transform as m
+                callables = [
+                    k for k, v in m.__dict__.items() if not k.startswith("_") and callable(v)
+                ]
+                ac.help = "(e.g. {}, ... or <module>:<fn name> (e.g. dictknife.transform:flatten))".format(
+                    ", ".join(sorted(callables))
+                )
+        self._print_message(self.format_help(), file)
+
+    sparser.print_help = print_help
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--config", default="{}")
     sparser.add_argument("--config-file", default=None)
     sparser.add_argument("--code", default=None)
-    sparser.add_argument("--function", default=None)
+    sparser.add_argument("--fn", "--function", default=[], action="append", dest="functions")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
