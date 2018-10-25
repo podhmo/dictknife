@@ -57,7 +57,7 @@ class _Atom:
     def uid(self):
         v = self.value
         if isinstance(v, str):
-            return (ONE_0, STR_1, PRIMITIVE_2, v)
+            return (ONE_0, STR_1, PRIMITIVE_2, v.lower())
         elif isinstance(v, (float, int)):
             return (ONE_0, NUM_1, PRIMITIVE_2, v)
         elif v is None:
@@ -108,7 +108,7 @@ class _Dict:
             return (MIXED_0, EMPTY_1, DICT_2, None)
         d = defaultdict(list)
         vs = {}
-        for k in self.keys or self.value.keys():
+        for k in sorted(self.keys or self.value.keys()):
             uid = self.value.get(k, _MISSING).uid
             d[(uid[0], uid[1], uid[2])].append(k)
             vs[k] = uid[3:]
