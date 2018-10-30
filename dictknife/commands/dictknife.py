@@ -53,6 +53,8 @@ def cat(
 
             if hasattr(sd, "keys"):
                 d = deepmerge(d, sd)
+            elif len(files) == 1:
+                d = sd
             else:
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
