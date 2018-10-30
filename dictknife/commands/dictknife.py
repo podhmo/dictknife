@@ -249,6 +249,7 @@ def main():
     # modification
     parser.add_argument("--compact", action="store_true", dest="modification_compact")
     parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
+    parser.add_argument("--unescape", action="store_true", dest="modification_unescape")
 
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
