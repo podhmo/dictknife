@@ -61,8 +61,17 @@ def cat(
 
 
 def transform(
-    *, src, dst, config, config_file, code, functions, input_format, output_format, format,
-    sort_keys
+    *,
+    src: str,
+    dst: str,
+    config: str,
+    config_file: str,
+    code: str,
+    functions: str,
+    input_format: str,
+    output_format: str,
+    format: str,
+    sort_keys: str,
 ):
     """transform dict"""
     from magicalimport import import_symbol
@@ -100,14 +109,15 @@ def diff(
     left: dict,
     right: dict,
     n: int,
+    input_format: str,
     output_format: str = "diff"
 ):
     """diff dict"""
     from dictknife.diff import diff, diff_rows
     with open(left) as rf:
-        left_data = loading.load(rf)
+        left_data = loading.load(rf, format=input_format)
         with open(right) as rf:
-            right_data = loading.load(rf)
+            right_data = loading.load(rf, format=input_format)
 
             if output_format == "diff":
                 for line in diff(
@@ -352,6 +362,7 @@ def main():
     sparser.add_argument("right")
     sparser.add_argument("--n", default=3, type=int)
     sparser.add_argument("--skip-empty", action="store_true")
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument(
         "-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff"
     )
