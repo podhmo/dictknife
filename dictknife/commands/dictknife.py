@@ -249,7 +249,9 @@ def main():
     # modification
     parser.add_argument("--compact", action="store_true", dest="modification_compact")
     parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
-    parser.add_argument("--unescape", action="store_true", dest="modification_unescape")
+    parser.add_argument(
+        "--unescape", default=None, dest="modification_unescape", choices=["unicode"]
+    )
 
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
@@ -420,9 +422,13 @@ def main():
             # apply modification
             for k in list(params.keys()):
                 if k.startswith("modification_"):
-                    if params.pop(k):
+                    v = params.pop(k)
+                    if v:
                         from importlib import import_module
-                        module_path = "dictknife.loading.{}".format(k.replace("_", "."))
+                        if isinstance(v, str):
+                            module_path = "dictknife.loading.{}_{}".format(k.replace("_", "."), v)
+                        else:
+                            module_path = "dictknife.loading.{}".format(k.replace("_", "."))
                         logger.info("apply %s.setup()", module_path)
 
                         m = import_module(module_path)
