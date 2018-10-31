@@ -250,7 +250,7 @@ def main():
     parser.add_argument("--compact", action="store_true", dest="modification_compact")
     parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
     parser.add_argument(
-        "--unescape", default=None, dest="modification_unescape", choices=["unicode"]
+        "--unescape", default=None, dest="modification_unescape", choices=["unicode", "url"]
     )
 
     subparsers = parser.add_subparsers(dest="subcommand")

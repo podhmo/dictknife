@@ -13,3 +13,4 @@ defaut: 00 01 02
 	dictknife --flatten cat 01nested.json --dst dst/01nested.flatten.csv
 02:
 	dictknife --unescape unicode cat 02unescape_unicode.json --dst dst/02unescape_unicode.json
+	dictknife --unescape url cat 02unescape_url.json --dst dst/02unescape_url.json
