@@ -1,0 +1,8 @@
+{
+  "age": "20",
+  "father/age": "40",
+  "father/name": "boo",
+  "mother/age": "40",
+  "mother/name": "boo",
+  "name": "foo"
+}

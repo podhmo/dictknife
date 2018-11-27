@@ -226,6 +226,7 @@ def mkdict(
                 for e in x.split("=", 1):
                     args.append(repr(e))
         r = mkdict(" ".join(args), separator=separator)
+
     if squash:
         for row in r:
             loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
@@ -246,6 +247,13 @@ def main():
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
+
+    # modification
+    parser.add_argument("--compact", action="store_true", dest="modification_compact")
+    parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
+    parser.add_argument(
+        "--unescape", default=None, dest="modification_unescape", choices=["unicode", "url"]
+    )
 
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
@@ -409,6 +417,24 @@ def main():
             args.log_level = logging._levelToName[logging.WARNING]
             s.enter_context(warnings.catch_warnings())
             warnings.simplefilter("ignore")
+
         logging.basicConfig(level=getattr(logging, params.pop("log_level")))
+
         with traceback_shortly(params.pop("debug")):
+            # apply modification
+            for k in list(params.keys()):
+                if k.startswith("modification_"):
+                    v = params.pop(k)
+                    if v:
+                        from importlib import import_module
+                        if isinstance(v, str):
+                            module_path = "dictknife.loading.{}_{}".format(k.replace("_", "."), v)
+                        else:
+                            module_path = "dictknife.loading.{}".format(k.replace("_", "."))
+                        logger.info("apply %s.setup()", module_path)
+
+                        m = import_module(module_path)
+                        if not hasattr(m, "setup"):
+                            raise RuntimeError("{}:setup() is not found".format(module_path))
+                        m.setup(loading.dispatcher)
             return params.pop("subcommand")(**params)
