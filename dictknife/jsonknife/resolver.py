@@ -1,13 +1,26 @@
 import sys
 import logging
 import os.path
-from dictknife import loading
-from dictknife.langhelpers import reify, pairrsplit
-from . import relpath
+from .. import loading
+from ..langhelpers import reify, pairrsplit
+from .relpath import normpath
+from .accessor import (
+    access_by_json_pointer,
+    assign_by_json_pointer,
+)
+
 logger = logging.getLogger("jsonknife.resolver")
 
 
-class OneDocResolver(object):
+class AccessorMixin:
+    def access(self, doc, jsonref):
+        return access_by_json_pointer(doc, jsonref)
+
+    def assign(self, doc, jsonref, value):
+        return assign_by_json_pointer(doc, jsonref, value)
+
+
+class OneDocResolver(AccessorMixin):
     def __init__(self, doc, name="*root*", onload=None):
         self.doc = doc
         self.name = name
@@ -22,7 +35,7 @@ class OneDocResolver(object):
         return self, query[1:]
 
 
-class ExternalFileResolver(object):
+class ExternalFileResolver(AccessorMixin):
     def __init__(
         self,
         filename,
@@ -84,7 +97,7 @@ class ExternalFileResolver(object):
         filepath, query = pairrsplit(query, "#")
         if filepath == "":
             return self.filename, self.filename, query
-        fullpath = relpath.normpath(filepath, where=os.path.dirname(self.filename))
+        fullpath = normpath(filepath, where=os.path.dirname(self.filename))
         return fullpath, filepath, query
 
     def resolve(self, query, format=None):
@@ -115,7 +128,7 @@ class ROOT:
     history = []
 
 
-def get_resolver_from_filename(filename, loader=loading, doc=None, onload=None):
+def get_resolver(filename, loader=loading, doc=None, onload=None):
     if filename is None:
         doc = doc or loading.load(sys.stdin)
         return OneDocResolver(doc, onload=onload)
@@ -124,3 +137,7 @@ def get_resolver_from_filename(filename, loader=loading, doc=None, onload=None):
         if doc:
             resolver.doc = doc
         return resolver
+
+
+# for backward compatibility
+get_resolver_from_filename = get_resolver
