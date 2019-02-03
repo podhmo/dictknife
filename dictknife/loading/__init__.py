@@ -156,6 +156,11 @@ def get_formats(dispatcher=dispatcher):
     return [fmt for fmt in dispatcher.loader.fn_map.keys() if fmt != unknown]
 
 
+def get_unknown(dispatcher=dispatcher):
+    loader = dispatcher.loader.fn_map[unknown]
+    return sys.modules[loader.__module__]
+
+
 def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):
     global loading_config
     if input is not None:
