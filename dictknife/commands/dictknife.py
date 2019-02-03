@@ -5,7 +5,7 @@ import contextlib
 import itertools
 from dictknife.langhelpers import make_dict
 from dictknife import loading
-from dictknife.langhelpers import traceback_shortly
+from dictknife.cliutils import traceback_shortly
 
 logger = logging.getLogger(__name__)
 

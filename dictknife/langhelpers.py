@@ -1,6 +1,4 @@
 import re
-import sys
-import contextlib
 
 # if sys.version_info[:2] >= (3, 6):
 #     make_dict = dict
@@ -39,18 +37,6 @@ def pairrsplit(s, sep):
         return r[0], ""
     else:
         return r
-
-
-@contextlib.contextmanager
-def traceback_shortly(debug):
-    try:
-        yield
-    except Exception as e:
-        if debug:
-            raise
-        else:
-            print("\x1b[33m\x1b[1m{e.__class__.__name__}: {e}\x1b[0m".format(e=e, file=sys.stderr))
-            sys.exit(1)
 
 
 # stolen from pyramid

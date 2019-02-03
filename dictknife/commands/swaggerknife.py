@@ -2,7 +2,7 @@ import logging
 import warnings
 import contextlib
 from dictknife import loading
-from dictknife.langhelpers import traceback_shortly
+from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
