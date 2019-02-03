@@ -7,4 +7,5 @@ def dump(text, fp, sort_keys=False):
 
 
 def setup_parser(parser):
+    """for dictknife.cliutils.extraarguments"""
     return parser

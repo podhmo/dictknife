@@ -1,6 +1,5 @@
 import sys
 from ._lazyimport import m
-from .raw import setup_parser
 from dictknife.langhelpers import make_dict
 from dictknife.guessing import guess
 from logging import getLogger as get_logger
@@ -8,6 +7,11 @@ from logging import getLogger as get_logger
 logger = get_logger(__name__)
 
 _cls_registry = {}
+
+
+def setup_parser(parser):
+    parser.add_argument("--full-scan", action="store_true", help="full scan for guessing headers")
+    return parser
 
 
 def load(
@@ -28,22 +32,28 @@ def load(
     return reader
 
 
-def dump(rows, fp, *, delimiter=",", sort_keys=False):
+def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):
         rows = [rows]  # string or dict
 
     itr = iter(rows)
-    first_row = next(itr)
-    fields = list(first_row.keys())
+    scanned = [next(itr)]
+    fields = set(scanned[0].keys())
+    if fullscan:
+        for row in itr:
+            fields.update(row.keys())
+            scanned.append(row)
+
     if sort_keys:
         fields = sorted(fields)
+    fields = list(fields)
     writer = m.csv.DictWriter(
         fp, fields, delimiter=delimiter, lineterminator="\r\n", quoting=m.csv.QUOTE_ALL
     )
     writer.writeheader()
-    writer.writerow(first_row)
+    writer.writerows(scanned)
     writer.writerows(itr)
 
 
