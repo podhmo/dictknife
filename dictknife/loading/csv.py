@@ -10,7 +10,7 @@ _cls_registry = {}
 
 
 def setup_parser(parser):
-    parser.add_argument("--full-scan", action="store_true", help="full scan for guessing headers")
+    parser.add_argument("--fullscan", action="store_true", help="full scan for guessing headers")
     return parser
 
 
