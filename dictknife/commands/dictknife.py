@@ -40,16 +40,20 @@ def cat(
 
     input_format = input_format or format
     d = make_dict()
+    # use contxtlib
     for f in files:
         logger.debug("merge: %s", f)
         opener = loading.get_opener(filename=f, format=input_format, default=_open)
         with opener(f, encoding=encoding, errors=errors) as rf:
             if slurp:
                 sd = (loading.loads(line, format=input_format) for line in rf)
+                if size is not None:
+                    sd = itertools.islice(sd, size)
+                sd = list(sd)
             else:
                 sd = loading.load(rf, format=input_format, errors=errors)
-            if size is not None:
-                sd = itertools.islice(sd, size)
+                if size is not None:
+                    sd = itertools.islice(sd, size)
 
             if hasattr(sd, "keys"):
                 d = deepmerge(d, sd)
