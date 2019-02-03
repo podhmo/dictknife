@@ -20,7 +20,8 @@ diff:
 
 linecat:
 	mkdir -p dst/04linecat
-	dictknife linecat --src src/04linecat/log.txt --format json > dst/04linecat/log.json
+	dictknife cat --slurp src/04linecat/log.txt --format json > dst/04linecat/log.json
+	dictknife cat --slurp --size=2 src/04linecat/broken.txt --format json > dst/04linecat/log2.json
 
 diff2:
 	mkdir -p dst/05diff

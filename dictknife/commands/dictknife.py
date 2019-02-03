@@ -40,10 +40,11 @@ def cat(
 
     input_format = input_format or format
     d = make_dict()
-    for f in files:
-        logger.debug("merge: %s", f)
-        opener = loading.get_opener(filename=f, format=input_format, default=_open)
-        with opener(f, encoding=encoding, errors=errors) as rf:
+    with contextlib.ExitStack() as s:
+        for f in files:
+            logger.debug("merge: %s", f)
+            opener = loading.get_opener(filename=f, format=input_format, default=_open)
+            rf = s.enter_context(opener(f, encoding=encoding, errors=errors))
             if slurp:
                 sd = (loading.loads(line, format=input_format) for line in rf)
             else:
@@ -59,7 +60,7 @@ def cat(
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
                 d.extend(sd)
-    loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
+        loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
 
 
 def transform(
@@ -147,15 +148,6 @@ def diff(
                 if skip_empty:
                     rows = [row for row in rows if row[diff_key] not in ("", 0)]
                 loading.dumpfile(rows, format=output_format)
-
-
-def linecat(src=None, **kwargs):
-    """concat dicts --slurp"""
-    warnings.warn("concat() is deprecated, please using `cat --slurp` instead of it.")
-    if src is not None:
-        kwargs["files"] = [src]
-    kwargs["slurp"] = True
-    return cat(**kwargs)
 
 
 def shape(
@@ -286,31 +278,6 @@ def main():
     fn = concat
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin])
-    sparser.add_argument("--slurp", action="store_true")
-
-    sparser.add_argument("--size", type=int, default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--encoding", default=None)
-    sparser.add_argument(
-        "--errors",
-        default=None,
-        choices=[
-            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
-            "backslashreplace", "namereplace"
-        ],
-        help="see pydoc codecs.Codec",
-    )
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
-
-    # linecat
-    fn = linecat
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
-    sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", nargs="?", default=None)  # xxx: backward compatibility
     sparser.add_argument("files", nargs="*", default=[sys.stdin])
     sparser.add_argument("--slurp", action="store_true")
 
