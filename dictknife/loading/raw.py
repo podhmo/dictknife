@@ -4,3 +4,7 @@ def load(fp, *, loader=None, errors=None):
 
 def dump(text, fp, sort_keys=False):
     return fp.write(text)
+
+
+def setup_parser(parser):
+    return parser

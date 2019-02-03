@@ -2,6 +2,7 @@ import re
 import contextlib
 from collections import namedtuple
 from ._lazyimport import m
+from .raw import setup_parser
 
 _loader = None
 Guessed = namedtuple("Guessed", "spreadsheet_id, range, sheet_id")

@@ -1,5 +1,6 @@
 import sys
 import os.path
+from .raw import setup_parser
 from dictknife.langhelpers import make_dict
 
 

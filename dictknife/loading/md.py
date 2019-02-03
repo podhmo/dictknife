@@ -1,4 +1,5 @@
 # markdown table format
+from .raw import setup_parser
 from dictknife.langhelpers import make_dict
 import itertools
 
