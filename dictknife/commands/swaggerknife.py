@@ -7,14 +7,14 @@ from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
-def tojsonschema(src, dst, name):
+def tojsonschema(*, src, dst, name):
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)
     root.update(d)
     loading.dumpfile(root, filename=dst)
 
 
-def json2swagger(files, dst, name, detector, emitter, annotate, emit, with_minimap):
+def json2swagger(*, files, dst, name, detector, emitter, annotate, emit, with_minimap):
     from prestring import Module
 
     if annotate is not None:
@@ -76,6 +76,7 @@ def main():
     # json2swagger
     fn = json2swagger
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--name", default="top")
@@ -88,6 +89,7 @@ def main():
     # flatten
     fn = flatten
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", default=None)
     sparser.add_argument("--dst", default=None)
 

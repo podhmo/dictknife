@@ -3,7 +3,7 @@ default: 00 01 02
 00:
 	mkdir -p dst
 	swaggerknife json2swagger src/00config.json --name config --dst dst/00config-spec.yaml
-	swaggerknife tojsonschema dst/00config-spec.yaml --name config --dst dst/00config-schema.json
+	swaggerknife tojsonschema --src dst/00config-spec.yaml --name config --dst dst/00config-schema.json
 
 
 01:
