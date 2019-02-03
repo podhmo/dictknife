@@ -68,6 +68,8 @@ class ExtraArgumentsParsers:
         return args
 
     def _show_warnigs(self, rest):
+        if not rest:
+            return
         print(f"extra arguments: {rest!r} are ignored (option: {self.dest})", file=sys.stderr)
 
 
