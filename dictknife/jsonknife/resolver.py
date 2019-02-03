@@ -3,11 +3,12 @@ import logging
 import os.path
 from .. import loading
 from ..langhelpers import reify, pairrsplit
-from . import relpath
+from .relpath import normpath
 from .accessor import (
     access_by_json_pointer,
     assign_by_json_pointer,
 )
+
 logger = logging.getLogger("jsonknife.resolver")
 
 
@@ -96,7 +97,7 @@ class ExternalFileResolver(AccessorMixin):
         filepath, query = pairrsplit(query, "#")
         if filepath == "":
             return self.filename, self.filename, query
-        fullpath = relpath.normpath(filepath, where=os.path.dirname(self.filename))
+        fullpath = normpath(filepath, where=os.path.dirname(self.filename))
         return fullpath, filepath, query
 
     def resolve(self, query, format=None):

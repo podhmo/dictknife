@@ -10,6 +10,10 @@ class CachedItem:
         self.data = data
 
 
+def path_to_json_pointer(path):
+    return "/".join((normalize_json_pointer(x) for x in path))
+
+
 def normalize_json_pointer(ref):
     if "~" not in ref:
         return ref
