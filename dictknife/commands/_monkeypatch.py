@@ -1,3 +1,14 @@
+def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra"):
+    original = parser.parse_known_args
+
+    def parse_known_args(*args, **kwargs):
+        args, extra = original(*args, **kwargs)
+        setattr(args, dest, extra)
+        return args, []
+
+    parser.parse_known_args = parse_known_args
+
+
 def apply_loading_format_extra_arguments_parser(parser):
     from importlib import import_module
     from dictknife.cliutils.extraaguments import ExtraArgumentsParsers
