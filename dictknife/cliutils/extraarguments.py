@@ -61,8 +61,14 @@ class ExtraArgumentsParsers:
         return parser
 
     def parse_args(self, name, args):
+        rest = self._transform_args(args)
+        return self._parse_args(name, rest)
+
+    def _transform_args(self, args):
         prefix = f"--{self.prefix}"
-        rest = [(x[7:] if x.startswith(prefix) else x) for x in args]
+        return [(x[7:] if x.startswith(prefix) else x) for x in args]
+
+    def _parse_args(self, name, rest):
         args, rest = self.mapping[name].parse_known_args(rest)
         self._show_warnigs(rest)
         return args
