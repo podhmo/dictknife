@@ -4,7 +4,7 @@ def apply_loading_format_extra_arguments_parser(parser):
     from dictknife import loading
 
     formats = loading.get_formats()
-    ex_parsers = ExtraArgumentsParsers(parser, "--format")  # xxx:
+    ex_parsers = ExtraArgumentsParsers(parser, "--output-format")  # xxx:
     for f in formats:
         if f == "markdown":  # xxx:
             continue
@@ -21,9 +21,11 @@ def apply_loading_format_extra_arguments_parser(parser):
 
     def parse_known_args(*args, **kwargs):
         args, rest = original(*args, **kwargs)
-        if args.format is None:
-            args.format = loading.get_unknown().__name__.split(".")[-1]
-        ex_args = ex_parsers.parse_args(args.format, rest)
+        if args.output_format is None:
+            args.output_format = args.format or loading.get_unknown().__name__.split(".")[-1]
+        if args.dst is not None:
+            args.output_format = loading.guess_format(args.dst)
+        ex_args = ex_parsers.parse_args(args.output_format, rest)
         args.extra = dict(vars(ex_args))
         return args, []  # xxx:
 
