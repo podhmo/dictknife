@@ -1,4 +1,4 @@
-from .raw import setup_parser
+from .raw import setup_extra_parser
 from dictknife.langhelpers import make_dict
 from ._lazyimport import m
 

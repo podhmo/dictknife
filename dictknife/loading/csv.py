@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 _cls_registry = {}
 
 
-def setup_parser(parser):
+def setup_extra_parser(parser):
     parser.add_argument("--fullscan", action="store_true", help="full scan for guessing headers")
     return parser
 

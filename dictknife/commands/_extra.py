@@ -11,9 +11,9 @@ def apply_loading_format_extra_arguments_parser(parser):
 
         m = import_module(f"dictknife.loading.{f}")
         ex_parser = ex_parsers.add_parser(f)
-        setup = getattr(m, "setup_parser", None)
+        setup = getattr(m, "setup_extra_parser", None)
         if setup is None:
-            print(f"{m.__name__} doesn't have setup_parser() function", file=sys.stderr)
+            print(f"{m.__name__} doesn't have setup_extra_parser() function", file=sys.stderr)
             continue
         setup(ex_parser)
 

@@ -6,6 +6,6 @@ def dump(text, fp, sort_keys=False):
     return fp.write(text)
 
 
-def setup_parser(parser):
+def setup_extra_parser(parser):
     """for dictknife.cliutils.extraarguments"""
     return parser
