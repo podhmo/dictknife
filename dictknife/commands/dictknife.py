@@ -6,6 +6,7 @@ import itertools
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife.cliutils import traceback_shortly
+from dictknife.commands._extra import apply_loading_format_extra_arguments_parser
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,8 @@ def cat(
     encoding=None,
     errors=None,
     size=None,
-    slurp=False
+    slurp=False,
+    extra=None,
 ):
     from dictknife import deepmerge
 
@@ -60,7 +62,13 @@ def cat(
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
                 d.extend(sd)
-        loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
+        loading.dumpfile(
+            d,
+            dst,
+            format=output_format or format,
+            sort_keys=sort_keys,
+            extra=extra,
+        )
 
 
 def transform(
@@ -253,6 +261,7 @@ def main():
     # cat
     fn = cat
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin])
     sparser.add_argument("--slurp", action="store_true")
@@ -277,6 +286,7 @@ def main():
     # concat (deprecated)
     fn = concat
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin])
     sparser.add_argument("--slurp", action="store_true")
