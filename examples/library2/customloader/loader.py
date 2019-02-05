@@ -1,26 +1,19 @@
-import os.path
-from dictknife.jsonknife.resolver import ExternalFileResolver
+from dictknife import loading
+from dictknife.jsonknife import get_resolver
 from dictknife import DictWalker
 
 
-class Loader:
-    def __init__(self, cwd=None):
-        cwd = cwd or os.getcwd()
-        self.resolver = ExternalFileResolver(os.path.join(cwd, "*root*"))
-        self.ref_walker = DictWalker(["$include"])
+def run(*, filename):
+    def onload(d, resolver, w=DictWalker(["$include"])):
+        for _, sd, in w.walk(d):
+            subresolver, jsref = resolver.resolve(sd.pop("$include"))
+            sd.update(subresolver.access_by_json_pointer(jsref))
 
-    def load(self, filename, resolver=None):
-        resolver = resolver or self.resolver
-        subresolver, _ = resolver.resolve(filename)
-        for _, d, in self.ref_walker.walk(subresolver.doc):
-            subfilename = d.pop("$include")
-            subdata = self.load(subfilename, resolver=subresolver)
-            d.update(subdata)
-        return subresolver.doc
+    resolver = get_resolver(filename, onload=onload)
+    loading.dumpfile(resolver.doc)
 
 
 def main():
-    from dictknife import loading
     import argparse
     # import logging
 
@@ -31,10 +24,7 @@ def main():
     parser.add_argument("filename")
 
     args = parser.parse_args()
-
-    loader = Loader()
-    data = loader.load(args.filename)
-    loading.dumpfile(data)
+    return run(**vars(args))
 
 
 if __name__ == "__main__":
