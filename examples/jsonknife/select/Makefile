@@ -1,14 +1,18 @@
-default: orthodox
+default: 00select 01select 02select 00cut
 
-orthodox:
-	jsonknife select --src src/person.yaml --dst dst/extracted.yaml --ref "#/definitions/person"
-	jsonknife examples dst/extracted.yaml --format yaml > dst/data.yaml
-	swaggerknife json2swagger --name person dst/data.yaml > dst/data2swagger.yaml
+cmd := jsonknife select --src src/colors.yaml
 
-ref:
-	jsonknife select --src src/primitive.yaml --ref "#/definitions/name" > dst/00nowrap.yaml
-	jsonknife select --src src/primitive.yaml --ref "#/definitions/name" --wrap name > dst/01wrap.yaml
-	jsonknife select --src src/primitive.yaml --ref "#/definitions/name@#/definitions/NAME" --ref "#/definitions/age@#/definitions/AGE" > dst/02wrap-pair.yaml
+dst:
+	mkdir -p dst
 
-# shortcut
-# jsonknife samplevalue <(jsonknife extract --src src/person.yaml --ref "#/definitions/person")
+00select: dst
+	${cmd} --ref "#/rainbow/yellow" > dst/00select.yaml
+
+01select: dst
+	${cmd} --ref "#/rainbow/yellow@yellow" > dst/01select.yaml
+
+02select: dst
+	${cmd} --ref "#/rainbow/yellow@yellow" --ref "#/rainbow/indigo@indigo" > dst/02select.yaml
+
+00cut: dst
+	${cmd} --ref "#/rainbow/yellow@yellow" --ref "#/rainbow/indigo@indigo" | jsonknife cut --ref "#/yellow" > dst/00cut.yaml

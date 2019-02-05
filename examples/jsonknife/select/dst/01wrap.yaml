@@ -1,4 +1,0 @@
-name:
-  type: string
-  example: foo
-  default: boo

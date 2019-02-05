@@ -1,4 +1,0 @@
-type: object
-properties:
-  name:
-    $ref: "./primitive.yaml#/definitions/name"
