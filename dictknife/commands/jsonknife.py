@@ -26,6 +26,18 @@ def cut(*, src, dst, refs):
 
 
 def deref(*, src, dst, refs, unwrap, wrap):
+    warnings.warn("deref() is deprecated, please using `select()` instead of it.")
+    return select(src=src, dst=dst, refs=refs, unwrap=unwrap, wrapped=wrapped)
+
+
+def select(
+    *,
+    src: str,
+    dst: str,
+    refs,
+    unwrap,
+    wrap,
+):
     resolver = get_resolver_from_filename(src)
     expander = Expander(resolver)
     if unwrap and not refs:
@@ -86,6 +98,15 @@ def main():
 
     # deref
     fn = deref
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--ref", dest="refs", action="append")
+    sparser.add_argument("--unwrap", default=None)
+    sparser.add_argument("--wrap", default=None)
+    # select
+    fn = select
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)

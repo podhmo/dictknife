@@ -1,0 +1,14 @@
+default: orthodox
+
+orthodox:
+	jsonknife select --src src/person.yaml --dst dst/extracted.yaml --ref "#/definitions/person"
+	jsonknife examples dst/extracted.yaml --format yaml > dst/data.yaml
+	swaggerknife json2swagger --name person dst/data.yaml > dst/data2swagger.yaml
+
+ref:
+	jsonknife select --src src/primitive.yaml --ref "#/definitions/name" > dst/00nowrap.yaml
+	jsonknife select --src src/primitive.yaml --ref "#/definitions/name" --wrap name > dst/01wrap.yaml
+	jsonknife select --src src/primitive.yaml --ref "#/definitions/name@#/definitions/NAME" --ref "#/definitions/age@#/definitions/AGE" > dst/02wrap-pair.yaml
+
+# shortcut
+# jsonknife samplevalue <(jsonknife extract --src src/person.yaml --ref "#/definitions/person")
