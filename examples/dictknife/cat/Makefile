@@ -16,3 +16,4 @@ defaut: 00 01 02 03
 	dictknife --unescape url cat 02unescape_url.json --dst dst/02unescape_url.json
 03:
 	dictknife cat --extra--fullscan 03people.json --dst dst/03people.csv
+	dictknife cat 03people.json -o csv &> dst/03people.ng.csv || echo ok

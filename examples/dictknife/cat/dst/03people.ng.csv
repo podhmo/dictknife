@@ -1,0 +1,3 @@
+"name","age"
+"foo","20"
+[33m[1mValueError: dict contains fields not in fieldnames: 'nickname'[0m
