@@ -1,8 +1,9 @@
-%.output : %.py
+dst/%.output : %.py
 	python $< > $@
 
-default: $(shell ls *.py | sed 's/\.py$$/.output/g')
-
+default: clean dst $(shell ls *.py | sed 's@^@dst/@g; s@\.py$$@.output@g')
+dst:
+	mkdir -p dst
 clean:
-	rm -f *.output
+	rm -rf dst
 
