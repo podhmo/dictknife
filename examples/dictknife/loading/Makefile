@@ -1,8 +1,10 @@
 default: 00 01 02 03 06 07
 
-# dump single
-00: 00person.json
+dst:
 	mkdir -p dst
+
+# dump single
+00: src/00person.json dst
 	dictknife cat $< --dst dst/00output.json
 	dictknife cat $< --dst dst/00output.yaml
 	dictknife cat $< --dst dst/00output.toml
@@ -11,8 +13,7 @@ default: 00 01 02 03 06 07
 	dictknife cat $< --dst dst/00output.md
 
 # dump multi
-01: 01people.json
-	mkdir -p dst
+01: src/01people.json dst
 	dictknife cat $< --dst dst/01output.json
 	dictknife cat $< --dst dst/01output.yaml
 	# dictknife cat $< --dst dst/01output.toml
@@ -21,8 +22,7 @@ default: 00 01 02 03 06 07
 	dictknife cat $< --dst dst/01output.md
 
 # load single
-02: 00
-	mkdir -p dst
+02: src/00 dst
 	dictknife cat dst/00output.json --dst dst/02output.json.json
 	dictknife cat dst/00output.yaml --dst dst/02output.yaml.json
 	dictknife cat dst/00output.toml --dst dst/02output.toml.json
@@ -31,8 +31,7 @@ default: 00 01 02 03 06 07
 	dictknife cat dst/00output.md --dst dst/02output.md.json
 
 # load multi
-03: 01
-	mkdir -p dst
+03: src/01 dst
 	dictknife cat dst/01output.json --dst dst/03output.json.json
 	dictknife cat dst/01output.yaml --dst dst/03output.yaml.json
 	# dictknife cat dst/01output.toml --dst dst/03output.toml.json
@@ -41,15 +40,14 @@ default: 00 01 02 03 06 07
 	dictknife cat dst/01output.md --dst dst/03output.md.json
 
 # load with ignore error
-04: 02encoding-error.csv
+04: src/02encoding-error.csv
 	dictknife cat $< --errors=replace
 	dictknife cat $< --errors=ignore
 	dictknife cat $<
-05: 02quote-error.csv
+05: src/02quote-error.csv
 	dictknife cat $< --errors=ignore
 
-06: 06missing.json
-	mkdir -p dst
+06: src/06missing.json dst
 	dictknife cat $< --dst dst/06output.json
 	dictknife cat $< --dst dst/06output.yaml
 	# dictknife cat $< --dst dst/06output.toml
@@ -58,8 +56,7 @@ default: 00 01 02 03 06 07
 	dictknife cat $< --dst dst/06output.md
 
 # size
-07: 07alphabets.csv
-	mkdir -p dst
+07: src/07alphabets.csv dst
 	dictknife cat $< --size=5 --dst dst/07output.json
 	dictknife cat $< --size=5 --dst dst/07output.yaml
 	dictknife cat $< --size=5 --dst dst/07output.tsv
