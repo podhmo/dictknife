@@ -7,6 +7,7 @@ from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
+# todo: id
 def tojsonschema(*, src, dst, name):
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)

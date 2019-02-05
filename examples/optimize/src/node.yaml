@@ -1,6 +1,0 @@
-definitions:
-  node:
-    type: object
-    properties:
-      value:
-        $ref: "primitive.yaml#/definitions/value"

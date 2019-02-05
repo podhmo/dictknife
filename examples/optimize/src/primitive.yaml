@@ -1,4 +1,0 @@
-definitions:
-  value:
-    type: integer
-    description: value

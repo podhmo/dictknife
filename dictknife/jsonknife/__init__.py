@@ -1,8 +1,8 @@
-from .expander import Expander  # NOQA
-from .bundler import Bundler  # NOQA
-from .resolver import get_resolver_from_filename  # NOQA
-from .example import extract as extract_example  # NOQA
-from .accessor import (  # NOQA
+from .expander import Expander  # noqa
+from .bundler import Bundler  # noqa
+from .resolver import get_resolver, get_resolver_from_filename  # noqa
+from .example import extract as extract_example  # noqa
+from .accessor import (  # noqa
     access_by_json_pointer,
     assign_by_json_pointer,
     path_to_json_pointer,
