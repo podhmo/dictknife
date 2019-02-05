@@ -69,7 +69,8 @@ class ExtraArgumentsParsers:
         return [(x[7:] if x.startswith(prefix) else x) for x in args]
 
     def _parse_args(self, name, rest):
-        args, rest = self.mapping[name].parse_known_args(rest)
+        parser = self.mapping[name]
+        args, rest = parser.parse_known_args(rest, namespace=argparse.Namespace())
         self._show_warnigs(rest)
         return args
 

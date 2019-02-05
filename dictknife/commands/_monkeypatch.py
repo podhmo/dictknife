@@ -10,6 +10,7 @@ def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra"):
 
 
 def apply_loading_format_extra_arguments_parser(parser):
+    import copy
     import sys
     import argparse
     from importlib import import_module
@@ -32,6 +33,7 @@ def apply_loading_format_extra_arguments_parser(parser):
             continue
         setup(ex_parser)
         for ac in ex_parser._actions:
+            ac = copy.deepcopy(ac)  # xxx: Action has state.
             mixed_parser._add_action(ac)
 
     original = parser.parse_known_args
@@ -39,7 +41,9 @@ def apply_loading_format_extra_arguments_parser(parser):
     def parse_known_args(*args, **kwargs):
         parsed, rest = original(*args, **kwargs)
         transformed_rest = ex_parsers._transform_args(rest)
-        _, unexpected = mixed_parser.parse_known_args(transformed_rest)
+        _, unexpected = mixed_parser.parse_known_args(
+            transformed_rest, namespace=argparse.Namespace()
+        )
         if unexpected:
             return parsed, unexpected  # xxx:
 
@@ -47,7 +51,6 @@ def apply_loading_format_extra_arguments_parser(parser):
             parsed.output_format = parsed.format or loading.get_unknown().__name__.split(".")[-1]
         if parsed.dst is not None:
             parsed.output_format = loading.guess_format(parsed.dst)
-
         ex_parsed = ex_parsers._parse_args(parsed.output_format, transformed_rest)
         parsed.extra = dict(vars(ex_parsed))
         return parsed, []

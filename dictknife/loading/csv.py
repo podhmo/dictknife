@@ -42,12 +42,14 @@ def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
     scanned = [next(itr)]
     fields = list(scanned[0].keys())
     seen = set(fields)
+
     if fullscan:
         for row in itr:
             for k in row.keys():
                 if k not in seen:
                     seen.add(k)
                     fields.append(k)
+            scanned.append(row)
     if sort_keys:
         fields = sorted(fields)
     fields = list(fields)
