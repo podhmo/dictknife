@@ -57,7 +57,7 @@ class ExternalFileResolver(AccessorMixin):
         if doc is not None:
             self.doc = doc
             if self.onload is not None:
-                self.onload(self.doc, self)
+                self.onload(doc, self)
 
     def __repr__(self):
         return "<FileResolver {!r}>".format(self.filename)
@@ -73,10 +73,10 @@ class ExternalFileResolver(AccessorMixin):
             self.history[-1].filename
         )
         with open(self.filename) as rf:
-            doc = self.loader.load(rf, format=self.format)
+            self.doc = self.loader.load(rf, format=self.format)
         if self.onload is not None:
-            self.onload(doc, self)
-        return doc
+            self.onload(self.doc, self)
+        return self.doc
 
     def new(self, filename, doc=None, rawfilename=None, format=None):
         rawfilename = rawfilename or filename
