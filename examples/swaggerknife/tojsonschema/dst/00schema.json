@@ -1,0 +1,78 @@
+{
+  "type": "object",
+  "properties": {
+    "server": {
+      "$ref": "#/definitions/server"
+    },
+    "db": {
+      "$ref": "#/definitions/db"
+    }
+  },
+  "required": [
+    "server",
+    "db"
+  ],
+  "definitions": {
+    "slaveItem": {
+      "type": "object",
+      "properties": {
+        "weight": {
+          "type": "integer",
+          "example": 1
+        },
+        "ip": {
+          "type": "string",
+          "example": "10.0.0.1"
+        }
+      },
+      "required": [
+        "weight",
+        "ip"
+      ]
+    },
+    "slave": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/slaveItem"
+      }
+    },
+    "server": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "example": "localhost"
+        },
+        "port": {
+          "type": "string",
+          "example": "3306"
+        },
+        "slave": {
+          "$ref": "#/definitions/slave"
+        }
+      },
+      "required": [
+        "host",
+        "port",
+        "slave"
+      ]
+    },
+    "db": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "string",
+          "example": "root"
+        },
+        "pass": {
+          "type": "string",
+          "example": "pass"
+        }
+      },
+      "required": [
+        "user",
+        "pass"
+      ]
+    }
+  }
+}
