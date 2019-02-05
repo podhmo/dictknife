@@ -1,13 +1,15 @@
 default: 00 01
 
+dst:
+	mkdir -p dst
 # basic
-00:
-	dictknife diff 000person.json 001person.json > 00.diff
-	dictknife diff 000person.json 001person.json --sort-keys > 00.sorted.diff
-	dictknife diff 000person.json 001person.json -o md > 00.md
+00: dst
+	dictknife diff src/000person.json src/001person.json > dst/00.diff
+	dictknife diff src/000person.json src/001person.json --sort-keys > dst/00.sorted.diff
+	dictknife diff src/000person.json src/001person.json -o md > dst/00.md
 # list
-01:
-	dictknife diff 010people.tsv 011people.tsv > 01.diff
-	dictknife diff 010people.tsv 011people.tsv --sort-keys > 01.sorted.diff
-	dictknife diff 010people.tsv 011people.tsv -o md > 01.md
-	dictknife diff 010people.tsv 011people.tsv --skip-empty -o md > 01.skipped.md
+01: dst
+	dictknife diff src/010people.tsv src/011people.tsv > dst/01.diff
+	dictknife diff src/010people.tsv src/011people.tsv --sort-keys > dst/01.sorted.diff
+	dictknife diff src/010people.tsv src/011people.tsv -o md > dst/01.md
+	dictknife diff src/010people.tsv src/011people.tsv --skip-empty -o md > dst/01.skipped.md

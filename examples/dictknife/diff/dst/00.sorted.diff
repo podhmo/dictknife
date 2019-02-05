@@ -1,5 +1,5 @@
---- 000person.json
-+++ 001person.json
+--- src/000person.json
++++ src/001person.json
 @@ -1,5 +1,5 @@
  {
 -  "age": 20,
