@@ -1,0 +1,6 @@
+definitions:
+  doc:
+    $ref: "doc.yaml#/definitions/doc"
+
+description:
+  $xref: "doc.yaml#/definitions/doc/description"
