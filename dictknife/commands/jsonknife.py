@@ -7,7 +7,7 @@ from dictknife import deepmerge
 from dictknife.cliutils import traceback_shortly
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
-from dictknife.jsonknife import Bundler
+from dictknife.jsonknife import bundle
 from dictknife.jsonknife import extract_example
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
@@ -49,10 +49,7 @@ def deref(*, src, dst, refs, unwrap, wrap):
 
 
 def bundle(*, src, dst):
-    resolver = get_resolver_from_filename(src)
-    bundler = Bundler(resolver)
-    d = bundler.bundle()
-    loading.dumpfile(d, dst)
+    loading.dumpfile(bundle(src), dst)
 
 
 def examples(*, src, ref, format):
