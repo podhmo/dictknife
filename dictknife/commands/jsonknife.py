@@ -7,7 +7,6 @@ from dictknife import deepmerge
 from dictknife.cliutils import traceback_shortly
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
-from dictknife.jsonknife import bundle
 from dictknife.jsonknife import extract_example
 from dictknife.jsonknife.resolver import get_resolver_from_filename
 from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
@@ -61,6 +60,7 @@ def select(
 
 
 def bundle(*, src, dst):
+    from dictknife.jsonknife import bundle
     loading.dumpfile(bundle(src), dst)
 
 

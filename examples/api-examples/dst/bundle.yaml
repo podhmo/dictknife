@@ -18,9 +18,6 @@ paths:
           schema:
             $ref: '#/definitions/userlist'
 definitions:
-  name:
-    type: string
-    description: name of object
   user:
     type: object
     properties:
@@ -28,6 +25,9 @@ definitions:
         $ref: '#/definitions/name'
       age:
         $ref: '#/definitions/name'
+  name:
+    type: string
+    description: name of object
   userlist:
     type: array
     items:
