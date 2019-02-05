@@ -7,6 +7,9 @@ dst:
 	dictknife diff src/000person.json src/001person.json > dst/00.diff
 	dictknife diff src/000person.json src/001person.json --sort-keys > dst/00.sorted.diff
 	dictknife diff src/000person.json src/001person.json -o md > dst/00.md
+	dictknife diff src/000person.json src/001person.json -o dict > dst/00.dict
+	dictknife diff src/000person.json src/001person.json -o tsv > dst/00.tsv
+
 # list
 01: dst
 	dictknife diff src/010people.tsv src/011people.tsv > dst/01.diff
