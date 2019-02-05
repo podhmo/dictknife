@@ -60,35 +60,38 @@ class Dumper:
     def add_format(self, fmt, fn):
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *args, **kwargs):
+    def dumps(self, d, *, format=None, sort_keys=False, extra=None, **kwargs):
         fp = StringIO()
-        self.dump(d, fp, *args, **kwargs)
+        self.dump(d, fp, format=format, sort_keys=sort_keys, extra=extra, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, format=None, sort_keys=False):
+    def dump(self, d, fp, *, format=None, sort_keys=False, extra=None):
         if format is not None:
             dumper = self.fn_map[format]
         else:
             fname = getattr(fp, "name", "(unknown)")
             dumper = self.dispatcher.dispatch(fname, self.fn_map)
-        return dumper(d, fp, sort_keys=sort_keys)
+        extra = extra or {}
+        return dumper(d, fp, sort_keys=sort_keys, **extra)
 
-    def dumpfile(self, d, filename=None, format=None, sort_keys=False, _retry=False):
+    def dumpfile(self, d, filename=None, *, format=None, sort_keys=False, extra=None, _retry=False):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator
             d = list(d)
 
         if filename is None:
-            return self.dump(d, sys.stdout, format=format, sort_keys=sort_keys)
+            return self.dump(d, sys.stdout, format=format, sort_keys=sort_keys, extra=extra)
         else:
             try:
                 with open(filename, "w") as wf:
-                    return self.dump(d, wf, format=format, sort_keys=sort_keys)
+                    return self.dump(d, wf, format=format, sort_keys=sort_keys, extra=extra)
             except FileNotFoundError:
                 if _retry:
                     raise
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
-                return self.dumpfile(d, filename, format=format, sort_keys=sort_keys, _retry=True)
+                return self.dumpfile(
+                    d, filename, format=format, sort_keys=sort_keys, extra=extra, _retry=True
+                )
 
 
 class Dispatcher:
@@ -135,6 +138,7 @@ loadfile = dispatcher.loader.loadfile
 dump = dispatcher.dumper.dump
 dumps = dispatcher.dumper.dumps
 dumpfile = dispatcher.dumper.dumpfile
+guess_format = dispatcher.guess_format
 
 
 def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatcher):
@@ -151,6 +155,11 @@ def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatche
 
 def get_formats(dispatcher=dispatcher):
     return [fmt for fmt in dispatcher.loader.fn_map.keys() if fmt != unknown]
+
+
+def get_unknown(dispatcher=dispatcher):
+    loader = dispatcher.loader.fn_map[unknown]
+    return sys.modules[loader.__module__]
 
 
 def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):

@@ -1,4 +1,4 @@
-defaut: 00 01 02
+defaut: 00 01 02 03
 
 00:
 	mkdir -p dst
@@ -14,3 +14,5 @@ defaut: 00 01 02
 02:
 	dictknife --unescape unicode cat 02unescape_unicode.json --dst dst/02unescape_unicode.json
 	dictknife --unescape url cat 02unescape_url.json --dst dst/02unescape_url.json
+03:
+	dictknife cat --extra--fullscan 03people.json --dst dst/03people.csv

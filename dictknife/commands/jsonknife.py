@@ -4,7 +4,7 @@ import warnings
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
-from dictknife.langhelpers import traceback_shortly
+from dictknife.cliutils import traceback_shortly
 from dictknife.accessing import Accessor
 from dictknife.jsonknife import Expander
 from dictknife.jsonknife import Bundler

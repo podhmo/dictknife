@@ -4,3 +4,8 @@ def load(fp, *, loader=None, errors=None):
 
 def dump(text, fp, sort_keys=False):
     return fp.write(text)
+
+
+def setup_extra_parser(parser):
+    """for dictknife.cliutils.extraarguments"""
+    return parser

@@ -5,7 +5,11 @@ import contextlib
 import itertools
 from dictknife.langhelpers import make_dict
 from dictknife import loading
-from dictknife.langhelpers import traceback_shortly
+from dictknife.cliutils import traceback_shortly
+from dictknife.commands._monkeypatch import (
+    apply_loading_format_extra_arguments_parser,
+    apply_rest_arguments_as_extra_arguments_parser,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +38,8 @@ def cat(
     encoding=None,
     errors=None,
     size=None,
-    slurp=False
+    slurp=False,
+    extra=None,
 ):
     from dictknife import deepmerge
 
@@ -60,7 +65,13 @@ def cat(
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
                 d.extend(sd)
-        loading.dumpfile(d, dst, format=output_format or format, sort_keys=sort_keys)
+        loading.dumpfile(
+            d,
+            dst,
+            format=output_format or format,
+            sort_keys=sort_keys,
+            extra=extra,
+        )
 
 
 def transform(
@@ -253,6 +264,7 @@ def main():
     # cat
     fn = cat
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin])
     sparser.add_argument("--slurp", action="store_true")
@@ -277,6 +289,7 @@ def main():
     # concat (deprecated)
     fn = concat
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin])
     sparser.add_argument("--slurp", action="store_true")
@@ -362,6 +375,7 @@ def main():
     # mkdict
     fn = mkdict
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    apply_rest_arguments_as_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--squash", action="store_true")
     sparser.add_argument("-o", "--output-format", default="json", choices=formats)
@@ -369,15 +383,8 @@ def main():
     sparser.add_argument("--delimiter", default=";")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
-    # for mkdict, using parse_known_args() instead of parse_args()
-    args, extra = parser.parse_known_args()
+    args = parser.parse_args()
     params = vars(args)
-    if args.subcommand == mkdict:
-        params["extra"] = extra
-    elif extra:
-        from gettext import gettext as _
-        msg = _('unrecognized arguments: %s')
-        return parser.error(msg % ' '.join(extra))
 
     with contextlib.ExitStack() as s:
         if params.pop("quiet"):

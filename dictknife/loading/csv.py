@@ -9,6 +9,11 @@ logger = get_logger(__name__)
 _cls_registry = {}
 
 
+def setup_extra_parser(parser):
+    parser.add_argument("--fullscan", action="store_true", help="full scan for guessing headers")
+    return parser
+
+
 def load(
     fp,
     *,
@@ -27,22 +32,30 @@ def load(
     return reader
 
 
-def dump(rows, fp, *, delimiter=",", sort_keys=False):
+def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):
         rows = [rows]  # string or dict
 
     itr = iter(rows)
-    first_row = next(itr)
-    fields = list(first_row.keys())
+    scanned = [next(itr)]
+    fields = list(scanned[0].keys())
+    seen = set(fields)
+    if fullscan:
+        for row in itr:
+            for k in row.keys():
+                if k not in seen:
+                    seen.add(k)
+                    fields.append(k)
     if sort_keys:
         fields = sorted(fields)
+    fields = list(fields)
     writer = m.csv.DictWriter(
         fp, fields, delimiter=delimiter, lineterminator="\r\n", quoting=m.csv.QUOTE_ALL
     )
     writer.writeheader()
-    writer.writerow(first_row)
+    writer.writerows(scanned)
     writer.writerows(itr)
 
 
