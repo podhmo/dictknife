@@ -77,34 +77,3 @@ class ExtraArgumentsParsers:
         if not rest:
             return
         print(f"extra arguments: {rest!r} are ignored (option: {self.dest})", file=sys.stderr)
-
-
-if __name__ == "__main__":
-    import json
-    import toml
-
-    def run(*, src: str, format: str, extra: None) -> None:
-        extra = extra or {}
-        module = getattr(sys.modules[__name__], format)
-        with open(src) as rf:
-            d = json.load(rf)
-        print(module.dumps(d, **extra).rstrip(), file=sys.stdout)
-
-    parser = argparse.ArgumentParser()
-    parser.print_usage = parser.print_help
-
-    parser.add_argument('src')
-    parser.add_argument("--format", choices=["json", "toml"], default="json")
-
-    ex_parsers = ExtraArgumentsParsers(parser, "--format")
-    # json
-    ex_parser = ex_parsers.add_parser("json")
-    ex_parser.add_argument("--sort-keys", action="store_true", help="sort keys")
-    ex_parser = None
-    # toml
-    ex_parser = ex_parsers.add_parser("toml")
-    ex_parser = None
-
-    args, rest = parser.parse_known_args()
-    extra = ex_parsers.parse_args(args.format, rest)
-    run(**vars(args), extra=vars(extra))
