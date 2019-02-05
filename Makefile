@@ -1,3 +1,6 @@
+test:
+	python setup.py test
+
 docs: runlib
 	$(MAKE) html -C docs
 .PHONY: docs
