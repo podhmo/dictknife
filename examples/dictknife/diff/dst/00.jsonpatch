@@ -1,0 +1,12 @@
+[
+  {
+    "path": "/name",
+    "op": "replace",
+    "value": "bar"
+  },
+  {
+    "path": "/age",
+    "op": "replace",
+    "value": 21
+  }
+]

@@ -124,10 +124,11 @@ def diff(
     right: dict,
     n: int,
     input_format: str,
-    output_format: str = "diff"
+    output_format: str = "diff",
+    verbose: bool = False,
 ):
     """diff dict"""
-    from dictknife.diff import diff, diff_rows
+    from dictknife.diff import diff, diff_rows, make_jsonpatch
     with open(left) as rf:
         left_data = loading.load(rf, format=input_format)
         with open(right) as rf:
@@ -144,6 +145,9 @@ def diff(
                     sort_keys=sort_keys,
                 ):
                     print(line)
+            elif output_format == "jsonpatch":
+                r = make_jsonpatch(left_data, right_data, verbose=verbose)
+                loading.dumpfile(list(r), format="json")
             else:
                 if output_format == "dict":
                     output_format = "json"
@@ -348,13 +352,14 @@ def main():
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--normalize", action="store_true")
+    sparser.add_argument("--verbose", action="store_true")
     sparser.add_argument("left")
     sparser.add_argument("right")
     sparser.add_argument("--n", default=3, type=int)
     sparser.add_argument("--skip-empty", action="store_true")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument(
-        "-o", "--output-format", choices=["diff", "dict", "md", "tsv"], default="diff"
+        "-o", "--output-format", choices=["diff", "dict", "md", "tsv", "jsonpatch"], default="diff"
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 

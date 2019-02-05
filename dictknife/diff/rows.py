@@ -1,74 +1,7 @@
 import difflib
 import itertools
 from dictknife.deepequal import sort_flexibly
-
-
-def _default_tostring(d, *, default=str, sort_keys=True):
-    import json
-    return json.dumps(d, indent=2, ensure_ascii=False, sort_keys=sort_keys, default=default)
-
-
-def _normalize_dict(d):  # side effect!
-    if hasattr(d, "keys"):
-        for k, v in list(d.items()):
-            d[str(k)] = d.pop(k)
-            _normalize_dict(v)
-    elif isinstance(d, (list, tuple)):
-        for x in d:
-            _normalize_dict(x)
-
-
-def diff(
-    d0,
-    d1,
-    tostring=_default_tostring,
-    fromfile="left",
-    tofile="right",
-    n=3,
-    terminator="\n",
-    normalize=False,
-    sort_keys=False,
-):
-    """fancy diff"""
-    if normalize:
-        d0 = sort_flexibly(d0)
-        d1 = sort_flexibly(d1)
-        _normalize_dict(d0)
-        _normalize_dict(d1)
-
-    # iterator?
-    if hasattr(d0, "__next__"):
-        d0 = list(d0)
-    if hasattr(d1, "__next__"):
-        d1 = list(d1)
-
-    s0 = tostring(d0, sort_keys=sort_keys).split(terminator)
-    s1 = tostring(d1, sort_keys=sort_keys).split(terminator)
-    return difflib.unified_diff(s0, s1, fromfile=fromfile, tofile=tofile, lineterm="", n=n)
-
-
-def _all_keys(xs, ys):
-    if not xs:
-        return ys
-    if not ys:
-        return xs
-
-    seen = set(xs)
-    pre = []
-    r = [[x] for x in xs]
-    i = 0
-    first = True
-    for y in ys:
-        if y in seen:
-            first = False
-            while r[i][0] != y:
-                i += 1
-        else:
-            if first:
-                pre.append(y)
-            else:
-                r[i].append(y)
-    return itertools.chain(pre, *r)
+from ._utils import _normalize_dict
 
 
 def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False):
@@ -123,9 +56,25 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
         return [{"name": "", fromfile: d0, tofile: d1, diff_key: diff_value}]
 
 
-if __name__ == "__main__":
-    import datetime
-    d0 = {"x": datetime.date(2000, 1, 1), "y": {"a": 1, "b": 10}}
-    d1 = {"x": datetime.date(2000, 2, 1), "y": {"a": 1, "c": 10}}
-    for line in diff(d0, d1):
-        print(line)
+def _all_keys(xs, ys):
+    if not xs:
+        return ys
+    if not ys:
+        return xs
+
+    seen = set(xs)
+    pre = []
+    r = [[x] for x in xs]
+    i = 0
+    first = True
+    for y in ys:
+        if y in seen:
+            first = False
+            while r[i][0] != y:
+                i += 1
+        else:
+            if first:
+                pre.append(y)
+            else:
+                r[i].append(y)
+    return itertools.chain(pre, *r)

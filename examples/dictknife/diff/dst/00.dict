@@ -1,0 +1,20 @@
+[
+  {
+    "name": "name",
+    "src/000person.json": "foo",
+    "src/001person.json": "bar",
+    "diff": "- f- o- o+ b+ a+ r"
+  },
+  {
+    "name": "age",
+    "src/000person.json": 20,
+    "src/001person.json": 21,
+    "diff": 1
+  },
+  {
+    "name": "type",
+    "src/000person.json": "person",
+    "src/001person.json": "person",
+    "diff": ""
+  }
+]

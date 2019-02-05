@@ -1,0 +1,4 @@
+"name"	"src/000person.json"	"src/001person.json"	"diff"
+"name"	"foo"	"bar"	"- f- o- o+ b+ a+ r"
+"age"	"20"	"21"	"1"
+"type"	"person"	"person"	""
