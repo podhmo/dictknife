@@ -1,0 +1,6 @@
+definitions:
+  doc:
+    type: string
+    description: document
+description:
+  $xref: doc.yaml#/definitions/doc/description

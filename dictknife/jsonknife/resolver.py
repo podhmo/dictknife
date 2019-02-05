@@ -4,6 +4,7 @@ import os.path
 from .. import loading
 from ..langhelpers import reify, pairrsplit
 from .relpath import normpath
+from ..accessing import Accessor
 from .accessor import (
     access_by_json_pointer,
     assign_by_json_pointer,
@@ -13,11 +14,18 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class AccessorMixin:
-    def access(self, doc, jsonref):
-        return access_by_json_pointer(doc, jsonref)
+    # need self.doc
+    def assign(self, path, value, *, doc=None, a=Accessor()):
+        return a.assign(doc or self.doc, path, value)
 
-    def assign(self, doc, jsonref, value):
-        return assign_by_json_pointer(doc, jsonref, value)
+    def access(self, path, *, doc=None, a=Accessor()):
+        return a.access(doc or self.doc, path)
+
+    def access_by_json_pointer(self, jsonref, *, doc=None):
+        return access_by_json_pointer(doc or self.doc, jsonref)
+
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None):
+        return assign_by_json_pointer(doc or self.doc, jsonref, value)
 
 
 class OneDocResolver(AccessorMixin):
@@ -57,7 +65,7 @@ class ExternalFileResolver(AccessorMixin):
         if doc is not None:
             self.doc = doc
             if self.onload is not None:
-                self.onload(self.doc, self)
+                self.onload(doc, self)
 
     def __repr__(self):
         return "<FileResolver {!r}>".format(self.filename)
@@ -73,10 +81,10 @@ class ExternalFileResolver(AccessorMixin):
             self.history[-1].filename
         )
         with open(self.filename) as rf:
-            doc = self.loader.load(rf, format=self.format)
+            self.doc = self.loader.load(rf, format=self.format)
         if self.onload is not None:
-            self.onload(doc, self)
-        return doc
+            self.onload(self.doc, self)
+        return self.doc
 
     def new(self, filename, doc=None, rawfilename=None, format=None):
         rawfilename = rawfilename or filename

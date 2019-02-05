@@ -1,0 +1,4 @@
+definitions:
+  doc:
+    type: string
+    description: document
