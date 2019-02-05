@@ -31,6 +31,7 @@ setup(
     extras_require={
         'testing': [
             "PyYAML",
+            "jsonpatch",
         ],
         'docs': [
             "sphinx",
