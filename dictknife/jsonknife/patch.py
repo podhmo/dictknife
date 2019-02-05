@@ -3,6 +3,12 @@ diff = namedtuple("diff", "op, value, x_from, x_to")
 
 
 def make_jsonpatch(src, dst, *, verbose=False):
+    # iterator?
+    if hasattr(src, "__next__"):
+        src = list(src)
+    if hasattr(dst, "__next__"):
+        dst = list(dst)
+
     r = _Walker().walk(src, dst)
     rows = _merge(r)
 

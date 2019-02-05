@@ -146,12 +146,8 @@ def diff(
                 ):
                     print(line)
             elif output_format == "jsonpatch":
-                r = make_jsonpatch(
-                    list(left_data),
-                    list(right_data),
-                    verbose=verbose,
-                )
-                loading.dumpfile(r, format="json")
+                r = make_jsonpatch(left_data, right_data, verbose=verbose)
+                loading.dumpfile(list(r), format="json")
             else:
                 if output_format == "dict":
                     output_format = "json"
