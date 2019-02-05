@@ -4,6 +4,7 @@ import os.path
 from .. import loading
 from ..langhelpers import reify, pairrsplit
 from .relpath import normpath
+from ..accessing import Accessor
 from .accessor import (
     access_by_json_pointer,
     assign_by_json_pointer,
@@ -13,11 +14,18 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class AccessorMixin:
-    def access(self, doc, jsonref):
-        return access_by_json_pointer(doc, jsonref)
+    # need self.doc
+    def assign(self, path, value, *, doc=None, a=Accessor()):
+        return a.assign(doc or self.doc, path, value)
 
-    def assign(self, doc, jsonref, value):
-        return assign_by_json_pointer(doc, jsonref, value)
+    def access(self, path, *, doc=None, a=Accessor()):
+        return a.access(doc or self.doc, path)
+
+    def access_by_json_pointer(self, jsonref, *, doc=None):
+        return access_by_json_pointer(doc or self.doc, jsonref)
+
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None):
+        return assign_by_json_pointer(doc or self.doc, jsonref, value)
 
 
 class OneDocResolver(AccessorMixin):
