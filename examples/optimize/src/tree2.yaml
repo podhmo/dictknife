@@ -1,8 +1,0 @@
-definitions:
-  tree:
-    type: object
-    properties:
-      left:
-        $ref: "./left.yaml"
-      right:
-        $ref: "./right.yaml"

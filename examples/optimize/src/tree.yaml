@@ -1,8 +1,0 @@
-definitions:
-  tree:
-    type: object
-    properties:
-      left:
-        $ref: "./node.yaml#/definitions/node"
-      right:
-        $ref: "./node.yaml#/definitions/node"
