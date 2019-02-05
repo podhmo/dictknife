@@ -1,0 +1,3 @@
+definitions:
+  doc:
+    $ref: "doc.yaml#/definitions/doc"
