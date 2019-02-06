@@ -1,7 +1,4 @@
-def _as_jsonpointer(k):
-    if "/" not in k:
-        return k
-    return k.replace("~", "~0").replace("/", "~1")
+from dictknife.langhelpers import as_jsonpointer as _as_jsonpointer
 
 
 def _make_key(k0, k1, *, sep="/"):

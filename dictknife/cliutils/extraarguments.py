@@ -3,14 +3,7 @@ import argparse
 
 
 class ExtraArgumentsParsers:
-    def __init__(
-        self,
-        parser,
-        dest,
-        *,
-        prefix="extra",
-        parser_factory=argparse.ArgumentParser,
-    ):
+    def __init__(self, parser, dest, *, prefix="extra", parser_factory=argparse.ArgumentParser):
         self.parser = parser
         self.dest = dest
 
@@ -22,14 +15,14 @@ class ExtraArgumentsParsers:
 
     def add_parser(self, name):
         self.mapping[name] = p = self.parser_factory(
-            f"{self.prefix} arguments {name}",
-            description=f"for {self.dest}={name}",
+            "{self.prefix} arguments {name}".format(self=self, name=name),
+            description="for {self.dest}={name}".format(self=self, name=name),
             add_help=False,
         )
         return p
 
     def as_epilog(self):
-        r = [f"{self.prefix} arguments: (with --{self.prefix}<option>)"]
+        r = ["{self.prefix} arguments: (with --{self.prefix}<option>)".format(self=self)]
 
         formatter = argparse.HelpFormatter("")
         for name, parser in self.mapping.items():
@@ -65,7 +58,7 @@ class ExtraArgumentsParsers:
         return self._parse_args(name, rest)
 
     def _transform_args(self, args):
-        prefix = f"--{self.prefix}"
+        prefix = "--{prefix}".format(prefix=self.prefix)
         return [(x[7:] if x.startswith(prefix) else x) for x in args]
 
     def _parse_args(self, name, rest):
@@ -77,4 +70,9 @@ class ExtraArgumentsParsers:
     def _show_warnigs(self, rest):
         if not rest:
             return
-        print(f"extra arguments: {rest!r} are ignored (option: {self.dest})", file=sys.stderr)
+        print(
+            "extra arguments: {rest!r} are ignored (option: {self.dest})".format(
+                rest=rest, self=self
+            ),
+            file=sys.stderr
+        )
