@@ -1,4 +1,4 @@
-default: 00 01
+default: 00 01 02
 
 dst:
 	mkdir -p dst
@@ -8,4 +8,6 @@ dst:
 01: dst
 	swaggerknife merge src/*.json --style=whole --dst dst/01whole.json
 
-# strict
+# conflicted
+02: dst
+	swaggerknife merge src/*.json src/conflicted/*.json --strict --dst dst/02ref.json |& tee dst/02conflicted.error || echo ok

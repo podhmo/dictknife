@@ -1,0 +1,16 @@
+{
+  "definitions": {
+    "db": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "example": "http://localhost:9200/foo"
+        }
+      },
+      "required": [
+        "url"
+      ]
+    }
+  }
+}

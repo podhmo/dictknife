@@ -5,7 +5,7 @@
       "properties": {
         "host": {
           "type": "string",
-          "example": "http://localhost:9200"
+          "example": "http://localhost"
         },
         "name": {
           "type": "string",

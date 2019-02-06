@@ -75,6 +75,7 @@ def merge(
                     r[ns][name] = {"$ref": "#/{ns}/{name}".format(ns=ns, name=name)}
                     where[ns][name] = src
     elif style == "whole":
+        # TODO: strict support?
         data = [loading.loadfile(src) for src in files]
         r = deepmerge(*data, override=True)
     else:
@@ -109,6 +110,7 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--strict", action="store_true")
     sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
     # tojsonschema
 
