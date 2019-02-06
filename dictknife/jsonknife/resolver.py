@@ -16,20 +16,28 @@ logger = logging.getLogger("jsonknife.resolver")
 class AccessorMixin:
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):
-        return a.assign(doc or self.doc, path, value)
+        if doc is None:
+            doc = self.doc
+        return a.assign(doc, path, value)
 
     def access(self, path, *, doc=None, a=Accessor()):
-        return a.access(doc or self.doc, path)
+        if doc is None:
+            doc = self.doc
+        return a.access(doc, path)
 
     def access_by_json_pointer(self, jsonref, *, doc=None):
-        return access_by_json_pointer(doc or self.doc, jsonref)
+        if doc is None:
+            doc = self.doc
+        return access_by_json_pointer(doc, jsonref)
 
     def assign_by_json_pointer(self, jsonref, value, *, doc=None):
-        return assign_by_json_pointer(doc or self.doc, jsonref, value)
+        if doc is None:
+            doc = self.doc
+        return assign_by_json_pointer(doc, jsonref, value)
 
 
 class OneDocResolver(AccessorMixin):
-    def __init__(self, doc, name="*root*", onload=None):
+    def __init__(self, doc, *, name="*root*", onload=None):
         self.doc = doc
         self.name = name
         self.onload = onload
