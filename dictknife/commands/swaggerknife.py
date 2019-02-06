@@ -1,8 +1,8 @@
+import os
 import logging
 import warnings
 import contextlib
 from dictknife import loading
-from dictknife import deepmerge
 from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
@@ -53,27 +53,39 @@ def merge(
     strict: bool = False,
 ):
     """merge files"""
-    from dictknife.langhelpers import make_dict
+    from dictknife.langhelpers import make_dict, as_jsonpointer
+    from dictknife import deepmerge
+    from dictknife.jsonknife.relpath import fixpath
     if style == "ref":
+        cwd = os.getcwd()
+        dstdir = dst and os.path.dirname(dst)
+
         r = make_dict()
-        where = {}
+        seen = {}
         for src in files:
             d = loading.loadfile(src)
             for ns, sd in d.items():
                 for name in sd:
                     if ns not in r:
                         r[ns] = make_dict()
-                        where[ns] = make_dict()
+                        seen[ns] = make_dict()
                     if strict and name in r[ns]:
                         raise RuntimeError(
                             "{name} is already existed, (where={where} and {where2})".format(
                                 name=name,
-                                where=where[ns][name],
+                                where=seen[ns][name],
                                 where2=src,
                             )
                         )
-                    r[ns][name] = {"$ref": "#/{ns}/{name}".format(ns=ns, name=name)}
-                    where[ns][name] = src
+                    if dst is None:
+                        where = ""
+                    else:
+                        where = fixpath(src, where=cwd, to=dstdir)
+                    r[ns][name] = {
+                        "$ref":
+                        "{where}#/{ns}/{name}".format(where=where, ns=ns, name=as_jsonpointer(name))
+                    }
+                    seen[ns][name] = src
     elif style == "whole":
         # TODO: strict support?
         data = [loading.loadfile(src) for src in files]
