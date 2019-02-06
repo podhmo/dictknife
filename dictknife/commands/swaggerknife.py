@@ -1,4 +1,4 @@
-import os
+import os.path
 import logging
 import warnings
 import contextlib
@@ -55,9 +55,7 @@ def merge(
     """merge files"""
     from dictknife.langhelpers import make_dict, as_jsonpointer
     from dictknife import deepmerge
-    from dictknife.jsonknife.relpath import fixpath
     if style == "ref":
-        cwd = os.getcwd()
         dstdir = dst and os.path.dirname(dst)
 
         r = make_dict()
@@ -80,7 +78,7 @@ def merge(
                     if dst is None:
                         where = ""
                     else:
-                        where = fixpath(src, where=cwd, to=dstdir)
+                        where = os.path.relpath(src, start=dstdir)
                     r[ns][name] = {
                         "$ref":
                         "{where}#/{ns}/{name}".format(where=where, ns=ns, name=as_jsonpointer(name))
