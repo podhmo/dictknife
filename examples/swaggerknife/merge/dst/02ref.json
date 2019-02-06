@@ -1,0 +1,13 @@
+{
+  "definitions": {
+    "db": {
+      "$ref": "#/definitions/db"
+    },
+    "person-summary": {
+      "$ref": "#/definitions/person-summary"
+    },
+    "person": {
+      "$ref": "#/definitions/person"
+    }
+  }
+}

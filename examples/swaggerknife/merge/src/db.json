@@ -1,0 +1,26 @@
+{
+  "definitions": {
+    "db": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "example": "http://localhost"
+        },
+        "name": {
+          "type": "string",
+          "example": "foo-db"
+        },
+        "port": {
+          "type": "integer",
+          "example": 4444
+        }
+      },
+      "required": [
+        "host",
+        "name",
+        "port"
+      ]
+    }
+  }
+}

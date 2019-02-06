@@ -1,0 +1,44 @@
+{
+  "definitions": {
+    "person-summary": {
+      "type": "object",
+      "properties": {
+        "age": {
+          "type": "integer",
+          "example": 40
+        },
+        "name": {
+          "type": "string",
+          "example": "b"
+        }
+      },
+      "required": [
+        "age",
+        "name"
+      ]
+    },
+    "person": {
+      "type": "object",
+      "properties": {
+        "age": {
+          "type": "integer",
+          "example": 20
+        },
+        "father": {
+          "$ref": "#/definitions/person-summary"
+        },
+        "mother": {
+          "$ref": "#/definitions/person-summary"
+        },
+        "name": {
+          "type": "string",
+          "example": "bar"
+        }
+      },
+      "required": [
+        "age",
+        "name"
+      ]
+    }
+  }
+}
