@@ -1,20 +1,20 @@
 default: 00 01 02 03 04 05 06 07 08
 
 00:
-	dictknife shape 00*.json > $@.output
+	dictknife shape src/00*.json > dst/$@.output
 01:
-	dictknife shape 01*.json > $@.output
+	dictknife shape src/01*.json > dst/$@.output
 02:
-	dictknife shape 01*.json --squash > $@.output
+	dictknife shape src/01*.json --squash > dst/$@.output
 03:
-	dictknife shape 02*.json --skiplist > $@.output
+	dictknife shape src/02*.json --skiplist > dst/$@.output
 04:
-	dictknife shape 02*.json --skiplist > $@.output
+	dictknife shape src/02*.json --skiplist > dst/$@.output
 05:
-	dictknife shape 03*.json --skiplist > $@.output
+	dictknife shape src/03*.json --skiplist > dst/$@.output
 06:
-	dictknife shape 03*.json --skiplist > $@.output
+	dictknife shape src/03*.json --skiplist > dst/$@.output
 07:
-	cat 03*.json | dictknife shape -i json --skiplist > $@.output
+	cat src/03*.json | dictknife shape -i json --skiplist > dst/$@.output
 08:
-	cat 03*.json | dictknife shape -i json --skiplist 00*.json 01*.json > $@.output
+	cat src/03*.json | dictknife shape -i json --skiplist src/0{0,1}*.json > dst/$@.output
