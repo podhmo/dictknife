@@ -1,9 +1,8 @@
-%.output : %.py
-	python $< > $@
+dst/%.output : src/%.py
+	python $< &> $@
 
-default: $(shell ls *.py | sed 's/\.py$$/.output/g')
-	for i in `find . -name "Makefile" -mindepth 2`; do $(MAKE) -C `dirname $$i`; done
-
+default: clean dst $(shell ls src/*.py | sed 's@src/@dst/@g; s@\.py$$@.output@g')
+dst:
+	mkdir -p dst
 clean:
-	rm -f *.output
-
+	rm -rf dst
