@@ -1,5 +1,6 @@
 from functools import partial
 from collections import defaultdict, namedtuple
+from .langhelpers import as_jsonpointer
 Row = namedtuple("Row", "path, type, example")
 
 
@@ -56,7 +57,14 @@ class Traverser:
         s.emit(path, v)
 
 
-def convert_pathlist_from_state(s, *, squash=False, skiplist=False, separator="/"):
+def _build_pathlist_from_state(
+    s,
+    *,
+    squash=False,
+    skiplist=False,
+    separator="/",
+    transform=str,  # str or _default_transform
+):
     r = []
     for path in s.paths:
         if not path:
@@ -81,7 +89,7 @@ def convert_pathlist_from_state(s, *, squash=False, skiplist=False, separator="/
 
         r.append(
             Row(
-                path=fmt.format(separator.join(map(str, path))),
+                path=fmt.format(separator.join(map(transform, path))),
                 type=sorted(set([type(v) for v in s.examples[rawpath]]), key=str),
                 example=s.examples[rawpath][0]
             )
@@ -92,14 +100,17 @@ def convert_pathlist_from_state(s, *, squash=False, skiplist=False, separator="/
 def shape(
     d,
     traverse=Traverser().traverse,
-    aggregate=convert_pathlist_from_state,
+    aggregate=_build_pathlist_from_state,
+    *,
     squash=False,
     skiplist=False,
     separator="/",
+    transform=as_jsonpointer,
 ):
     return aggregate(
         traverse(d),
         squash=squash,
         skiplist=skiplist,
         separator=separator,
+        transform=transform,
     )

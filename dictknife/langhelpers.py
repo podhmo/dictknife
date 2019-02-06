@@ -59,6 +59,7 @@ class reify(object):
 
 
 def as_jsonpointer(k):
+    k = str(k)
     if "/" not in k:
         return k
     return k.replace("~", "~0").replace("/", "~1")
