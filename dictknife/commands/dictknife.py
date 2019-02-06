@@ -166,8 +166,16 @@ def diff(
 
 
 def shape(
-    *, files, input_format, output_format, squash, skiplist, separator, with_type, with_example,
-    full
+    *,
+    files,
+    input_format,
+    output_format,
+    squash,
+    skiplist,
+    separator,
+    with_type,
+    with_example,
+    full,
 ):
     """shape"""
     from dictknife import shape
