@@ -1,0 +1,66 @@
+{
+  "definitions": {
+    "db": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string",
+          "example": "http://localhost:9200"
+        },
+        "name": {
+          "type": "string",
+          "example": "foo-db"
+        },
+        "port": {
+          "type": "integer",
+          "example": 4444
+        }
+      },
+      "required": [
+        "host",
+        "name",
+        "port"
+      ]
+    },
+    "person-summary": {
+      "type": "object",
+      "properties": {
+        "age": {
+          "type": "integer",
+          "example": 40
+        },
+        "name": {
+          "type": "string",
+          "example": "b"
+        }
+      },
+      "required": [
+        "age",
+        "name"
+      ]
+    },
+    "person": {
+      "type": "object",
+      "properties": {
+        "age": {
+          "type": "integer",
+          "example": 20
+        },
+        "father": {
+          "$ref": "#/definitions/person-summary"
+        },
+        "mother": {
+          "$ref": "#/definitions/person-summary"
+        },
+        "name": {
+          "type": "string",
+          "example": "bar"
+        }
+      },
+      "required": [
+        "age",
+        "name"
+      ]
+    }
+  }
+}
