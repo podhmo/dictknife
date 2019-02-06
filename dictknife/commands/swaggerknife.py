@@ -2,13 +2,14 @@ import logging
 import warnings
 import contextlib
 from dictknife import loading
+from dictknife import deepmerge
 from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
-# todo: id
 def tojsonschema(*, src, dst, name):
+    # todo: id
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)
     root.update(d)
@@ -45,6 +46,35 @@ def json2swagger(*, files, dst, name, detector, emitter, annotate, emit, with_mi
         loading.dumpfile(emitter.doc, filename=dst)
 
 
+def merge(
+    files: list,
+    dst: str,
+    strict: bool = False,
+):
+    """merge files"""
+    from dictknife.langhelpers import make_dict
+    r = make_dict()
+    where = {}
+    for src in files:
+        d = loading.loadfile(src)
+        for ns, sd in d.items():
+            for name in sd:
+                if ns not in r:
+                    r[ns] = make_dict()
+                    where[ns] = make_dict()
+                if strict and name in r[ns]:
+                    raise RuntimeError(
+                        "{name} is already existed, (where={where} and {where2})".format(
+                            name=name,
+                            where=where[ns][name],
+                            where2=src,
+                        )
+                    )
+                r[ns][name] = {"$ref": "#/{ns}/{name}".format(ns=ns, name=name)}
+                where[ns][name] = src
+    loading.dumpfile(r, dst)
+
+
 def flatten(src, dst):
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
@@ -66,13 +96,19 @@ def main():
     subparsers = parser.add_subparsers(dest="subcommand")
     subparsers.required = True
 
+    # merge
+    fn = merge
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("files", nargs="*", default=None)
+    sparser.add_argument("--dst", default=None)
+
     # tojsonschema
     fn = tojsonschema
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--name", default="top")
 
     # json2swagger
     fn = json2swagger
