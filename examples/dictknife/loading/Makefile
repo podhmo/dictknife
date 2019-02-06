@@ -22,7 +22,7 @@ dst:
 	dictknife cat $< --dst dst/01output.md
 
 # load single
-02: src/00 dst
+02: 00 dst
 	dictknife cat dst/00output.json --dst dst/02output.json.json
 	dictknife cat dst/00output.yaml --dst dst/02output.yaml.json
 	dictknife cat dst/00output.toml --dst dst/02output.toml.json
@@ -31,7 +31,7 @@ dst:
 	dictknife cat dst/00output.md --dst dst/02output.md.json
 
 # load multi
-03: src/01 dst
+03: 01 dst
 	dictknife cat dst/01output.json --dst dst/03output.json.json
 	dictknife cat dst/01output.yaml --dst dst/03output.yaml.json
 	# dictknife cat dst/01output.toml --dst dst/03output.toml.json
