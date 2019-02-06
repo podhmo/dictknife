@@ -59,7 +59,12 @@ def select(
     loading.dumpfile(d, dst)
 
 
-def bundle(*, src, dst):
+def bundle(
+    *,
+    src: str,
+    dst: str = None,
+    jsonref: str = None,
+):
     from dictknife.jsonknife import bundle
     loading.dumpfile(bundle(src), dst)
 
@@ -121,6 +126,7 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--ref", default=None)
 
     # examples
     fn = examples
