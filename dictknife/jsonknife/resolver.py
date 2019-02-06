@@ -2,13 +2,14 @@ import sys
 import logging
 import os.path
 from .. import loading
+from ..walkers import DictWalker
 from ..langhelpers import reify, pairrsplit
-from .relpath import normpath
 from ..accessing import Accessor
 from .accessor import (
     access_by_json_pointer,
     assign_by_json_pointer,
 )
+from .relpath import normpath
 
 logger = logging.getLogger("jsonknife.resolver")
 
@@ -55,6 +56,7 @@ class ExternalFileResolver(AccessorMixin):
     def __init__(
         self,
         filename,
+        *,
         cache=None,
         loader=None,
         history=None,
@@ -144,7 +146,7 @@ class ROOT:
     history = []
 
 
-def get_resolver(filename, loader=loading, doc=None, onload=None):
+def get_resolver(filename, *, loader=loading, doc=None, onload=None):
     if filename is None:
         doc = doc or loading.load(sys.stdin)
         return OneDocResolver(doc, onload=onload)
@@ -157,3 +159,14 @@ def get_resolver(filename, loader=loading, doc=None, onload=None):
 
 # for backward compatibility
 get_resolver_from_filename = get_resolver
+
+
+def build_subset(resolver, ref):
+    subset = {}
+    ob = resolver.access_by_json_pointer(ref)
+    resolver.assign_by_json_pointer(ref, ob, doc=subset)
+    for path, sd in DictWalker(["$ref"]).walk(ob):
+        # xxx:
+        if sd["$ref"].startswith("#/"):
+            resolver.assign(path[:-1], sd, doc=subset)
+    return subset
