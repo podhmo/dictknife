@@ -122,13 +122,14 @@ def main():
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--strict", action="store_true")
     sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
-    # tojsonschema
 
+    # tojsonschema
     fn = tojsonschema
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--name", default="top")
 
     # json2swagger
     fn = json2swagger

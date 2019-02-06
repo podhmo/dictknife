@@ -11,4 +11,5 @@ runlib:
 
 # integration tests (regression tests)
 run:
-	find . -mindepth 2 -name Makefile | grep -v optional/sheet | grep -v docs | xargs -n 1 -I{} dirname {} | xargs -n 1 make -C
+	find . -mindepth 2 -name Makefile | grep -v optional/sheet | grep -v docs | xargs -n 1 -I{} dirname {} | xargs -n 1 make -C || echo *******NG**********
+
