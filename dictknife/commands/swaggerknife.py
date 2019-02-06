@@ -49,29 +49,36 @@ def json2swagger(*, files, dst, name, detector, emitter, annotate, emit, with_mi
 def merge(
     files: list,
     dst: str,
+    style: str,  # flavor?, strategy?
     strict: bool = False,
 ):
     """merge files"""
     from dictknife.langhelpers import make_dict
-    r = make_dict()
-    where = {}
-    for src in files:
-        d = loading.loadfile(src)
-        for ns, sd in d.items():
-            for name in sd:
-                if ns not in r:
-                    r[ns] = make_dict()
-                    where[ns] = make_dict()
-                if strict and name in r[ns]:
-                    raise RuntimeError(
-                        "{name} is already existed, (where={where} and {where2})".format(
-                            name=name,
-                            where=where[ns][name],
-                            where2=src,
+    if style == "ref":
+        r = make_dict()
+        where = {}
+        for src in files:
+            d = loading.loadfile(src)
+            for ns, sd in d.items():
+                for name in sd:
+                    if ns not in r:
+                        r[ns] = make_dict()
+                        where[ns] = make_dict()
+                    if strict and name in r[ns]:
+                        raise RuntimeError(
+                            "{name} is already existed, (where={where} and {where2})".format(
+                                name=name,
+                                where=where[ns][name],
+                                where2=src,
+                            )
                         )
-                    )
-                r[ns][name] = {"$ref": "#/{ns}/{name}".format(ns=ns, name=name)}
-                where[ns][name] = src
+                    r[ns][name] = {"$ref": "#/{ns}/{name}".format(ns=ns, name=name)}
+                    where[ns][name] = src
+    elif style == "whole":
+        data = [loading.loadfile(src) for src in files]
+        r = deepmerge(*data, override=True)
+    else:
+        raise RuntimeError("invalid style: {}".format(style))
     loading.dumpfile(r, dst)
 
 
@@ -102,8 +109,9 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=None)
     sparser.add_argument("--dst", default=None)
-
+    sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
     # tojsonschema
+
     fn = tojsonschema
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
