@@ -4,6 +4,8 @@ import re
 #     make_dict = dict
 # else:
 from collections import OrderedDict as make_dict  # noqa
+# for backword comaptibility
+from .cliutils import traceback_shortly  # noqa
 
 
 def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):

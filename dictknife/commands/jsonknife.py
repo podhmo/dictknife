@@ -5,16 +5,12 @@ from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
 from dictknife.cliutils import traceback_shortly
-from dictknife.accessing import Accessor
-from dictknife.jsonknife import Expander
-from dictknife.jsonknife import extract_example
-from dictknife.jsonknife.resolver import get_resolver_from_filename
-from dictknife.jsonknife.accessor import assign_by_json_pointer, access_by_json_pointer
 
 logger = logging.getLogger(__name__)
 
 
 def cut(*, src, dst, refs):
+    from dictknife.accessing import Accessor
     d = loading.loadfile(src)
     accessor = Accessor(make_dict)
     for ref in refs:
@@ -37,7 +33,11 @@ def select(
     unwrap,
     wrap,
 ):
-    resolver = get_resolver_from_filename(src)
+    from dictknife.jsonknife import Expander
+    from dictknife.jsonknife.accessor import assign_by_json_pointer
+    from dictknife.jsonknife import get_resolver
+
+    resolver = get_resolver(src)
     expander = Expander(resolver)
     if unwrap and not refs:
         refs = list(refs)
@@ -63,14 +63,18 @@ def bundle(
     *,
     src: str,
     dst: str = None,
-    jsonref: str = None,
+    ref: str = None,
 ):
     from dictknife.jsonknife import bundle
-    loading.dumpfile(bundle(src), dst)
+
+    loading.dumpfile(bundle(src, jsonref=ref), dst)
 
 
 def examples(*, src, ref, format):
     """output sample value from swagger's spec"""
+    from dictknife.jsonknife import extract_example
+    from dictknife.jsonknife.accessor import access_by_json_pointer
+
     data = loading.loadfile(src)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
