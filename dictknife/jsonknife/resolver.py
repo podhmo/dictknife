@@ -1,6 +1,7 @@
 import sys
 import logging
 import os.path
+from collections import deque
 from .. import loading
 from ..walkers import DictWalker
 from ..langhelpers import reify, pairrsplit
@@ -163,10 +164,18 @@ get_resolver_from_filename = get_resolver
 
 def build_subset(resolver, ref):
     subset = {}
-    ob = resolver.access_by_json_pointer(ref)
-    resolver.assign_by_json_pointer(ref, ob, doc=subset)
-    for path, sd in DictWalker(["$ref"]).walk(ob):
-        # xxx:
-        if sd["$ref"].startswith("#/"):
-            resolver.assign(path[:-1], sd, doc=subset)
+
+    refs = deque([ref])
+    seen = set()
+    while refs:
+        ref = refs.popleft()
+        if ref in seen:
+            continue
+        seen.add(ref)
+        ob = resolver.access_by_json_pointer(ref)
+        resolver.assign_by_json_pointer(ref, ob, doc=subset)
+        for path, sd in DictWalker(["$ref"]).walk(ob):
+            # xxx:
+            if sd["$ref"].startswith("#/"):
+                refs.append(sd["$ref"][1:])
     return subset
