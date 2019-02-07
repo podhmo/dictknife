@@ -1,14 +1,16 @@
 import sys
 import logging
 import os.path
+from collections import deque
 from .. import loading
+from ..walkers import DictWalker
 from ..langhelpers import reify, pairrsplit
-from .relpath import normpath
 from ..accessing import Accessor
 from .accessor import (
     access_by_json_pointer,
     assign_by_json_pointer,
 )
+from .relpath import normpath
 
 logger = logging.getLogger("jsonknife.resolver")
 
@@ -16,20 +18,28 @@ logger = logging.getLogger("jsonknife.resolver")
 class AccessorMixin:
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):
-        return a.assign(doc or self.doc, path, value)
+        if doc is None:
+            doc = self.doc
+        return a.assign(doc, path, value)
 
     def access(self, path, *, doc=None, a=Accessor()):
-        return a.access(doc or self.doc, path)
+        if doc is None:
+            doc = self.doc
+        return a.access(doc, path)
 
     def access_by_json_pointer(self, jsonref, *, doc=None):
-        return access_by_json_pointer(doc or self.doc, jsonref)
+        if doc is None:
+            doc = self.doc
+        return access_by_json_pointer(doc, jsonref)
 
     def assign_by_json_pointer(self, jsonref, value, *, doc=None):
-        return assign_by_json_pointer(doc or self.doc, jsonref, value)
+        if doc is None:
+            doc = self.doc
+        return assign_by_json_pointer(doc, jsonref, value)
 
 
 class OneDocResolver(AccessorMixin):
-    def __init__(self, doc, name="*root*", onload=None):
+    def __init__(self, doc, *, name="*root*", onload=None):
         self.doc = doc
         self.name = name
         self.onload = onload
@@ -47,6 +57,7 @@ class ExternalFileResolver(AccessorMixin):
     def __init__(
         self,
         filename,
+        *,
         cache=None,
         loader=None,
         history=None,
@@ -136,7 +147,7 @@ class ROOT:
     history = []
 
 
-def get_resolver(filename, loader=loading, doc=None, onload=None):
+def get_resolver(filename, *, loader=loading, doc=None, onload=None):
     if filename is None:
         doc = doc or loading.load(sys.stdin)
         return OneDocResolver(doc, onload=onload)
@@ -149,3 +160,22 @@ def get_resolver(filename, loader=loading, doc=None, onload=None):
 
 # for backward compatibility
 get_resolver_from_filename = get_resolver
+
+
+def build_subset(resolver, ref):
+    subset = {}
+
+    refs = deque([ref])
+    seen = set()
+    while refs:
+        ref = refs.popleft()
+        if ref in seen:
+            continue
+        seen.add(ref)
+        ob = resolver.access_by_json_pointer(ref)
+        resolver.assign_by_json_pointer(ref, ob, doc=subset)
+        for path, sd in DictWalker(["$ref"]).walk(ob):
+            # xxx:
+            if sd["$ref"].startswith("#/"):
+                refs.append(sd["$ref"][1:])
+    return subset

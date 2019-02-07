@@ -1,0 +1,29 @@
+definitions:
+  person:
+    type: object
+    properties:
+      name:
+        $ref: '#/definitions/name'
+      age:
+        type: integer
+      friends:
+        $ref: '#/definitions/friends'
+  team:
+    type: object
+    properties:
+      name:
+        $ref: '#/definitions/name'
+      members:
+        type: array
+        items:
+          $ref: '#/definitions/person'
+  name:
+    type: string
+    descrition: name of something
+  friends:
+    type: array
+    items:
+      type:
+        $ref: '#/definitions/friend'
+  friend:
+    $ref: '#/definitions/person'

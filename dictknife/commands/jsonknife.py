@@ -130,6 +130,7 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("--ref", default=None)
 
     # examples
     fn = examples

@@ -96,7 +96,10 @@ class Emitter(object):
             if name == "":
                 continue
             data = item.data
+            # replace: <file.yaml>#/<ref> -> #/<ref>
             for path, sd in self.ref_walking.iterate(data):
+                if sd["$ref"].startswith("#/"):
+                    continue
                 self.replace_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
 

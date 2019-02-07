@@ -1,0 +1,7 @@
+definitions:
+  name:
+    type: string
+    descrition: name of something
+  point:
+    type: integer
+    description: value of something

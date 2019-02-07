@@ -1,6 +1,10 @@
 from .expander import Expander  # noqa
 from .bundler import Bundler  # noqa
-from .resolver import get_resolver, get_resolver_from_filename  # noqa
+from .resolver import (  # noqa
+    get_resolver,
+    get_resolver_from_filename,  # backward compatibility
+    build_subset,
+)
 from .example import extract as extract_example  # noqa
 from .accessor import (  # noqa
     access_by_json_pointer,
@@ -9,7 +13,12 @@ from .accessor import (  # noqa
 )
 
 
-def bundle(filename, *, onload=None, doc=None):
+def bundle(filename, *, jsonref=None, onload=None, doc=None):
+    if "#/" in filename:
+        filename, jsonref = filename.rsplit("#/", 1)
     resolver = get_resolver_from_filename(filename, doc=doc, onload=onload)
     bundler = Bundler(resolver)
-    return bundler.bundle()
+    doc = resolver.doc
+    if jsonref is not None:
+        doc = build_subset(resolver, jsonref)
+    return bundler.bundle(doc)
