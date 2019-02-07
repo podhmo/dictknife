@@ -1,0 +1,10 @@
+definitions:
+  team:
+    type: object
+    properties:
+      name:
+        $ref: "primitive/name.yaml#/definitions/name"
+      members:
+        type: array
+        items:
+          $ref: "person.yaml#/definitions/person"

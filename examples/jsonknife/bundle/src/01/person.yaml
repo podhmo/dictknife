@@ -1,0 +1,24 @@
+definitions:
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "primitive/name.yaml#/definitions/name"
+      age:
+        type: integer
+      friends:
+        $ref: "#/definitions/friends"
+  friend:
+    $ref: "#/definitions/person"
+  friends:
+    type: array
+    items:
+      type:
+        $ref: "#/definitions/friend"
+  pair:
+    type: object
+    properties:
+      left:
+        $ref: "#/definitions/person"
+      right:
+        $ref: "#/definitions/person"
