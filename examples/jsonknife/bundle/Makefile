@@ -1,5 +1,5 @@
 default: 00 01 02 03 04 05 06 07
-OPTS ?= --log=DEBUG
+OPTS ?=
 
 dst:
 	mkdir -p dst

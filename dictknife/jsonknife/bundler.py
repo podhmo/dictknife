@@ -97,10 +97,9 @@ class Emitter(object):
                 continue
             data = item.data
             for path, sd in self.ref_walking.iterate(data):
-                try:
-                    self.replace_ref(item.resolver, sd)
-                except KeyError as e:
-                    logger.debug("replace ref, not found %s", e)
+                if sd["$ref"].startswith("#/"):
+                    continue
+                self.replace_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
 
         # adhoc paths support
