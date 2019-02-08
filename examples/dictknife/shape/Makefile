@@ -17,7 +17,7 @@ default: 00 01 02 03 04 05 06 07 08 09
 07:
 	cat src/03*.json | dictknife shape -i json --skiplist > dst/$@.output
 08:
-	cat src/03*.json | dictknife shape -i json --skiplist src/0{0,1}*.json > dst/$@.output
+	cat src/03*.json | dictknife shape -i json --skiplist src/00*.json src/01*.json > dst/$@.output
 
 # json pointer
 09:

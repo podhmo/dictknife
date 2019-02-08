@@ -10,4 +10,4 @@ dst:
 
 # conflicted
 02: dst
-	(swaggerknife merge src/*.json src/conflicted/*.json --strict --dst dst/02ref.json |& tee dst/02conflicted.error) || echo ok
+	(swaggerknife merge src/*.json src/conflicted/*.json --strict --dst dst/02ref.json 2>&1 > dst/02conflicted.error) || echo ok

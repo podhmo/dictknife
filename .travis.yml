@@ -5,6 +5,7 @@ python:
   - "3.7-dev" # 3.7 development branch
   - "nightly"
 install:
-  - pip install -e .[testing]
-script: python setup.py test
-# todo: make run?
+  - pip install -e .[testing,load,command]
+script:
+ - python setup.py test
+ - make run

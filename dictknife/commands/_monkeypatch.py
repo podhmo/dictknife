@@ -10,7 +10,6 @@ def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra"):
 
 
 def apply_loading_format_extra_arguments_parser(parser):
-    import copy
     import sys
     import argparse
     from importlib import import_module
@@ -31,10 +30,12 @@ def apply_loading_format_extra_arguments_parser(parser):
         if setup is None:
             print(f"{m.__name__} doesn't have setup_extra_parser() function", file=sys.stderr)
             continue
+
         setup(ex_parser)
-        for ac in ex_parser._actions:
-            ac = copy.deepcopy(ac)  # xxx: Action has state.
-            mixed_parser._add_action(ac)
+        # xxx: Action has state (not copyable) , so, re-setup by setup function
+        # for ac in ex_parser._actions:
+        #     mixed_parser._add_action(new_ac)
+        setup(mixed_parser)
 
     original = parser.parse_known_args
 
