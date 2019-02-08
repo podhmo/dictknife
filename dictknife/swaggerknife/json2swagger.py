@@ -59,6 +59,7 @@ class Detector:
                 self._detect(v, s["children"][k], k, path=path)
                 path.pop()
         elif isinstance(d, (list, tuple)):
+            s["name"] = name
             s["type2"] = "array"
             s["freq2"] += 1
             for i, x in enumerate(d):

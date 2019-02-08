@@ -13,10 +13,10 @@ from .accessor import (  # noqa
 )
 
 
-def bundle(filename, *, jsonref=None, onload=None, doc=None):
+def bundle(filename, *, jsonref=None, onload=None, doc=None, format=None):
     if "#/" in filename:
         filename, jsonref = filename.rsplit("#/", 1)
-    resolver = get_resolver_from_filename(filename, doc=doc, onload=onload)
+    resolver = get_resolver_from_filename(filename, doc=doc, onload=onload, format=None)
     bundler = Bundler(resolver)
     doc = resolver.doc
     if jsonref is not None:

@@ -32,11 +32,15 @@ def select(
     refs,
     unwrap,
     wrap,
+    input_format: str,
+    output_format: str,
+    format: str,
 ):
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
     from dictknife.jsonknife import get_resolver
 
+    input_format = input_format or format
     resolver = get_resolver(src)
     expander = Expander(resolver)
     if unwrap and not refs:
@@ -56,7 +60,7 @@ def select(
                 assign_by_json_pointer(d, ref_wrap, extracted)
             else:
                 d = deepmerge(d, extracted)
-    loading.dumpfile(d, dst)
+    loading.dumpfile(d, dst, format=output_format or format)
 
 
 def bundle(
@@ -64,10 +68,16 @@ def bundle(
     src: str,
     dst: str = None,
     ref: str = None,
+    input_format: str,
+    output_format: str,
+    format: str,
 ):
     from dictknife.jsonknife import bundle
-
-    loading.dumpfile(bundle(src, jsonref=ref), dst)
+    loading.dumpfile(
+        bundle(src, jsonref=ref, format=input_format or format),
+        dst,
+        format=output_format or format,
+    )
 
 
 def examples(*, src, ref, format):
@@ -114,6 +124,9 @@ def main():
     sparser.add_argument("--ref", dest="refs", action="append")
     sparser.add_argument("--unwrap", default=None)
     sparser.add_argument("--wrap", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     # select
     fn = select
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
@@ -123,6 +136,9 @@ def main():
     sparser.add_argument("--ref", dest="refs", action="append")
     sparser.add_argument("--unwrap", default=None)
     sparser.add_argument("--wrap", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     # bundle
     fn = bundle
@@ -131,6 +147,9 @@ def main():
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     # examples
     fn = examples
