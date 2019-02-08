@@ -16,8 +16,21 @@ def tojsonschema(*, src, dst, name):
     loading.dumpfile(root, filename=dst)
 
 
-def json2swagger(*, files, dst, name, detector, emitter, annotate, emit, with_minimap):
+def json2swagger(
+    *,
+    files,
+    dst: str,
+    output_format: str,
+    name: str,
+    detector,
+    emitter,
+    annotate,
+    emit,
+    with_minimap: bool,
+    without_example: bool,
+):
     from prestring import Module
+    from dictknife import DictWalker
 
     if annotate is not None:
         annotate = loading.loadfile(annotate)
@@ -43,7 +56,11 @@ def json2swagger(*, files, dst, name, detector, emitter, annotate, emit, with_mi
             print("# minimap ###")
             print("# *", end="")
             print("\n# ".join(str(m).split("\n")))
-        loading.dumpfile(emitter.doc, filename=dst)
+
+        if without_example:
+            for _, d in DictWalker(["example"]).walk(emitter.doc):
+                d.pop("example")
+        loading.dumpfile(emitter.doc, filename=dst, format=output_format)
 
 
 def merge(
@@ -81,7 +98,9 @@ def merge(
                         where = os.path.relpath(src, start=dstdir)
                     r[ns][name] = {
                         "$ref":
-                        "{where}#/{ns}/{name}".format(where=where, ns=ns, name=as_jsonpointer(name))
+                        "{where}#/{ns}/{name}".format(
+                            where=where, ns=ns, name=as_jsonpointer(name)
+                        )
                     }
                     seen[ns][name] = src
     elif style == "whole":
@@ -93,16 +112,26 @@ def merge(
     loading.dumpfile(r, dst)
 
 
-def flatten(src, dst):
+def flatten(
+    *,
+    src: str,
+    dst: str,
+    input_format: str,
+    output_format: str,
+    format: str,
+):
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
-    data = loading.loadfile(src)
+    input_format = input_format or format
+    data = loading.loadfile(src, format=input_format)
     d = flatten(data)
-    loading.dumpfile(d, dst)
+    loading.dumpfile(d, dst, format=output_format or format)
 
 
 def main():
     import argparse
+    formats = loading.get_formats()
+
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
@@ -137,12 +166,14 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("--name", default="top")
     sparser.add_argument("--detector", default="Detector")
     sparser.add_argument("--emitter", default="Emitter")
     sparser.add_argument("--annotate", default=None)
     sparser.add_argument("--emit", default="schema", choices=["schema", "info"])
     sparser.add_argument("--with-minimap", action="store_true")
+    sparser.add_argument("--without-example", action="store_true")
 
     # flatten
     fn = flatten
@@ -150,6 +181,9 @@ def main():
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", default=None)
     sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
 
     args = parser.parse_args()
 

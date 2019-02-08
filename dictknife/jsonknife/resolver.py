@@ -39,12 +39,13 @@ class AccessorMixin:
 
 
 class OneDocResolver(AccessorMixin):
-    def __init__(self, doc, *, name="*root*", onload=None):
+    def __init__(self, doc, *, name="*root*", onload=None, format=None):
         self.doc = doc
         self.name = name
         self.onload = onload
         if self.onload is not None:
             self.onload(self.doc, self)
+        self.format = format
 
     def resolve(self, query, format=None):
         # not support external file
@@ -147,12 +148,12 @@ class ROOT:
     history = []
 
 
-def get_resolver(filename, *, loader=loading, doc=None, onload=None):
+def get_resolver(filename, *, loader=loading, doc=None, onload=None, format=None):
     if filename is None:
         doc = doc or loading.load(sys.stdin)
-        return OneDocResolver(doc, onload=onload)
+        return OneDocResolver(doc, onload=onload, format=format)
     else:
-        resolver = ExternalFileResolver(filename, loader=loader, onload=onload)
+        resolver = ExternalFileResolver(filename, loader=loader, onload=onload, format=format)
         if doc:
             resolver.doc = doc
         return resolver
