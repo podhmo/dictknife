@@ -1,0 +1,27 @@
+[
+  {
+    "signal": "SIGABRT",
+    "message": "ng",
+    "score": 0
+  },
+  {
+    "signal": "SIGALRM",
+    "message": "not found",
+    "score": 0
+  },
+  {
+    "signal": "SIGBUS",
+    "message": "not found",
+    "score": 0
+  },
+  {
+    "signal": "SIGCHLD",
+    "message": "not found",
+    "score": 0
+  },
+  {
+    "signal": "SIGCLD",
+    "message": "not found",
+    "score": 0
+  }
+]

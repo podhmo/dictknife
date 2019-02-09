@@ -1,4 +1,4 @@
-default: 00 01 02 03 04
+default: 00 01 02 03 04 05 06
 OPTS ?= --debug --log=DEBUG
 
 dst:
@@ -16,3 +16,7 @@ dst:
 	jsonknife ${OPTS} select --src src/02/error.yaml | jsonknife ${OPTS} examples --ref "#/definitions/error" --dst dst/03.json
 04: dst
 	jsonknife ${OPTS} select --src src/02/error.yaml | jsonknife ${OPTS} examples --ref "#/definitions/error" --limit 1 --dst dst/04.json
+05: dst
+	jsonknife ${OPTS} examples src/02/error.yaml --expand --ref "#/definitions/error" --dst dst/05.json
+06: dst
+	jsonknife ${OPTS} examples --expand --limit 1 "src/02/error.yaml#/definitions/error" --dst dst/06.json
