@@ -169,12 +169,19 @@ class SimpleConflictFixer(object):  # todo: rename
         self.item_map = item_map
         self.strict = strict
 
+    def is_same_item(self, olditem, newitem):
+        if not ("$ref" in newitem.data and len(newitem.data) == 1):
+            return False
+        filename, ref = pairrsplit(newitem.data["$ref"], "#/")
+        return olditem.localref == ref and olditem.globalref[0] == relpath(filename, where=newitem.globalref[0])
+
     def fix_conflict(self, olditem, newitem):
         # unused
-        if "$ref" in newitem.data and len(newitem.data) == 1:
-            filename, ref = pairrsplit(newitem.data["$ref"], "#/")
-            if olditem.localref == ref and olditem.globalref[0] == relpath(filename, where=newitem.globalref[0]):
-                return None
+        if self.is_same_item(olditem, newitem):
+            return None
+        if self.is_same_item(newitem, olditem):
+            self.item_map[newitem.localref] = newitem
+            return None
 
         msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
