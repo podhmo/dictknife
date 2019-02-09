@@ -1,5 +1,5 @@
 dst/%.output : src/%.py
-	python $< &> $@
+	python $< 2>&1 > $@
 
 default: clean dst $(shell ls src/*.py | sed 's@src/@dst/@g; s@\.py$$@.output@g')
 dst:
