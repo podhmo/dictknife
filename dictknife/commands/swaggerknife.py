@@ -68,6 +68,8 @@ def merge(
     dst: str,
     style: str,  # flavor?, strategy?
     strict: bool = False,
+    wrap: str = None,
+    wrap_section: str = "definitions",
 ):
     """merge files"""
     from dictknife.langhelpers import make_dict, as_jsonpointer
@@ -109,6 +111,14 @@ def merge(
         r = deepmerge(*data, override=True)
     else:
         raise RuntimeError("invalid style: {}".format(style))
+
+    if wrap is not None:
+        wd = make_dict()
+        wd["type"] = "object"
+        wd["properties"] = make_dict()
+        for name in r.get(wrap_section) or {}:
+            wd["properties"][name] = {"$ref": f"#/{wrap_section}/{name}"}
+        r[wrap_section][wrap] = wd
     loading.dumpfile(r, dst)
 
 
@@ -151,8 +161,10 @@ def main():
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--strict", action="store_true")
     sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
-
+    sparser.add_argument("--wrap", default=None)
+    sparser.add_argument("--wrap-section", default="definitions")
     # tojsonschema
+
     fn = tojsonschema
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
