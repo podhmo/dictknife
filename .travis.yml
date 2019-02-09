@@ -8,4 +8,4 @@ install:
   - pip install -e .[testing,load,command]
 script:
  - python setup.py test
- - make run
+ - make ci
