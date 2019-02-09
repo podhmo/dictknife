@@ -1,0 +1,5 @@
+definitions:
+  x:
+    $ref: '#/definitions/x'
+  db:
+    $ref: '#/definitions/db'

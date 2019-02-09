@@ -1,0 +1,15 @@
+{
+  "definitions": {
+    "db": {
+      "$ref": "db.json#/definitions/db"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "db": {
+          "$ref": "#/definitions/db"
+        }
+      }
+    }
+  }
+}

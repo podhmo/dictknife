@@ -1,0 +1,8 @@
+definitions:
+  config:
+    properties:
+      db:
+        $ref: '#/definitions/db'
+    type: object
+  db:
+    $ref: '#/definitions/db'
