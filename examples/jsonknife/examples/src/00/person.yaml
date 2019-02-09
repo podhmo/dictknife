@@ -1,0 +1,10 @@
+definitions:
+  person:
+    type: object
+    properties:
+      name:
+        type: string
+        example: "foo"
+      age:
+        type: intger
+        example: [10,20]

@@ -45,7 +45,7 @@ def select(
     resolver = get_resolver(src)
     expander = Expander(resolver)
     if unwrap and not refs:
-        refs = list(refs)
+        refs = []
         refs.append(unwrap)
 
     if not refs:
@@ -75,8 +75,9 @@ def bundle(
     extras: list = None,
 ):
     from dictknife.jsonknife import bundle
+
     if ref is not None:
-        src = f"{src}#/{ref}"
+        src = f"{src}#/{ref.lstrip('#/')}"
     loading.dumpfile(
         bundle(src, format=input_format or format, extras=extras),
         dst,
@@ -84,16 +85,36 @@ def bundle(
     )
 
 
-def examples(*, src, ref, format):
+def examples(
+    *,
+    src: str,
+    dst: str = None,
+    ref: str,
+    limit: int,
+    input_format: str,
+    output_format: str,
+    format: str,
+    use_expand: bool = False,
+):
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
+    if use_expand:
+        from dictknife.jsonknife import bundle, expand
 
-    data = loading.loadfile(src)
+        if ref is not None:
+            src = f"{src}#/{ref.lstrip('#/')}"
+        data = bundle(src, format=input_format or format)
+        data = expand(None, doc=data)
+    else:
+        data = loading.loadfile(src, format=input_format or format)
+
+    if src and "#/" in src:
+        _, ref = src.split("#/", 1)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
-    d = extract_example(data)
-    loading.dumpfile(d, format=format)
+    d = extract_example(data, limit=limit)
+    loading.dumpfile(d, dst, format=output_format or format or "json")
 
 
 def main():
@@ -165,8 +186,13 @@ def main():
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", default=None)
+    sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", dest="ref", default=None)
-    sparser.add_argument("-f", "--format", default="json", choices=formats)
+    sparser.add_argument("--limit", dest="limit", default=5, type=int)
+    sparser.add_argument("--expand", dest="use_expand", action="store_true")
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     args = parser.parse_args()
 

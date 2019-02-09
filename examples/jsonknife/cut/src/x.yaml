@@ -1,0 +1,8 @@
+definitions:
+  x:
+    type: object
+    properties:
+      name:
+        $ref: "#/name.yaml"
+      score:
+        type: integer

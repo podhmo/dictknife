@@ -150,7 +150,8 @@ class ROOT:
 
 def get_resolver(filename, *, loader=loading, doc=None, onload=None, format=None):
     if filename is None:
-        doc = doc or loading.load(sys.stdin)
+        if doc is None:
+            doc = doc or loading.load(sys.stdin)
         return OneDocResolver(doc, onload=onload, format=format)
     else:
         resolver = ExternalFileResolver(filename, loader=loader, onload=onload, format=format)

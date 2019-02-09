@@ -1,4 +1,4 @@
-this is the tiny examples, for bundling separated files.
+this is the tiny examples, bundling separated multiplle files to one file.
 
 two flavor are existed.
 

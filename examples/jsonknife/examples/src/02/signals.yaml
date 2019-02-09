@@ -1,0 +1,44 @@
+definitions:
+  signal:
+    type: string
+    enum:
+      - SIGABRT
+      - SIGALRM
+      - SIGBUS
+      - SIGCHLD
+      - SIGCLD
+      - SIGCONT
+      - SIGFPE
+      - SIGHUP
+      - SIGILL
+      - SIGINT
+      - SIGIO
+      - SIGIOT
+      - SIGKILL
+      - SIGPIPE
+      - SIGPOLL
+      - SIGPROF
+      - SIGPWR
+      - SIGQUIT
+      - SIGRTMAX
+      - SIGRTMIN
+      - SIGSEGV
+      - SIGSTOP
+      - SIGSYS
+      - SIGTERM
+      - SIGTRAP
+      - SIGTSTP
+      - SIGTTIN
+      - SIGTTOU
+      - SIGURG
+      - SIGUSR1
+      - SIGUSR2
+      - SIGVTALRM
+      - SIGWINCH
+      - SIGXCPU
+      - SIGXFSZ
+      - SIG_BLOCK
+      - SIG_DFL
+      - SIG_IGN
+      - SIG_SETMASK
+      - SIG_UNBLOCK

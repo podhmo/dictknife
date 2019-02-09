@@ -14,8 +14,16 @@ from ..langhelpers import make_dict, pairrsplit
 import os.path
 
 
-def bundle(filename, onload=None, doc=None, format=None, extras=None):
-    filename, jsonref = pairrsplit(filename, "#/")
+def expand(filename, *, onload=None, doc=None, format=None):
+    resolver = get_resolver(filename, doc=doc, onload=onload, format=format)
+    expander = Expander(resolver)
+    return expander.expand()
+
+
+def bundle(filename, *, onload=None, doc=None, format=None, extras=None):
+    jsonref = ""
+    if filename:
+        filename, jsonref = pairrsplit(filename, "#/")
 
     if jsonref:
         doc = make_dict()
@@ -36,7 +44,7 @@ def bundle(filename, onload=None, doc=None, format=None, extras=None):
                 eref = f"{os.path.relpath(efilename, start=cwd)}#/{ejsonref}"
             assign_by_json_pointer(doc, ejsonref, {"$ref": eref})
 
-    resolver = get_resolver(filename, doc=doc, onload=onload, format=None)
+    resolver = get_resolver(filename, doc=doc, onload=onload, format=format)
     bundler = Bundler(resolver)
     r = bundler.bundle(resolver.doc)
     return r
