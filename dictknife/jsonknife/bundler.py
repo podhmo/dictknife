@@ -60,14 +60,18 @@ class Scanner(object):
                     self.item_map[item.localref] = item
                     self.scan(doc=item.data)
                 if item.globalref != self.item_map[item.localref].globalref:
-                    newitem = self.conflict_fixer.fix_conflict(self.item_map[item.localref], item)
+                    newitem = self.conflict_fixer.fix_conflict(
+                        self.item_map[item.localref], item
+                    )
                     if newitem is None:
                         continue
                     self.scan(doc=newitem.data)
             except RuntimeError:
                 raise
             except Exception as e:
-                raise RuntimeError("{} (where={})".format(e, self.accessor.resolver.name))
+                raise RuntimeError(
+                    "{} (where={})".format(e, self.accessor.resolver.name)
+                )
             finally:
                 self.accessor.pop_stack()
 
@@ -123,7 +127,9 @@ class Emitter(object):
         related = self.get_item_by_globalref((filename, pointer))
         new_ref = "#/{}".format(related.localref)
         if sd["$ref"] != new_ref:
-            logger.debug("fix ref: %r -> %r (where=%r)", sd["$ref"], new_ref, resolver.filename)
+            logger.debug(
+                "fix ref: %r -> %r (where=%r)", sd["$ref"], new_ref, resolver.filename
+            )
             sd["$ref"] = new_ref
 
 
@@ -173,7 +179,9 @@ class SimpleConflictFixer(object):  # todo: rename
         if not ("$ref" in newitem.data and len(newitem.data) == 1):
             return False
         filename, ref = pairrsplit(newitem.data["$ref"], "#/")
-        return olditem.localref == ref and olditem.globalref[0] == relpath(filename, where=newitem.globalref[0])
+        return olditem.localref == ref and olditem.globalref[0] == relpath(
+            filename, where=newitem.globalref[0]
+        )
 
     def fix_conflict(self, olditem, newitem):
         # unused
