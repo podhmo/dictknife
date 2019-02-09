@@ -75,6 +75,7 @@ def bundle(
     extras: list = None,
 ):
     from dictknife.jsonknife import bundle
+
     if ref is not None:
         src = f"{src}#/{ref}"
     loading.dumpfile(
@@ -84,16 +85,24 @@ def bundle(
     )
 
 
-def examples(*, src, ref, format):
+def examples(
+    *,
+    src: str,
+    dst: str = None,
+    ref: str,
+    input_format: str,
+    output_format: str,
+    format: str,
+):
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
 
-    data = loading.loadfile(src)
+    data = loading.loadfile(src, format=input_format or format)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
     d = extract_example(data)
-    loading.dumpfile(d, format=format)
+    loading.dumpfile(d, dst, format=output_format or format)
 
 
 def main():
@@ -165,8 +174,11 @@ def main():
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", default=None)
+    sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", dest="ref", default=None)
-    sparser.add_argument("-f", "--format", default="json", choices=formats)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     args = parser.parse_args()
 
