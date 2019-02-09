@@ -184,7 +184,6 @@ class SimpleConflictFixer(object):  # todo: rename
         )
 
     def fix_conflict(self, olditem, newitem):
-        # unused
         if self.is_same_item(olditem, newitem):
             return None
         if self.is_same_item(newitem, olditem):

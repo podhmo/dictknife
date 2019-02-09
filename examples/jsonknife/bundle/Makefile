@@ -31,5 +31,6 @@ dst:
 	jsonknife ${OPTS} bundle --src "src/08/config.json" > dst/08.yaml
 09: dst
 	jsonknife ${OPTS} bundle --src "src/08/config2.json" > dst/09.yaml
+# multi references
 10: dst
 	jsonknife ${OPTS} bundle --src "src/10/main.json#/definitions/x" --extra "src/08/config.json#/definitions/db" > dst/10.yaml
