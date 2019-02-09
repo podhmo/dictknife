@@ -6,6 +6,7 @@ from dictknife import DictWalker
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
+from .relpath import relpath
 from .accessor import CachedItemAccessor
 
 logger = logging.getLogger("jsonknife.bundler")
@@ -60,6 +61,8 @@ class Scanner(object):
                     self.scan(doc=item.data)
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(self.item_map[item.localref], item)
+                    if newitem is None:
+                        continue
                     self.scan(doc=newitem.data)
             except RuntimeError:
                 raise
@@ -167,6 +170,12 @@ class SimpleConflictFixer(object):  # todo: rename
         self.strict = strict
 
     def fix_conflict(self, olditem, newitem):
+        # unused
+        if "$ref" in newitem.data and len(newitem.data) == 1:
+            filename, ref = pairrsplit(newitem.data["$ref"], "#/")
+            if olditem.localref == ref and olditem.globalref[0] == relpath(filename, where=newitem.globalref[0]):
+                return None
+
         msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
             raise RuntimeError(msg)
