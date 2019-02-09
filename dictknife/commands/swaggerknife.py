@@ -5,6 +5,7 @@ import contextlib
 from dictknife import loading
 from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
+
 logger = logging.getLogger(__name__)
 
 
@@ -68,10 +69,13 @@ def merge(
     dst: str,
     style: str,  # flavor?, strategy?
     strict: bool = False,
+    wrap: str = None,
+    wrap_section: str = "definitions",
 ):
     """merge files"""
     from dictknife.langhelpers import make_dict, as_jsonpointer
     from dictknife import deepmerge
+
     if style == "ref":
         dstdir = dst and os.path.dirname(dst)
 
@@ -87,9 +91,7 @@ def merge(
                     if strict and name in r[ns]:
                         raise RuntimeError(
                             "{name} is already existed, (where={where} and {where2})".format(
-                                name=name,
-                                where=seen[ns][name],
-                                where2=src,
+                                name=name, where=seen[ns][name], where2=src
                             )
                         )
                     if dst is None:
@@ -97,8 +99,7 @@ def merge(
                     else:
                         where = os.path.relpath(src, start=dstdir)
                     r[ns][name] = {
-                        "$ref":
-                        "{where}#/{ns}/{name}".format(
+                        "$ref": "{where}#/{ns}/{name}".format(
                             where=where, ns=ns, name=as_jsonpointer(name)
                         )
                     }
@@ -109,19 +110,21 @@ def merge(
         r = deepmerge(*data, override=True)
     else:
         raise RuntimeError("invalid style: {}".format(style))
+
+    if wrap is not None:
+        wd = make_dict()
+        wd["type"] = "object"
+        wd["properties"] = make_dict()
+        for name in r.get(wrap_section) or {}:
+            wd["properties"][name] = {"$ref": f"#/{wrap_section}/{name}"}
+        r[wrap_section][wrap] = wd
     loading.dumpfile(r, dst)
 
 
-def flatten(
-    *,
-    src: str,
-    dst: str,
-    input_format: str,
-    output_format: str,
-    format: str,
-):
+def flatten(*, src: str, dst: str, input_format: str, output_format: str, format: str):
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
+
     input_format = input_format or format
     data = loading.loadfile(src, format=input_format)
     d = flatten(data)
@@ -130,12 +133,16 @@ def flatten(
 
 def main():
     import argparse
+
     formats = loading.get_formats()
 
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
-        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+        "--log",
+        choices=list(logging._nameToLevel.keys()),
+        default="INFO",
+        dest="log_level",
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -151,8 +158,10 @@ def main():
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--strict", action="store_true")
     sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
-
+    sparser.add_argument("--wrap", default=None)
+    sparser.add_argument("--wrap-section", default="definitions")
     # tojsonschema
+
     fn = tojsonschema
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
