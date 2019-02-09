@@ -99,7 +99,6 @@ def examples(
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
-
     if use_expand:
         from dictknife.jsonknife import bundle, expand
 
@@ -115,7 +114,7 @@ def examples(
     if ref is not None:
         data = access_by_json_pointer(data, ref)
     d = extract_example(data, limit=limit)
-    loading.dumpfile(d, dst, format=output_format or format)
+    loading.dumpfile(d, dst, format=output_format or format or "json")
 
 
 def main():
@@ -191,7 +190,7 @@ def main():
     sparser.add_argument("--ref", dest="ref", default=None)
     sparser.add_argument("--limit", dest="limit", default=5, type=int)
     sparser.add_argument("--expand", dest="use_expand", action="store_true")
-    sparser.add_argument("-f", "--format", default="json", choices=formats)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
