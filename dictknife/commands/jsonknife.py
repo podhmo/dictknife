@@ -72,11 +72,13 @@ def bundle(
     input_format: str,
     output_format: str,
     format: str,
+    extras: list = None,
 ):
     from dictknife.jsonknife import bundle
-
+    if ref is not None:
+        src = f"{src}#/{ref}"
     loading.dumpfile(
-        bundle(src, jsonref=ref, format=input_format or format),
+        bundle(src, format=input_format or format, extras=extras),
         dst,
         format=output_format or format,
     )
@@ -156,6 +158,7 @@ def main():
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--extra", default=None, nargs="+", dest="extras")
 
     # examples
     fn = examples
