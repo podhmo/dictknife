@@ -45,7 +45,7 @@ def select(
     resolver = get_resolver(src)
     expander = Expander(resolver)
     if unwrap and not refs:
-        refs = list(refs)
+        refs = []
         refs.append(unwrap)
 
     if not refs:
