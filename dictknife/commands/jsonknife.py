@@ -90,6 +90,7 @@ def examples(
     src: str,
     dst: str = None,
     ref: str,
+    limit: int,
     input_format: str,
     output_format: str,
     format: str,
@@ -101,7 +102,7 @@ def examples(
     data = loading.loadfile(src, format=input_format or format)
     if ref is not None:
         data = access_by_json_pointer(data, ref)
-    d = extract_example(data)
+    d = extract_example(data, limit=limit)
     loading.dumpfile(d, dst, format=output_format or format)
 
 
@@ -176,6 +177,7 @@ def main():
     sparser.add_argument("src", nargs="?", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", dest="ref", default=None)
+    sparser.add_argument("--limit", dest="limit", default=5, type=int)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
