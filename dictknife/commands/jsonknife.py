@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def cut(*, src, dst, refs):
     from dictknife.accessing import Accessor
+
     d = loading.loadfile(src)
     accessor = Accessor(make_dict)
     for ref in refs:
@@ -71,10 +72,13 @@ def bundle(
     input_format: str,
     output_format: str,
     format: str,
+    extras: list = None,
 ):
     from dictknife.jsonknife import bundle
+    if ref is not None:
+        src = f"{src}#/{ref}"
     loading.dumpfile(
-        bundle(src, jsonref=ref, format=input_format or format),
+        bundle(src, format=input_format or format, extras=extras),
         dst,
         format=output_format or format,
     )
@@ -94,12 +98,16 @@ def examples(*, src, ref, format):
 
 def main():
     import argparse
+
     formats = loading.get_formats()
 
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
-        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+        "--log",
+        choices=list(logging._nameToLevel.keys()),
+        default="INFO",
+        dest="log_level",
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -150,6 +158,7 @@ def main():
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--extra", default=None, nargs="+", dest="extras")
 
     # examples
     fn = examples

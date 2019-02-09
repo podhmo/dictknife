@@ -1,0 +1,22 @@
+definitions:
+  x:
+    type: object
+    properties:
+      name:
+        type: string
+  db:
+    type: object
+    properties:
+      host:
+        type: string
+        example: localhost
+      name:
+        type: string
+        example: xxx
+      port:
+        type: integer
+        example: 444
+    required:
+    - host
+    - name
+    - port

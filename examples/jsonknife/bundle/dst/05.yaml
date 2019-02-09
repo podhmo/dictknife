@@ -8,6 +8,9 @@ definitions:
         type: integer
       friends:
         $ref: '#/definitions/friends'
+  name:
+    type: string
+    descrition: name of something
   friends:
     type: array
     items:
@@ -15,6 +18,3 @@ definitions:
         $ref: '#/definitions/friend'
   friend:
     $ref: '#/definitions/person'
-  name:
-    type: string
-    descrition: name of something

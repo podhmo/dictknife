@@ -1,0 +1,11 @@
+{
+  "definitions": {
+    "y": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"}
+      }
+    }
+  }
+}
+

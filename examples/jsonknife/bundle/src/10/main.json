@@ -1,0 +1,10 @@
+{
+  "definitions": {
+    "x": {
+      "$ref": "x.json#/definitions/x"
+    },
+    "y": {
+      "$ref": "y.json#/definitions/y"
+    }
+  }
+}
