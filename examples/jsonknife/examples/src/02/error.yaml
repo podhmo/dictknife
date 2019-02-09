@@ -1,0 +1,15 @@
+definitions:
+  error:
+    type: object
+    properties:
+      signal:
+        $ref: "signals.yaml#/definitions/signal"
+      message:
+        type: string
+        example:
+          - ng
+          - not found
+      score:
+        type: integer
+        default: 0
+
