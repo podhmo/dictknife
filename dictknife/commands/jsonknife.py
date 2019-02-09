@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 def cut(*, src, dst, refs):
     from dictknife.accessing import Accessor
+
     d = loading.loadfile(src)
     accessor = Accessor(make_dict)
     for ref in refs:
@@ -73,6 +74,7 @@ def bundle(
     format: str,
 ):
     from dictknife.jsonknife import bundle
+
     loading.dumpfile(
         bundle(src, jsonref=ref, format=input_format or format),
         dst,
@@ -94,12 +96,16 @@ def examples(*, src, ref, format):
 
 def main():
     import argparse
+
     formats = loading.get_formats()
 
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
-        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+        "--log",
+        choices=list(logging._nameToLevel.keys()),
+        default="INFO",
+        dest="log_level",
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
