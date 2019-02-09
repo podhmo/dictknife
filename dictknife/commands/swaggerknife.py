@@ -5,6 +5,7 @@ import contextlib
 from dictknife import loading
 from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
+
 logger = logging.getLogger(__name__)
 
 
@@ -74,6 +75,7 @@ def merge(
     """merge files"""
     from dictknife.langhelpers import make_dict, as_jsonpointer
     from dictknife import deepmerge
+
     if style == "ref":
         dstdir = dst and os.path.dirname(dst)
 
@@ -89,9 +91,7 @@ def merge(
                     if strict and name in r[ns]:
                         raise RuntimeError(
                             "{name} is already existed, (where={where} and {where2})".format(
-                                name=name,
-                                where=seen[ns][name],
-                                where2=src,
+                                name=name, where=seen[ns][name], where2=src
                             )
                         )
                     if dst is None:
@@ -99,8 +99,7 @@ def merge(
                     else:
                         where = os.path.relpath(src, start=dstdir)
                     r[ns][name] = {
-                        "$ref":
-                        "{where}#/{ns}/{name}".format(
+                        "$ref": "{where}#/{ns}/{name}".format(
                             where=where, ns=ns, name=as_jsonpointer(name)
                         )
                     }
@@ -122,16 +121,10 @@ def merge(
     loading.dumpfile(r, dst)
 
 
-def flatten(
-    *,
-    src: str,
-    dst: str,
-    input_format: str,
-    output_format: str,
-    format: str,
-):
+def flatten(*, src: str, dst: str, input_format: str, output_format: str, format: str):
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
+
     input_format = input_format or format
     data = loading.loadfile(src, format=input_format)
     d = flatten(data)
@@ -140,12 +133,16 @@ def flatten(
 
 def main():
     import argparse
+
     formats = loading.get_formats()
 
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
-        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+        "--log",
+        choices=list(logging._nameToLevel.keys()),
+        default="INFO",
+        dest="log_level",
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
