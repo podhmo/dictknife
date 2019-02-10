@@ -1,4 +1,5 @@
 import yaml
+import re
 from collections import defaultdict, ChainMap, OrderedDict
 from dictknife.langhelpers import make_dict
 
@@ -30,11 +31,14 @@ def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
     def _construct_odict(loader, node):
         return make_dict(loader.construct_pairs(node))
 
-    def _represent_str(dumper, instance):
-        if "\n" in instance:
-            return dumper.represent_scalar('tag:yaml.org,2002:str', instance, style='|')
-        else:
+    def _represent_str(dumper, instance, _rx=re.compile("[\n#]")):
+        m = _rx.search(instance)
+        if m is None:
             return dumper.represent_scalar('tag:yaml.org,2002:str', instance)
+        elif m.group(0) == "#":
+            return dumper.represent_scalar('tag:yaml.org,2002:str', instance, style="'")
+        else:
+            return dumper.represent_scalar('tag:yaml.org,2002:str', instance, style="#")
 
     Loader.add_constructor('tag:yaml.org,2002:map', _construct_odict)
     for dict_class in dict_classes:
