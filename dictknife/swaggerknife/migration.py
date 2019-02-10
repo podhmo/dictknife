@@ -1,7 +1,9 @@
 import os.path
 import contextlib
-from collections import ChainMap
 import logging
+import tempfile
+import shutil
+from collections import ChainMap
 
 from ..jsonknife.bundler import Scanner, CachedItemAccessor
 from ..langhelpers import make_dict, pairrsplit, reify
@@ -40,39 +42,73 @@ class Migration:
         yield self.updater
 
         resolvers = set(item.resolver for item in self.item_map.values())
-        logger.info("migrate dry run and diff")
         for r in resolvers:
             is_first = True
             for line in self.differ.diff(r, where=where):
                 if is_first:
-                    logger.info("diff is found %s", os.path.relpath(r.filename, start=where))
+                    logger.info(
+                        "diff is found %s", os.path.relpath(r.filename, start=where)
+                    )
                     is_first = False
                 print(line)
 
     @contextlib.contextmanager
-    def _migrate(self, doc=None, *, where=None):
+    def _migrate(self, doc=None, *, where=None, savedir=None):
         where = where or os.getcwd()
         doc = doc or self.resolver.doc
         self._prepare(doc=doc, where=where)
-
         yield self.updater
 
         resolvers = set(item.resolver for item in self.item_map.values())
-        logger.info("start")
         for r in resolvers:
+            relpath = os.path.relpath(r.filename, start=where)
+            savepath = r.filename
+            if savedir:
+                savepath = os.path.relpath(
+                    os.path.abspath(r.filename).replace(where, savedir), start=where
+                )
+
             diff = "\n".join(self.differ.diff(r, where=where))
             if not diff:
-                logger.debug("skip %s", os.path.relpath(r.filename, start=where))
+                if savedir is None:
+                    logger.debug("skip %s", relpath)
+                else:
+                    logger.info("copy %s -> %s", relpath, (savepath or relpath))
+                    try:
+                        shutil.copy(r.filename, savepath)
+                    except FileNotFoundError:
+                        os.makedirs(os.path.dirname(savepath))
+                        shutil.copy(r.filename, savepath)
                 continue
-            logger.info("update %s", os.path.relpath(r.filename, start=where))
-            loading.dumpfile(r.doc, r.filename)
-        logger.info("end")
 
-    def migrate(self, doc=None, *, dry_run=False, where=None):
+            logger.info("update %s -> %s", relpath, (savepath or relpath))
+            loading.dumpfile(r.doc, savepath)
+
+    def migrate(self, doc=None, *, dry_run=False, where=None, copy=True, keep=False):
+        logger.info("migrate (dry_run=%r, copy=%r, where=%r)", dry_run, copy, where)
         if dry_run:
             return self._migrate_dryrun_and_diff(doc=doc, where=where)
-        else:
-            return self._migrate(doc=doc, where=where)
+
+        @contextlib.contextmanager
+        def _migrate():
+            nonlocal where
+            where = where or os.getcwd()
+            savedir = None
+            if copy:
+                savedir = os.path.abspath(
+                    tempfile.mkdtemp(prefix="migration-", dir=where)
+                )  # xxx
+            try:
+                with self._migrate(doc=doc, where=where, savedir=savedir) as u:
+                    yield u
+            except Exception as e:
+                if not keep and savedir:
+                    logger.info("rollback. remove %s", savedir)
+                    shutil.rmtree(savedir)
+                raise
+            return savedir
+
+        return _migrate()
 
 
 class _Differ:
