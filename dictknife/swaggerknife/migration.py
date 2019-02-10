@@ -6,6 +6,7 @@ import logging
 from ..jsonknife.bundler import Scanner, CachedItemAccessor
 from ..langhelpers import make_dict, pairrsplit, reify
 from ..diff import diff
+from .. import loading
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,7 @@ class Migration:
         scanner.scan(self.resolver.doc)
 
     @contextlib.contextmanager
-    def migrate_dryrun_and_diff(self, doc=None, *, where=None):
+    def _migrate_dryrun_and_diff(self, doc, *, where=None):
         where = where or os.getcwd()
         doc = doc or self.resolver.doc
         self._prepare(doc=doc, where=where)
@@ -41,18 +42,37 @@ class Migration:
         resolvers = set(item.resolver for item in self.item_map.values())
         logger.info("migrate dry run and diff")
         for r in resolvers:
+            is_first = True
             for line in self.differ.diff(r, where=where):
+                if is_first:
+                    logger.info("diff is found %s", os.path.relpath(r.filename, start=where))
+                    is_first = False
                 print(line)
+
+    @contextlib.contextmanager
+    def _migrate(self, doc=None, *, where=None):
+        where = where or os.getcwd()
+        doc = doc or self.resolver.doc
+        self._prepare(doc=doc, where=where)
+
+        yield self.updater
+
+        resolvers = set(item.resolver for item in self.item_map.values())
+        logger.info("start")
+        for r in resolvers:
+            diff = "\n".join(self.differ.diff(r, where=where))
+            if not diff:
+                logger.debug("skip %s", os.path.relpath(r.filename, start=where))
+                continue
+            logger.info("update %s", os.path.relpath(r.filename, start=where))
+            loading.dumpfile(r.doc, r.filename)
+        logger.info("end")
 
     def migrate(self, doc=None, *, dry_run=False, where=None):
         if dry_run:
-            return self.migrate_dryrun_and_diff(doc=doc, where=where)
-
-        @contextlib.contextmanager
-        def _migrate():
-            raise NotImplementedError("hmm")
-
-        return _migrate()
+            return self._migrate_dryrun_and_diff(doc=doc, where=where)
+        else:
+            return self._migrate(doc=doc, where=where)
 
 
 class _Differ:
