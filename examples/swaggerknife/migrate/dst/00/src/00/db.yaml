@@ -1,0 +1,13 @@
+definitions:
+  db:
+    type: object
+    properties:
+      name:
+        $ref: 'primitive.yaml#/definitions/name'
+      port:
+        type: integer
+      host:
+        type: string
+    required:
+      - host
+      - name
