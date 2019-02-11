@@ -104,7 +104,7 @@ def examples(
         from dictknife.jsonknife import bundle, expand
 
         if ref is not None:
-            src = f"{src}#/{ref.lstrip('#/')}"
+            src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
         data = bundle(src, format=input_format or format)
         data = expand(None, doc=data)
     else:
