@@ -33,11 +33,11 @@ def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
     def _construct_odict(loader, node):
         return make_dict(loader.construct_pairs(node))
 
-    def _represent_str(dumper, instance, _rx=re.compile("[\n#]")):
+    def _represent_str(dumper, instance, _rx=re.compile("[\n#:]")):
         m = _rx.search(instance)
         if m is None:
             style = None
-        elif m.group(0) == "#":
+        elif m.group(0) == "#" or m.group(0) == ":":
             style = "'"
         else:
             style = "|"
