@@ -1,3 +1,7 @@
+0.10.1
+
+- this is latest version of support 3.5
+
 0.10.0
 
 - drop 3.5 support
