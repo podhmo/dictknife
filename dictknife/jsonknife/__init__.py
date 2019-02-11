@@ -29,9 +29,13 @@ def bundle(filename, *, onload=None, doc=None, format=None, extras=None):
         doc = make_dict()
         cwd = os.getcwd()
 
-        ref = f"{os.path.relpath(filename, start=cwd)}#/{jsonref}"
+        ref = "{prefix}#/{jsonref}".format(
+            prefix=os.path.relpath(filename, start=cwd), jsonref=jsonref
+        )
         assign_by_json_pointer(doc, jsonref, {"$ref": ref})
-        filename = os.path.join(cwd, f"*root*{os.path.splitext(filename)[1]}#/")
+        filename = os.path.join(
+            cwd, "*root*{name}#/".format(name=os.path.splitext(filename)[1])
+        )
 
         # adding multi files
         if extras is not None:
@@ -41,7 +45,9 @@ def bundle(filename, *, onload=None, doc=None, format=None, extras=None):
                     raise ValueError(
                         "{efilename!r} is not json reference. (please <filename>#/<reference>)"
                     )
-                eref = f"{os.path.relpath(efilename, start=cwd)}#/{ejsonref}"
+                eref = "{prefix}#/{ejsonref}".format(
+                    prefix=os.path.relpath(efilename, start=cwd), ejsonref=ejsonref
+                )
             assign_by_json_pointer(doc, ejsonref, {"$ref": eref})
 
     resolver = get_resolver(filename, doc=doc, onload=onload, format=format)

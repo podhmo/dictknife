@@ -68,7 +68,7 @@ class ExternalFileResolver(AccessorMixin):
         format=None
     ):
         self.rawfilename = rawfilename or filename
-        self.filename = os.path.normpath(os.path.abspath(filename))
+        self.filename = os.path.normpath(os.path.abspath(str(filename)))
         self.cache = cache or {}  # filename -> resolver
         self.loader = loader or loading
         self.history = history or [ROOT]

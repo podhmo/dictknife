@@ -28,7 +28,7 @@ def json2swagger(
     annotate,
     emit,
     with_minimap: bool,
-    without_example: bool,
+    without_example: bool
 ):
     from prestring import Module
     from dictknife import DictWalker
@@ -65,12 +65,13 @@ def json2swagger(
 
 
 def merge(
+    *,
     files: list,
     dst: str,
     style: str,  # flavor?, strategy?
     strict: bool = False,
     wrap: str = None,
-    wrap_section: str = "definitions",
+    wrap_section: str = "definitions"
 ):
     """merge files"""
     from dictknife.langhelpers import make_dict, as_jsonpointer
@@ -116,7 +117,7 @@ def merge(
         wd["type"] = "object"
         wd["properties"] = make_dict()
         for name in r.get(wrap_section) or {}:
-            wd["properties"][name] = {"$ref": f"#/{wrap_section}/{name}"}
+            wd["properties"][name] = {"$ref": "#/{wrap_section}/{name}".format(wrap_section=wrap_section, name=name)}
         r[wrap_section][wrap] = wd
     loading.dumpfile(r, dst)
 

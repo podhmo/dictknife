@@ -35,7 +35,7 @@ def select(
     wrap,
     input_format: str,
     output_format: str,
-    format: str,
+    format: str
 ):
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
@@ -72,12 +72,12 @@ def bundle(
     input_format: str,
     output_format: str,
     format: str,
-    extras: list = None,
+    extras: list = None
 ):
     from dictknife.jsonknife import bundle
 
     if ref is not None:
-        src = f"{src}#/{ref.lstrip('#/')}"
+        src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
     loading.dumpfile(
         bundle(src, format=input_format or format, extras=extras),
         dst,
@@ -94,16 +94,17 @@ def examples(
     input_format: str,
     output_format: str,
     format: str,
-    use_expand: bool = False,
+    use_expand: bool = False
 ):
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
+
     if use_expand:
         from dictknife.jsonknife import bundle, expand
 
         if ref is not None:
-            src = f"{src}#/{ref.lstrip('#/')}"
+            src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
         data = bundle(src, format=input_format or format)
         data = expand(None, doc=data)
     else:
