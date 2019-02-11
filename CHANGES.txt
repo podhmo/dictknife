@@ -1,3 +1,16 @@
+0.10.0
+
+- drop 3.5 support
+- adding swaggerknife merge command, (#100), (#86)
+- jsonknife's bundle action support jsonreference (#94)
+- jsonknife's bundler fix conflict automatically (#101), when primitive input
+- dictknife's diff support jsonpatch's output
+- dictknife's shape output using jsonpointer (#88)
+- loading, Yaml include hash (#105), quoted output, as default
+- (fix) swaggerknife, tojsonschema json2swagger (#96)
+- (refactor) jsonknife lazy import (#95)
+- (WIP) initial work for open api3.0 (#103)
+
 0.9.0
 
 - bundle, prevent infinite recursion
