@@ -1,3 +1,7 @@
+0.10.2
+
+- loading, adjustment yaml's output
+
 0.10.1
 
 - this is latest version of support 3.5
