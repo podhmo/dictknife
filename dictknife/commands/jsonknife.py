@@ -35,7 +35,7 @@ def select(
     wrap,
     input_format: str,
     output_format: str,
-    format: str,
+    format: str
 ):
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
@@ -72,7 +72,7 @@ def bundle(
     input_format: str,
     output_format: str,
     format: str,
-    extras: list = None,
+    extras: list = None
 ):
     from dictknife.jsonknife import bundle
 
@@ -94,7 +94,7 @@ def examples(
     input_format: str,
     output_format: str,
     format: str,
-    use_expand: bool = False,
+    use_expand: bool = False
 ):
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
