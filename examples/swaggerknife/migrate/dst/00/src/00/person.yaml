@@ -1,0 +1,14 @@
+definitions:
+  people:
+    items:
+      $ref: '#/definitions/person'
+    type: array
+  person:
+    properties:
+      age:
+        type: integer
+      name:
+        $ref: 'primitive.yaml#/definitions/name'
+      value:
+        type: integer
+    type: object
