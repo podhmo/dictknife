@@ -14,10 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 class Migration:
-    def __init__(self, resolver, *, make_dict=make_dict):
+    def __init__(self, resolver, *, make_dict=make_dict, dump_options=None):
         self.resolver = resolver
         self.item_map = make_dict()
         self.make_dict = make_dict
+        self.dump_options = dump_options or {}
 
     @reify
     def differ(self):
@@ -82,7 +83,7 @@ class Migration:
                 continue
 
             logger.info("update %s -> %s", relpath, (savepath or relpath))
-            loading.dumpfile(r.doc, savepath)
+            loading.dumpfile(r.doc, savepath, **self.dump_options)
 
     def migrate(
         self,

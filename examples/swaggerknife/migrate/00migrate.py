@@ -7,7 +7,10 @@ def run(*, src: str, savedir: str, log: str, dry_run: bool = False) -> None:
     logging.basicConfig(level=log)
 
     resolver = get_resolver(src)
-    with Migration(resolver).migrate(dry_run=dry_run, keep=True, savedir=savedir) as u:
+    # xxx: sort_keys for ambitious output (for 3.6 only?)
+    with Migration(resolver, dump_options={"sort_keys": True}).migrate(
+        dry_run=dry_run, keep=True, savedir=savedir
+    ) as u:
         for k, item in u.iterate_items():
             if k == "definitions/person":
                 ref = "#/definitions/person/properties/value"
