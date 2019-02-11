@@ -17,20 +17,13 @@ definitions:
     multiline
     'string#hash'
     multiline
-  string23: 'string#hash
-
-    '
-  string30: 'key: value
-
+  string23: |
+    string#hash
+  string30: |
+    key: value
     "key": value
-
     key: "value"
-
-    '
-  string31: 'key: value # foo
-
+  string31: |
+    key: value # foo
     "key": value # foo
-
     key: "value" # foo
-
-    '

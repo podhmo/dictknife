@@ -33,14 +33,14 @@ def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
     def _construct_odict(loader, node):
         return make_dict(loader.construct_pairs(node))
 
-    def _represent_str(dumper, instance, _rx=re.compile("[\n#:]")):
-        m = _rx.search(instance)
-        if m is None:
-            style = None
-        elif m.group(0) == "#" or m.group(0) == ":":
-            style = "'"
-        else:
+    def _represent_str(dumper, instance, _rx=re.compile("[#:]")):
+        style = None
+        if "\n" in instance:
             style = "|"
+        else:
+            m = _rx.search(instance)
+            if m is not None:
+                style = "'"
         return dumper.represent_scalar("tag:yaml.org,2002:str", instance, style=style)
 
     Loader.add_constructor("tag:yaml.org,2002:map", _construct_odict)
