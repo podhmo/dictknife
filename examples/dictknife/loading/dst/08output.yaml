@@ -1,0 +1,22 @@
+definitions:
+  string0: string
+  string1: string
+  string2: string
+  string10: 'string#hash'
+  string11: 'string#hash'
+  string12: 'string#hash'
+  string20: |
+    multiline
+    string#hash
+    multiline
+  string21: |
+    multiline
+    "string#hash"
+    multiline
+  string22: |
+    multiline
+    'string#hash'
+    multiline
+  string23: 'string#hash
+
+    '

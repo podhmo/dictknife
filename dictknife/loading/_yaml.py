@@ -1,4 +1,5 @@
 import yaml
+import re
 from collections import defaultdict, ChainMap, OrderedDict
 from dictknife.langhelpers import make_dict
 
@@ -25,18 +26,24 @@ class Loader(yaml.Loader):
 
 def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
     def _represent_odict(dumper, instance):
-        return dumper.represent_mapping('tag:yaml.org,2002:map', dumper._iterate_dict(instance))
+        return dumper.represent_mapping(
+            "tag:yaml.org,2002:map", dumper._iterate_dict(instance)
+        )
 
     def _construct_odict(loader, node):
         return make_dict(loader.construct_pairs(node))
 
-    def _represent_str(dumper, instance):
-        if "\n" in instance:
-            return dumper.represent_scalar('tag:yaml.org,2002:str', instance, style='|')
+    def _represent_str(dumper, instance, _rx=re.compile("[\n#:]")):
+        m = _rx.search(instance)
+        if m is None:
+            style = None
+        elif m.group(0) == "#" or m.group(0) == ":":
+            style = "'"
         else:
-            return dumper.represent_scalar('tag:yaml.org,2002:str', instance)
+            style = "|"
+        return dumper.represent_scalar("tag:yaml.org,2002:str", instance, style=style)
 
-    Loader.add_constructor('tag:yaml.org,2002:map', _construct_odict)
+    Loader.add_constructor("tag:yaml.org,2002:map", _construct_odict)
     for dict_class in dict_classes:
         Dumper.add_representer(dict_class, _represent_odict)
     Dumper.add_representer(str, _represent_str)
