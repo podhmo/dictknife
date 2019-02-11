@@ -154,15 +154,7 @@ class _Differ:
             return d
 
     def after_data(self, d):
-        if hasattr(d, "keys"):
-            r = self.make_dict()
-            for k, v in d.items():
-                r[k] = self.after_data(v)
-            return r
-        elif isinstance(d, (list, tuple)):
-            return [self.after_data(x) for x in d]
-        else:
-            return d
+        return d
 
 
 class _Updater:
