@@ -77,7 +77,7 @@ def bundle(
     from dictknife.jsonknife import bundle
 
     if ref is not None:
-        src = f"{src}#/{ref.lstrip('#/')}"
+        src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
     loading.dumpfile(
         bundle(src, format=input_format or format, extras=extras),
         dst,
