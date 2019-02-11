@@ -135,7 +135,10 @@ class _Differ:
         before = self.before_data(r.doc)
         after = self.after_data(r.doc)
         yield from diff(
-            before, after, fromfile=f"before:{filename}", tofile=f" after:{filename}"
+            before,
+            after,
+            fromfile="before:{filename}".format(filename=filename),
+            tofile=" after:{filename}".format(filename=filename),
         )
 
     def before_data(self, d):

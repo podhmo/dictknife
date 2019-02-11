@@ -24,11 +24,14 @@ def apply_loading_format_extra_arguments_parser(parser):
         if f == "markdown":  # xxx:
             continue
 
-        m = import_module(f"dictknife.loading.{f}")
+        m = import_module("dictknife.loading.{f}".format(f=f))
         ex_parser = ex_parsers.add_parser(f)
         setup = getattr(m, "setup_extra_parser", None)
         if setup is None:
-            print(f"{m.__name__} doesn't have setup_extra_parser() function", file=sys.stderr)
+            print(
+                "{m.__name__} doesn't have setup_extra_parser() function".format(m=m),
+                file=sys.stderr,
+            )
             continue
 
         setup(ex_parser)
@@ -49,7 +52,9 @@ def apply_loading_format_extra_arguments_parser(parser):
             return parsed, unexpected  # xxx:
 
         if parsed.output_format is None:
-            parsed.output_format = parsed.format or loading.get_unknown().__name__.split(".")[-1]
+            parsed.output_format = (
+                parsed.format or loading.get_unknown().__name__.split(".")[-1]
+            )
         if parsed.dst is not None:
             parsed.output_format = loading.guess_format(parsed.dst)
         ex_parsed = ex_parsers._parse_args(parsed.output_format, transformed_rest)
