@@ -93,7 +93,7 @@ class Migration:
         where=None,
         inplace=False,
         savedir=None,
-        keep=False,
+        keep=False
     ):
         logger.info(
             "migrate (dry_run=%r, inplace=%r, where=%r)", dry_run, inplace, where
