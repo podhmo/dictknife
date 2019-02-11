@@ -20,8 +20,8 @@ setup(
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only"
-        "Programming Language :: Python :: 3.6",
-        "Development Status :: 4 - Beta",
+        # "Programming Language :: Python :: 3.6",
+        # "Development Status :: 4 - Beta",
     ],
     keywords="dict, dict-handling",
     author="podhmo",
