@@ -101,7 +101,7 @@ def shape(
     squash=False,
     skiplist=False,
     separator="/",
-    transform=as_jsonpointer,
+    transform=as_jsonpointer
 ):
     return aggregate(
         traverse(d),
