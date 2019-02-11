@@ -21,7 +21,7 @@ class Migration:
 
     @reify
     def differ(self):
-        return _Differ()
+        return _Differ(make_dict=self.make_dict)
 
     @reify
     def updater(self):
@@ -84,17 +84,31 @@ class Migration:
             logger.info("update %s -> %s", relpath, (savepath or relpath))
             loading.dumpfile(r.doc, savepath)
 
-    def migrate(self, doc=None, *, dry_run=False, where=None, copy=True, keep=False):
-        logger.info("migrate (dry_run=%r, copy=%r, where=%r)", dry_run, copy, where)
+    def migrate(
+        self,
+        doc=None,
+        *,
+        dry_run=False,
+        where=None,
+        inplace=False,
+        savedir=None,
+        keep=False,
+    ):
+        logger.info(
+            "migrate (dry_run=%r, inplace=%r, where=%r)", dry_run, inplace, where
+        )
         if dry_run:
             return self._migrate_dryrun_and_diff(doc=doc, where=where)
 
         @contextlib.contextmanager
         def _migrate():
             nonlocal where
+            nonlocal savedir
+
             where = where or os.getcwd()
-            savedir = None
-            if copy:
+            if inplace:
+                savedir = None
+            elif savedir is None:
                 savedir = os.path.abspath(
                     tempfile.mkdtemp(prefix="migration-", dir=where)
                 )  # xxx
@@ -112,6 +126,9 @@ class Migration:
 
 
 class _Differ:
+    def __init__(self, *, make_dict=make_dict):
+        self.make_dict = make_dict
+
     def diff(self, r, *, where):
         filename = os.path.relpath(r.name, start=where)
         before = self.before_data(r.doc)
@@ -122,9 +139,15 @@ class _Differ:
 
     def before_data(self, d):
         if hasattr(d, "parents"):
-            return {k: self.before_data(v) for k, v in d.parents.items()}
+            r = self.make_dict()
+            for k, v in d.parents.items():
+                r[k] = self.before_data(v)
+            return r
         elif hasattr(d, "keys"):
-            return {k: self.before_data(v) for k, v in d.items()}
+            r = self.make_dict()
+            for k, v in d.items():
+                r[k] = self.before_data(v)
+            return r
         elif isinstance(d, (list, tuple)):
             return [self.before_data(x) for x in d]
         else:
@@ -132,7 +155,10 @@ class _Differ:
 
     def after_data(self, d):
         if hasattr(d, "keys"):
-            return {k: self.after_data(v) for k, v in d.items()}
+            r = self.make_dict()
+            for k, v in d.items():
+                r[k] = self.after_data(v)
+            return r
         elif isinstance(d, (list, tuple)):
             return [self.after_data(x) for x in d]
         else:
