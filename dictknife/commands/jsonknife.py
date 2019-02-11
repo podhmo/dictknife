@@ -99,6 +99,7 @@ def examples(
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
+
     if use_expand:
         from dictknife.jsonknife import bundle, expand
 

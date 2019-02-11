@@ -66,11 +66,7 @@ def cat(
                     d = [d] if d else []
                 d.extend(sd)
         loading.dumpfile(
-            d,
-            dst,
-            format=output_format or format,
-            sort_keys=sort_keys,
-            extra=extra,
+            d, dst, format=output_format or format, sort_keys=sort_keys, extra=extra
         )
 
 
@@ -90,6 +86,7 @@ def transform(
     """transform dict"""
     from magicalimport import import_symbol
     from dictknife import deepmerge
+
     if code is not None:
         transform = eval(code)
     elif functions:
@@ -100,6 +97,7 @@ def transform(
                     fn = "dictknife.transform:{}".format(fn)
                 d = import_symbol(fn)(d)
             return d
+
     else:
         transform = lambda x: x  # NOQA
 
@@ -129,6 +127,7 @@ def diff(
 ):
     """diff dict"""
     from dictknife.diff import diff, diff_rows, make_jsonpatch
+
     with open(left) as rf:
         left_data = loading.load(rf, format=input_format)
         with open(right) as rf:
@@ -158,7 +157,7 @@ def diff(
                     fromfile=left,
                     tofile=right,
                     diff_key=diff_key,
-                    normalize=normalize
+                    normalize=normalize,
                 )
                 if skip_empty:
                     rows = [row for row in rows if row[diff_key] not in ("", 0)]
@@ -179,6 +178,7 @@ def shape(
 ):
     """shape"""
     from dictknife import shape
+
     dataset = []
     for f in files:
         with _open(f) as rf:
@@ -222,6 +222,7 @@ def mkdict(
     extra,
 ):
     from dictknife.mkdict import mkdict
+
     if not extra:
         r = []
         for code in sys.stdin:
@@ -253,12 +254,16 @@ def mkdict(
 
 def main():
     import argparse
+
     formats = loading.get_formats()
 
     parser = argparse.ArgumentParser()
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
-        "--log", choices=list(logging._nameToLevel.keys()), default="INFO", dest="log_level"
+        "--log",
+        choices=list(logging._nameToLevel.keys()),
+        default="INFO",
+        dest="log_level",
     )
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
@@ -267,7 +272,10 @@ def main():
     parser.add_argument("--compact", action="store_true", dest="modification_compact")
     parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
     parser.add_argument(
-        "--unescape", default=None, dest="modification_unescape", choices=["unicode", "url"]
+        "--unescape",
+        default=None,
+        dest="modification_unescape",
+        choices=["unicode", "url"],
     )
 
     subparsers = parser.add_subparsers(dest="subcommand")
@@ -291,8 +299,13 @@ def main():
         "--errors",
         default=None,
         choices=[
-            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
-            "backslashreplace", "namereplace"
+            "strict",
+            "ignore",
+            "replace",
+            "surrogateescape",
+            "xmlcharrefreplace",
+            "backslashreplace",
+            "namereplace",
         ],
         help="see pydoc codecs.Codec",
     )
@@ -316,8 +329,13 @@ def main():
         "--errors",
         default=None,
         choices=[
-            "strict", "ignore", "replace", "surrogateescape", "xmlcharrefreplace",
-            "backslashreplace", "namereplace"
+            "strict",
+            "ignore",
+            "replace",
+            "surrogateescape",
+            "xmlcharrefreplace",
+            "backslashreplace",
+            "namereplace",
         ],
         help="see pydoc codecs.Codec",
     )
@@ -334,8 +352,11 @@ def main():
         for ac in self._actions:
             if ac.dest == "functions":
                 import dictknife.transform as m
+
                 callables = [
-                    k for k, v in m.__dict__.items() if not k.startswith("_") and callable(v)
+                    k
+                    for k, v in m.__dict__.items()
+                    if not k.startswith("_") and callable(v)
                 ]
                 ac.help = "(e.g. {}, ... or <module>:<fn name> (e.g. dictknife.transform:flatten))".format(
                     ", ".join(sorted(callables))
@@ -349,7 +370,9 @@ def main():
     sparser.add_argument("--config", default="{}")
     sparser.add_argument("--config-file", default=None)
     sparser.add_argument("--code", default=None)
-    sparser.add_argument("--fn", "--function", default=[], action="append", dest="functions")
+    sparser.add_argument(
+        "--fn", "--function", default=[], action="append", dest="functions"
+    )
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
@@ -367,7 +390,10 @@ def main():
     sparser.add_argument("--skip-empty", action="store_true")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument(
-        "-o", "--output-format", choices=["diff", "dict", "md", "tsv", "jsonpatch"], default="diff"
+        "-o",
+        "--output-format",
+        choices=["diff", "dict", "md", "tsv", "jsonpatch"],
+        default="diff",
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
 
@@ -414,14 +440,21 @@ def main():
                     v = params.pop(k)
                     if v:
                         from importlib import import_module
+
                         if isinstance(v, str):
-                            module_path = "dictknife.loading.{}_{}".format(k.replace("_", "."), v)
+                            module_path = "dictknife.loading.{}_{}".format(
+                                k.replace("_", "."), v
+                            )
                         else:
-                            module_path = "dictknife.loading.{}".format(k.replace("_", "."))
+                            module_path = "dictknife.loading.{}".format(
+                                k.replace("_", ".")
+                            )
                         logger.info("apply %s.setup()", module_path)
 
                         m = import_module(module_path)
                         if not hasattr(m, "setup"):
-                            raise RuntimeError("{}:setup() is not found".format(module_path))
+                            raise RuntimeError(
+                                "{}:setup() is not found".format(module_path)
+                            )
                         m.setup(loading.dispatcher)
             return params.pop("subcommand")(**params)
