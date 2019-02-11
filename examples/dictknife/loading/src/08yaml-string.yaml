@@ -21,5 +21,11 @@ definitions:
     multiline
   string23: |
     string#hash
-
-
+  string30: |
+    key: value
+    "key": value
+    key: "value"
+  string31: |
+    key: value # foo
+    "key": value # foo
+    key: "value" # foo
