@@ -4,7 +4,7 @@ from dictknife.swaggerknife.migration import Migration
 
 
 def run(*, src: str, savedir: str, log: str, dry_run: bool = False) -> None:
-    logging.basicConfig(level=log)
+    logging.basicConfig(level=getattr(logging, log))
 
     resolver = get_resolver(src)
     # xxx: sort_keys for ambitious output (for 3.6 only?)
