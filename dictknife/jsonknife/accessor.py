@@ -1,4 +1,5 @@
 from dictknife import Accessor
+from dictknife.langhelpers import as_jsonpointer
 
 
 class CachedItem:
@@ -11,7 +12,7 @@ class CachedItem:
 
 
 def path_to_json_pointer(path):
-    return "/".join((normalize_json_pointer(x) for x in path))
+    return "/".join((as_jsonpointer(x) for x in path))
 
 
 def normalize_json_pointer(ref):
