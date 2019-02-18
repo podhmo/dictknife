@@ -14,10 +14,10 @@ def run(*, src: str, savedir: str, log: str, dry_run: bool = False) -> None:
         for k, item in u.iterate_items():
             if k == "definitions/person":
                 ref = "#/definitions/person/properties/value"
-                u.update(item.resolver, ref, {"type": "integer"})
+                u.update(ref, {"type": "integer"}, resolver=item.resolver)
             if k == "definitions/name":
                 ref = "#/definitions/name/description"
-                u.update(item.resolver, ref, "name of something")
+                u.update(ref, "name of something", resolver=item.resolver)
 
 
 def main(argv=None):
