@@ -2,6 +2,29 @@ from dictknife import Accessor
 from dictknife.langhelpers import as_jsonpointer
 
 
+class AccessorMixin:
+    # need self.doc
+    def assign(self, path, value, *, doc=None, a=Accessor()):
+        if doc is None:
+            doc = self.doc
+        return a.assign(doc, path, value)
+
+    def access(self, path, *, doc=None, a=Accessor()):
+        if doc is None:
+            doc = self.doc
+        return a.access(doc, path)
+
+    def access_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return access_by_json_pointer(doc, jsonref, guess=guess)
+
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return assign_by_json_pointer(doc, jsonref, value, guess=guess)
+
+
 class CachedItem:
     def __init__(self, file, localref, globalref, resolver, data):
         self.file = file
