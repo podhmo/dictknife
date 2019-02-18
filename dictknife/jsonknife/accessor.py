@@ -21,21 +21,25 @@ def normalize_json_pointer(ref):
     return ref.replace("~1", "/").replace("~0", "~")
 
 
-def access_by_json_pointer(doc, query, accessor=Accessor()):
+def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
+        if guess:
+            path = [(int(p) if p.isdigit() else p) for p in path]
         return accessor.access(doc, path)
     except KeyError:
         raise KeyError(query)
 
 
-def assign_by_json_pointer(doc, query, v, accessor=Accessor()):
+def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
+        if guess:
+            path = [(int(p) if p.isdigit() else p) for p in path]
         return accessor.assign(doc, path, v)
     except KeyError:
         raise KeyError(query)

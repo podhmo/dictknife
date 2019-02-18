@@ -27,15 +27,15 @@ class AccessorMixin:
             doc = self.doc
         return a.access(doc, path)
 
-    def access_by_json_pointer(self, jsonref, *, doc=None):
+    def access_by_json_pointer(self, jsonref, *, doc=None, guess=True):
         if doc is None:
             doc = self.doc
-        return access_by_json_pointer(doc, jsonref)
+        return access_by_json_pointer(doc, jsonref, guess=guess)
 
-    def assign_by_json_pointer(self, jsonref, value, *, doc=None):
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess=True):
         if doc is None:
             doc = self.doc
-        return assign_by_json_pointer(doc, jsonref, value)
+        return assign_by_json_pointer(doc, jsonref, value, guess=guess)
 
 
 class OneDocResolver(AccessorMixin):
