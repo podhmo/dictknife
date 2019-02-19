@@ -1,3 +1,4 @@
+import contextlib
 from .langhelpers import make_dict
 
 
@@ -46,6 +47,46 @@ class Accessor:
         if path[-1] not in d:
             return default
         return d
+
+
+missing = object()
+
+
+class Scope:
+    def __init__(self, init=None, *, accessor=None):
+        self.states = []
+        self.accessor = accessor or Accessor()
+        if init is not None:
+            self.push(init)
+
+    def get(self, path, default=None):
+        if not isinstance(path, (list, tuple)):
+            raise TypeError("please tuple or list")
+        for s in reversed(self.states):
+            v = self.accessor.maybe_access(s, path, default=missing)
+            if v is not missing:
+                return v
+        return default
+
+    def __getitem__(self, path):
+        v = self.get(path, default=missing)
+        if v is not missing:
+            return v
+        raise KeyError(path)
+
+    def push(self, state):
+        self.states.append(state)
+
+    def pop(self):
+        self.states.pop()
+
+    @contextlib.contextmanager
+    def scope(self, d):
+        try:
+            self.push(d)
+            yield self
+        finally:
+            self.pop()
 
 
 class ImmutableModifier:
