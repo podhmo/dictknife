@@ -1,3 +1,4 @@
+import contextlib
 from .langhelpers import make_dict
 
 
@@ -30,22 +31,62 @@ class Accessor:
     def exists(self, d, path):
         return self.maybe_access_container(d, path) is not None
 
-    def maybe_access(self, d, path):
-        d = self.maybe_access_container(d, path)
-        if d is None:
-            return None
+    def maybe_access(self, d, path, *, default=None):
+        d = self.maybe_access_container(d, path, default=default)
+        if d is default:
+            return default
         return d.get(path[-1])
 
-    def maybe_access_container(self, d, path):
+    def maybe_access_container(self, d, path, *, default=None):
         for name in path[:-1]:
             if name not in d:
-                return None
+                return default
             d = d[name]
         if not d:
-            return None
+            return default
         if path[-1] not in d:
-            return None
+            return default
         return d
+
+
+missing = object()
+
+
+class Scope:
+    def __init__(self, init=None, *, accessor=None):
+        self.states = []
+        self.accessor = accessor or Accessor()
+        if init is not None:
+            self.push(init)
+
+    def get(self, path, default=None):
+        if not isinstance(path, (list, tuple)):
+            raise TypeError("please tuple or list")
+        for s in reversed(self.states):
+            v = self.accessor.maybe_access(s, path, default=missing)
+            if v is not missing:
+                return v
+        return default
+
+    def __getitem__(self, path):
+        v = self.get(path, default=missing)
+        if v is not missing:
+            return v
+        raise KeyError(path)
+
+    def push(self, state):
+        self.states.append(state)
+
+    def pop(self):
+        self.states.pop()
+
+    @contextlib.contextmanager
+    def scope(self, d):
+        try:
+            self.push(d)
+            yield self
+        finally:
+            self.pop()
 
 
 class ImmutableModifier:
