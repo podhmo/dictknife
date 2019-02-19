@@ -30,21 +30,21 @@ class Accessor:
     def exists(self, d, path):
         return self.maybe_access_container(d, path) is not None
 
-    def maybe_access(self, d, path):
-        d = self.maybe_access_container(d, path)
-        if d is None:
-            return None
+    def maybe_access(self, d, path, *, default=None):
+        d = self.maybe_access_container(d, path, default=default)
+        if d is default:
+            return default
         return d.get(path[-1])
 
-    def maybe_access_container(self, d, path):
+    def maybe_access_container(self, d, path, *, default=None):
         for name in path[:-1]:
             if name not in d:
-                return None
+                return default
             d = d[name]
         if not d:
-            return None
+            return default
         if path[-1] not in d:
-            return None
+            return default
         return d
 
 
