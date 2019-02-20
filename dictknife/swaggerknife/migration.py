@@ -83,9 +83,13 @@ class Migration:
             relpath = os.path.relpath(r.filename, start=where)
             savepath = r.filename
             if savedir:
-                savepath = os.path.relpath(
-                    os.path.abspath(r.filename).replace(where, savedir), start=where
+                savepath = os.path.join(
+                    savedir,
+                    os.path.relpath(
+                        savepath, start=os.path.dirname(self.resolver.filename)
+                    ),
                 )
+                savepath = os.path.relpath(savepath, start=where)
 
             diff = "\n".join(self.differ.diff(r, where=where))
             if not diff:
@@ -132,9 +136,8 @@ class Migration:
             if inplace:
                 savedir = None
             elif savedir is None:
-                savedir = os.path.abspath(
-                    tempfile.mkdtemp(prefix="migration-", dir=where)
-                )  # xxx
+                savedir = tempfile.mkdtemp(prefix="migration-", dir=where)  # xxx
+            savedir = os.path.normpath(os.path.abspath(savedir))
             try:
                 with self._migrate(doc=doc, where=where, savedir=savedir) as u:
                     yield u
