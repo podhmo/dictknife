@@ -81,12 +81,15 @@ class Scope:
         self.states.pop()
 
     @contextlib.contextmanager
-    def scope(self, d):
-        try:
-            self.push(d)
+    def scope(self, d=None):
+        if d is None:
             yield self
-        finally:
-            self.pop()
+        else:
+            try:
+                self.push(d)
+                yield self
+            finally:
+                self.pop()
 
 
 class ImmutableModifier:
