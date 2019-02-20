@@ -52,6 +52,8 @@ def migrate_for_mainfile(u, *, scope):
 
     if u.has("produces"):
         scope.push({"produces": u.pop("produces")})
+    if u.has("consumes"):
+        scope.push({"consumes": u.pop("consumes")})
 
 
 def migrate_parameters(uu, data, *, path, scope):

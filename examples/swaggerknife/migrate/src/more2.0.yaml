@@ -11,9 +11,9 @@ schemes:
   - http
 
 consumes:
-  - /application/json
+  - application/json
 produces:
-  - /application/json
+  - application/json
 
 definitions:
   User:
