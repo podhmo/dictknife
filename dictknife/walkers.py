@@ -92,10 +92,10 @@ class DictWalker(object):
                 ctx.pop()
             return
         elif isinstance(d, (list, tuple)):
-            ctx.push("[]")
-            for e in d:
+            for i, e in enumerate(d):
+                ctx.push(i)
                 yield from self._walk(ctx, qs, e, depth)
-            ctx.pop()
+                ctx.pop()
             return
         else:
             return
