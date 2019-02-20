@@ -21,11 +21,19 @@ class _Empty:
 
 
 class Migration:
-    def __init__(self, resolver, *, make_dict=make_dict, dump_options=None):
+    def __init__(
+        self, resolver, *, make_dict=make_dict, dump_options=None, transform=None
+    ):
         self.resolver = resolver
         self.item_map = make_dict()
         self.make_dict = make_dict
         self.dump_options = dump_options or {}
+        self._transform = transform
+
+    def transform(self, data):
+        if self._transform is None:
+            return data
+        return self._transform(data)
 
     @reify
     def differ(self):
@@ -95,7 +103,9 @@ class Migration:
 
             logger.info("update %s -> %s", relpath, (savepath or relpath))
             loading.dumpfile(
-                self.differ.after_data(r.doc), savepath, **self.dump_options
+                self.transform(self.differ.after_data(r.doc)),
+                savepath,
+                **self.dump_options
             )
 
     def migrate(
@@ -216,7 +226,6 @@ class _Updater:
             if not hasattr(d, "parents"):  # chainmap?
                 d = ChainMap(self.make_dict(), d)
             resolver.assign_by_json_pointer(parent_ref, d)
-
         d[k] = v
 
     def iterate_items(self):
