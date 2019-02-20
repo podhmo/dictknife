@@ -88,6 +88,8 @@ def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
 
     if uu.has("definitions"):
         uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
+    if uu.has("securityDefinitions"):
+        uu.update_by_path(["components", "securitySchemas"], uu.pop_by_path(["securityDefinitions"]))
 
     if uu.has("paths"):
         for url_path, path_item in uu.resolver.doc["paths"].items():

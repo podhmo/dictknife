@@ -9,6 +9,9 @@ components:
       required:
       - id
       - name
+  securitySchemas:
+    BasicAuth:
+      type: basic
 info:
   description: API description in Markdown.
   title: Sample API
@@ -115,9 +118,6 @@ paths:
       summary: Returns a user by ID.
 security:
 - BasicAuth: []
-securityDefinitions:
-  BasicAuth:
-    type: basic
 servers:
 - description: ''
   url: 'http://api.example.com/v1'
