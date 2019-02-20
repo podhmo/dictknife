@@ -227,9 +227,8 @@ def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
 
 # todo: skip x-XXX
 def run(
-    *, src: str, savedir: str, log: str, dry_run: bool = False, sort_keys: bool = False
+    *, src: str, savedir: str, dry_run: bool = False, sort_keys: bool = False
 ) -> None:
-    logging.basicConfig(level=getattr(logging, log))
 
     resolver = get_resolver(src)
     # xxx: sort_keys for ambitious output (for 3.6 only?)
@@ -256,13 +255,15 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser(description=None)
     parser.print_usage = parser.print_help
-    parser.add_argument("--log", default="DEBUG")
+    parser.add_argument("--logging", default="DEBUG")
     parser.add_argument("--src", required=True)
     parser.add_argument("--savedir", required=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--sort-keys", action="store_true")  # drop in the end
     args = parser.parse_args(argv)
-    run(**vars(args))
+    params = vars(args)
+    logging.basicConfig(level=getattr(logging, params.pop("logging")))
+    run(**params)
 
 
 if __name__ == "__main__":
