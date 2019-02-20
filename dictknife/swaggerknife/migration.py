@@ -232,7 +232,7 @@ class _Updater:
                 if not isinstance(d, (list, tuple)):
                     resolver.doc = d = ChainMap(self.make_dict(), d)
         else:
-            d = resolver.access(path[:-1])
+            d = resolver.maybe_access(path[:-1]) or {}
             if not hasattr(d, "parents"):  # chainmap?
                 if not isinstance(d, (list, tuple)):
                     d = ChainMap(self.make_dict(), d)

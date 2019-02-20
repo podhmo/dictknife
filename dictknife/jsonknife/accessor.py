@@ -17,6 +17,11 @@ class AccessorMixin:
             doc = self.doc
         return a.access(doc, path)
 
+    def maybe_access(self, path, *, doc=None, a=Accessor()):
+        if doc is None:
+            doc = self.doc
+        return a.maybe_access(doc, path)
+
     def access_by_json_pointer(self, jsonref, *, doc=None, guess=True):
         if doc is None:
             doc = self.doc
