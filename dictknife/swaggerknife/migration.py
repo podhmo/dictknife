@@ -13,12 +13,27 @@ from .. import loading
 logger = logging.getLogger(__name__)
 
 
+class _Empty:
+    __slots__ = ("v",)
+
+    def __init__(self, v):
+        self.v = v
+
+
 class Migration:
-    def __init__(self, resolver, *, make_dict=make_dict, dump_options=None):
+    def __init__(
+        self, resolver, *, make_dict=make_dict, dump_options=None, transform=None
+    ):
         self.resolver = resolver
         self.item_map = make_dict()
         self.make_dict = make_dict
         self.dump_options = dump_options or {}
+        self._transform = transform
+
+    def transform(self, data):
+        if self._transform is None:
+            return data
+        return self._transform(data)
 
     @reify
     def differ(self):
@@ -26,7 +41,7 @@ class Migration:
 
     @reify
     def updater(self):
-        return _Updater(self.item_map, make_dict=self.make_dict)
+        return _Updater(self.resolver, self.item_map, make_dict=self.make_dict)
 
     def _prepare(self, *, doc, where):
         logger.debug("prepare (where=%s)", where)
@@ -42,8 +57,7 @@ class Migration:
 
         yield self.updater
 
-        resolvers = set(item.resolver for item in self.item_map.values())
-        for r in resolvers:
+        for r in self.updater.resolvers:
             is_first = True
             for line in self.differ.diff(r, where=where):
                 if is_first:
@@ -60,8 +74,7 @@ class Migration:
         self._prepare(doc=doc, where=where)
         yield self.updater
 
-        resolvers = set(item.resolver for item in self.item_map.values())
-        for r in resolvers:
+        for r in self.updater.resolvers:
             relpath = os.path.relpath(r.filename, start=where)
             savepath = r.filename
             if savedir:
@@ -83,7 +96,11 @@ class Migration:
                 continue
 
             logger.info("update %s -> %s", relpath, (savepath or relpath))
-            loading.dumpfile(r.doc, savepath, **self.dump_options)
+            loading.dumpfile(
+                self.transform(self.differ.after_data(r.doc)),
+                savepath,
+                **self.dump_options
+            )
 
     def migrate(
         self,
@@ -155,22 +172,63 @@ class _Differ:
         elif isinstance(d, (list, tuple)):
             return [self.before_data(x) for x in d]
         else:
-            return d
+            return d.v if isinstance(d, _Empty) else d
 
     def after_data(self, d):
-        return d
+        if hasattr(d, "keys"):
+            r = self.make_dict()
+            for k, v in d.items():
+                if isinstance(v, _Empty):
+                    continue
+                r[k] = self.after_data(v)
+            return r
+        elif isinstance(d, (list, tuple)):
+            return [self.after_data(x) for x in d if not isinstance(x, _Empty)]
+        else:
+            return d
 
 
 class _Updater:
-    def __init__(self, item_map, *, make_dict=make_dict):
+    def __init__(self, resolver, item_map, *, make_dict=make_dict):
+        self.resolver = resolver
         self.item_map = item_map
         self.make_dict = make_dict
 
-    def update(self, resolver, ref, v):
+    @reify
+    def resolvers(self):
+        resolvers = set(item.resolver for item in self.item_map.values())
+        if self.resolver not in resolvers:
+            resolvers.add(self.resolver)
+        return resolvers
+
+    def new_child(self, resolver):
+        return self.__class__(resolver, self.item_map, make_dict=self.make_dict)
+
+    def has(self, ref, *, resolver=None):
+        resolver = resolver or self.resolver
+        try:
+            return resolver.access_by_json_pointer(ref) is not None
+        except KeyError:
+            return False  # xxx
+
+    def pop(self, ref, *, resolver=None):
+        resolver = resolver or self.resolver
+        v = resolver.access_by_json_pointer(ref)
+        self.update(ref, _Empty(v), resolver=resolver)
+        return v
+
+    def update(self, ref, v, *, resolver=None):
+        resolver = resolver or self.resolver
         parent_ref, k = pairrsplit(ref, "/")
-        d = resolver.access_by_json_pointer(parent_ref)
-        if not hasattr(d, "parents"):  # chainmap?
-            d = ChainMap(self.make_dict(), d)
+        if k == "":
+            d = resolver.doc
+            k, parent_ref = parent_ref, ""
+            if not hasattr(d, "parents"):  # chainmap?
+                resolver.doc = d = ChainMap(self.make_dict(), d)
+        else:
+            d = resolver.access_by_json_pointer(parent_ref)
+            if not hasattr(d, "parents"):  # chainmap?
+                d = ChainMap(self.make_dict(), d)
             resolver.assign_by_json_pointer(parent_ref, d)
         d[k] = v
 

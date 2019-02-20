@@ -1,0 +1,11 @@
+info:
+  description: API description in Markdown.
+  title: Sample API
+  version: 1.0.0
+openapi: 3.0.0
+paths:
+  /users:
+    $ref: './api.yaml#/paths/~1users'
+servers:
+- description: ''
+  url: 'http://api.example.com/v1'

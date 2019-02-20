@@ -1,4 +1,31 @@
+import logging
 from dictknife import Accessor
+from dictknife.langhelpers import as_jsonpointer
+
+logger = logging.getLogger(__name__)
+
+
+class AccessorMixin:
+    # need self.doc
+    def assign(self, path, value, *, doc=None, a=Accessor()):
+        if doc is None:
+            doc = self.doc
+        return a.assign(doc, path, value)
+
+    def access(self, path, *, doc=None, a=Accessor()):
+        if doc is None:
+            doc = self.doc
+        return a.access(doc, path)
+
+    def access_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return access_by_json_pointer(doc, jsonref, guess=guess)
+
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return assign_by_json_pointer(doc, jsonref, value, guess=guess)
 
 
 class CachedItem:
@@ -11,7 +38,7 @@ class CachedItem:
 
 
 def path_to_json_pointer(path):
-    return "/".join((normalize_json_pointer(x) for x in path))
+    return "/".join((as_jsonpointer(x) for x in path))
 
 
 def normalize_json_pointer(ref):
@@ -20,23 +47,54 @@ def normalize_json_pointer(ref):
     return ref.replace("~1", "/").replace("~0", "~")
 
 
-def access_by_json_pointer(doc, query, accessor=Accessor()):
+def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
         return accessor.access(doc, path)
     except KeyError:
+        if guess:
+            new_path = []
+            has_integer = False
+            for p in path:
+                if p.isdigit():
+                    new_path.append(int(p))
+                    has_integer = True
+                else:
+                    new_path.append(p)
+            if has_integer:
+                logger.debug("jsonpointer: %r is notfound. including integer?", query)
+                try:
+                    return accessor.access(doc, new_path)
+                except KeyError:
+                    pass
         raise KeyError(query)
 
 
-def assign_by_json_pointer(doc, query, v, accessor=Accessor()):
+def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
         return accessor.assign(doc, path, v)
     except KeyError:
+        if guess:
+            new_path = []
+            has_integer = False
+            for p in path:
+                if p.isdigit():
+                    new_path.append(int(p))
+                    has_integer = True
+                else:
+                    new_path.append(p)
+
+            if has_integer:
+                logger.debug("jsonpointer: %r is notfound. including integer?", query)
+                try:
+                    return accessor.assign(doc, new_path, v)
+                except KeyError:
+                    pass
         raise KeyError(query)
 
 

@@ -1,15 +1,17 @@
 import difflib
 import itertools
 from dictknife.deepequal import sort_flexibly
-from ._utils import _normalize_dict
+from dictknife.transform import normalize_dict
 
 
-def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False):
+def diff_rows(
+    d0, d1, *, fromfile="left", tofile="right", diff_key="diff", normalize=False
+):
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)
-        _normalize_dict(d0)
-        _normalize_dict(d1)
+        normalize_dict(d0)
+        normalize_dict(d1)
 
     # iterator?
     if hasattr(d0, "__next__"):
@@ -24,9 +26,13 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
                 sd0 = sd1.__class__()
             elif sd1 is None:
                 sd1 = sd0.__class__()
-            subrows = diff_rows(sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            subrows = diff_rows(
+                sd0, sd1, fromfile=fromfile, tofile=tofile, diff_key=diff_key
+            )
             for srow in subrows:
-                srow["name"] = "{}/{}".format(i, srow["name"]) if srow["name"] else str(i)
+                srow["name"] = (
+                    "{}/{}".format(i, srow["name"]) if srow["name"] else str(i)
+                )
             rows.extend(subrows)
         return rows
     elif hasattr(d0, "keys") or hasattr(d1, "keys"):
@@ -40,7 +46,9 @@ def diff_rows(d0, d1, *, fromfile="left", tofile="right", diff_key="diff", norma
             seen.add(k)
             lv = d0.get(k)
             rv = d1.get(k)
-            subrows = diff_rows(lv, rv, fromfile=fromfile, tofile=tofile, diff_key=diff_key)
+            subrows = diff_rows(
+                lv, rv, fromfile=fromfile, tofile=tofile, diff_key=diff_key
+            )
             for srow in subrows:
                 srow["name"] = "{}/{}".format(k, srow["name"]) if srow["name"] else k
             rows.extend(subrows)

@@ -2,40 +2,15 @@ import sys
 import logging
 import os.path
 from collections import deque
-from .. import loading
-from ..walkers import DictWalker
-from ..langhelpers import reify, pairrsplit
-from ..accessing import Accessor
-from .accessor import (
-    access_by_json_pointer,
-    assign_by_json_pointer,
-)
+
+from dictknife import loading
+from dictknife.walkers import DictWalker
+from dictknife.langhelpers import reify, pairrsplit
+
+from .accessor import AccessorMixin
 from .relpath import normpath
 
 logger = logging.getLogger("jsonknife.resolver")
-
-
-class AccessorMixin:
-    # need self.doc
-    def assign(self, path, value, *, doc=None, a=Accessor()):
-        if doc is None:
-            doc = self.doc
-        return a.assign(doc, path, value)
-
-    def access(self, path, *, doc=None, a=Accessor()):
-        if doc is None:
-            doc = self.doc
-        return a.access(doc, path)
-
-    def access_by_json_pointer(self, jsonref, *, doc=None):
-        if doc is None:
-            doc = self.doc
-        return access_by_json_pointer(doc, jsonref)
-
-    def assign_by_json_pointer(self, jsonref, value, *, doc=None):
-        if doc is None:
-            doc = self.doc
-        return assign_by_json_pointer(doc, jsonref, value)
 
 
 class OneDocResolver(AccessorMixin):
@@ -89,8 +64,10 @@ class ExternalFileResolver(AccessorMixin):
     @reify
     def doc(self):
         logger.debug(
-            "load file[%s]: %r (where=%r)", len(self.history), self.rawfilename,
-            self.history[-1].filename
+            "load file[%s]: %r (where=%r)",
+            len(self.history),
+            self.rawfilename,
+            self.history[-1].filename,
         )
         with open(self.filename) as rf:
             self.doc = self.loader.load(rf, format=self.format)
@@ -127,7 +104,10 @@ class ExternalFileResolver(AccessorMixin):
             query = query + "#"
 
         fullpath, filepath, query = self.resolve_pathset(query)
-        return self.resolve_subresolver(fullpath, rawfilename=filepath, format=format), query
+        return (
+            self.resolve_subresolver(fullpath, rawfilename=filepath, format=format),
+            query,
+        )
 
     def resolve_subresolver(self, filename, rawfilename=None, format=None):
         if filename in self.cache:
@@ -135,7 +115,9 @@ class ExternalFileResolver(AccessorMixin):
             if cached.history[-1].filename == self.filename:
                 return cached
             else:
-                return self.new(filename, doc=cached.doc, rawfilename=rawfilename, format=format)
+                return self.new(
+                    filename, doc=cached.doc, rawfilename=rawfilename, format=format
+                )
         subresolver = self.cache[filename] = self.new(
             filename, rawfilename=rawfilename, format=format
         )
@@ -154,7 +136,9 @@ def get_resolver(filename, *, loader=loading, doc=None, onload=None, format=None
             doc = doc or loading.load(sys.stdin)
         return OneDocResolver(doc, onload=onload, format=format)
     else:
-        resolver = ExternalFileResolver(filename, loader=loader, onload=onload, format=format)
+        resolver = ExternalFileResolver(
+            filename, loader=loader, onload=onload, format=format
+        )
         if doc:
             resolver.doc = doc
         return resolver
