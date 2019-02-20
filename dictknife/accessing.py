@@ -8,6 +8,7 @@ class Accessor:
         self.zero_value = zero_value
 
     def assign(self, d, path, value):
+        original = d
         for name in path[:-1]:
             try:
                 d = d[name]
@@ -19,6 +20,10 @@ class Accessor:
                 d[name] = self.make_dict()
                 d = d[name]
         try:
+            d[path[-1]] = value
+        except TypeError:
+            d = self.make_dict()
+            self.assign(original, path[:-1], d)
             d[path[-1]] = value
         except IndexError:
             for i in range(len(d), path[-1] + 1):
