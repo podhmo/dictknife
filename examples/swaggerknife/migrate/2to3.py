@@ -1,5 +1,6 @@
 import logging
 from functools import partial
+from dictknife import DictWalker
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
 from dictknife.transform import normalize_dict
@@ -74,10 +75,20 @@ def migrate_parameters(uu, data, *, path, scope):
     return frame
 
 
-def migrate_for_subfile(uu, *, scope):
-    from dictknife import DictWalker
+def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
+    for path, d in walker.walk(uu.resolver.doc):
+        if "/definitions/" in d["$ref"]:
+            uu.update_by_path(
+                path, d["$ref"].replace("/definitions/", "/components/schemas/", 1)
+            )
 
-    schema_walker = DictWalker(["schema"])
+
+def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
+    migrate_refs(uu, scope=scope)
+
+    if uu.has("definitions"):
+        uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
+
     if uu.has("paths"):
         for url_path, path_item in uu.resolver.doc["paths"].items():
             # xxx: vendor extensions?

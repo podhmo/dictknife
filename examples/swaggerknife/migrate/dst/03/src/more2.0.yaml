@@ -1,13 +1,14 @@
-definitions:
-  User:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    - name
+components:
+  schemas:
+    User:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
 info:
   description: API description in Markdown.
   title: Sample API
@@ -87,15 +88,9 @@ paths:
       summary: Returns a user by ID.
   /users2:
     post:
-      parameters: []
-      requestBody:
-        content:
-          application/json:
-            in: body
-            name: user
-            schema:
-              $ref: '#/definitions/User'
-        required: true
+      parameters:
+      - schema:
+          $ref: '#/components/schemas/User'
       resonses:
         '201':
           description: Created
@@ -109,7 +104,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/User'
+                $ref: '#/components/schemas/User'
           description: A user object.
         '400':
           description: The specified user ID is invalid (not a number)
