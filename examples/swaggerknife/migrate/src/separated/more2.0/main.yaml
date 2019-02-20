@@ -1,0 +1,33 @@
+# from: https://swagger.io/docs/specification/basic-structure/
+
+swagger: "2.0"
+info:
+  title: Sample API
+  description: API description in Markdown.
+  version: 1.0.0
+host: api.example.com
+basePath: /v1
+schemes:
+  - http
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+securityDefinitions:
+  BasicAuth:
+    type: basic
+
+security:
+  - BasicAuth: []
+
+paths:
+  /users:
+    $ref: "api_users.yaml#/paths/~1users"
+  /users/{userId}:
+    $ref: "api_users.yaml#/paths/~1users~1{userId}"
+  /users2:
+    $ref: "api_users2.yaml#/paths/~1users2"
+  /users2/{userId}:
+    $ref: "api_users2.yaml#/paths/~1users2~1{userId}"

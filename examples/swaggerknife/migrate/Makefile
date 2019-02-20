@@ -1,4 +1,4 @@
-default: clean 00 01 02 03
+default: clean 00 01 02 03 04
 OPTS ?= "--log=DEBUG"
 
 dst:
@@ -18,6 +18,8 @@ clean:
 	python 2to3.py ${OPTS} --sort-keys --src src/separated/2.0/main.yaml --savedir dst/02
 03: dst
 	python 2to3.py ${OPTS} --sort-keys --src src/more2.0.yaml --savedir dst/03
+04: dst
+	python 2to3.py ${OPTS} --sort-keys --src src/separated/more2.0/main.yaml --savedir dst/04
 
 2to3:
 	python 2to3.py ${OPTS} --src src/more2.0.yaml --dry-run --savedir dst/xxxx

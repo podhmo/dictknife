@@ -1,0 +1,9 @@
+parameters:
+  userId:
+    in: path
+    name: userId
+    required: true
+    description: The ID of the user to return
+    type: integer
+    format: int64
+    minimum: 1
