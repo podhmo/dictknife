@@ -257,7 +257,7 @@ def main(argv=None):
     parser.print_usage = parser.print_help
     parser.add_argument("--logging", default="DEBUG")
     parser.add_argument("--src", required=True)
-    parser.add_argument("--savedir", required=True)
+    parser.add_argument("--savedir")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--sort-keys", action="store_true")  # drop in the end
     args = parser.parse_args(argv)
