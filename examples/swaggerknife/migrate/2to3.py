@@ -1,10 +1,11 @@
 import logging
 from functools import partial
+from dictknife import DictWalker
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
 from dictknife.transform import normalize_dict
-from dictknife.jsonknife import get_resolver, path_to_json_pointer
-from dictknife.swaggerknife.migration import Migration
+from dictknife.jsonknife import get_resolver
+from dictknife.swaggerknife.migration import Migration, is_empty_collection
 
 # todo: update ref
 # todo: move definitions
@@ -52,45 +53,182 @@ def migrate_for_mainfile(u, *, scope):
 
     if u.has("produces"):
         scope.push({"produces": u.pop("produces")})
+    if u.has("consumes"):
+        scope.push({"consumes": u.pop("consumes")})
 
 
-def migrate_for_subfile(u, *, scope):
-    for resolver in u.resolvers:
-        uu = u.new_child(resolver)
-        if uu.has("paths", resolver=resolver):
-            from dictknife import DictWalker, Or
+def migrate_parameters(uu, data, *, path, scope):
+    frame = {}
+    if "parameters" in data:
+        if isinstance(data["parameters"], (list, tuple)):
+            itr = enumerate(data["parameters"])
+        else:
+            itr = data["parameters"].items()
 
-            method_walker = DictWalker(
-                [Or(["get", "post", "put", "delete", "patch", "head"])]
+        for i, param in itr:
+            if "$ref" in param:
+                continue
+
+            in_value = param.get("in")
+
+            if in_value in ("body", "form"):
+                param = uu.pop_by_path([*path, i])
+                content = uu.make_dict()
+
+                for k, v in param.items():
+                    if k in {
+                        "name",
+                        "in",
+                        "description",
+                        "required",
+                        "collectionFormat",
+                    }:
+                        continue
+                    # xxx: vendor extensions?
+                    content[k] = v
+
+                request_body = uu.make_dict()
+                if "description" in param:
+                    request_body["description"] = param["description"]
+                request_body["required"] = param.get("required", True)  # default: true
+                if in_value == "body":
+                    consume = "application/json"
+                elif in_value == "form":
+                    consume = "application/x-www-form-urlencoded"
+                request_body["content"] = {consume: content}
+
+                frame["requestBody"] = request_body
+            else:
+                content = uu.make_dict()
+                for k in list(param.keys()):
+                    if k in {
+                        "name",
+                        "in",
+                        "description",
+                        "required",
+                        "collectionFormat",
+                    }:
+                        continue
+                    content[k] = uu.pop_by_path([*path, i, k])
+                uu.update_by_path([*path, i, "schema"], content)
+        if is_empty_collection(data["parameters"]):
+            uu.pop_by_path(path)
+    return frame
+
+
+def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
+    for path, d in walker.walk(uu.resolver.doc):
+        if "/definitions/" in d["$ref"]:
+            uu.update_by_path(
+                path, d["$ref"].replace("/definitions/", "/components/schemas/", 1)
             )
-            schema_walker = DictWalker(["schema"])
 
-            for path, sd in method_walker.walk(uu.resolver.doc["paths"]):
-                # parameters
-                # responses
+
+def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
+    migrate_refs(uu, scope=scope)
+    if uu.has("definitions"):
+        uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
+    if uu.has("securityDefinitions"):
+        uu.update_by_path(
+            ["components", "securitySchemas"], uu.pop_by_path(["securityDefinitions"])
+        )
+    frame = {}
+    frame.update(
+        migrate_parameters(uu, uu.resolver.doc, path=["parameters"], scope=scope)
+    )
+    with scope.scope(frame or None):
+        if uu.has("paths"):
+            for url_path, path_item in uu.resolver.doc["paths"].items():
+                # xxx: vendor extensions?
+                if url_path.startswith("x-"):
+                    continue
+
+                # todo: parse pathItem object
+                # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
+                operation_methods = [
+                    "get",
+                    "put",
+                    "post",
+                    "delete",
+                    "options",
+                    "head",
+                    "patch",
+                ]
                 frame = {}
-                if "produces" in sd[path[-1]]:
-                    ref = path_to_json_pointer(["paths", *path, "produces"])
-                    frame["produces"] = uu.pop(ref)
-
+                frame.update(
+                    migrate_parameters(
+                        uu,
+                        path_item,
+                        path=["paths", url_path, "parameters"],
+                        scope=scope,
+                    )
+                )
                 with scope.scope(frame or None):
-                    if "responses" in sd[path[-1]]:
-                        for spath, ssd in schema_walker.walk(sd[path[-1]]["responses"]):
-                            fullpath = ["paths", *path, "responses", *spath]
-                            ref = path_to_json_pointer(fullpath)
-                            schema = uu.pop(ref)
-                            content = uu.make_dict()
-                            for produce in scope[["produces"]]:
-                                content[produce] = {"schema": schema}
-                            ref = path_to_json_pointer([*fullpath[:-1], "content"])
-                            uu.update(ref, content)
+                    for method_name in operation_methods:
+                        operation = path_item.get(method_name)
+                        if operation is None:
+                            continue
+
+                        # todo: parse Operation object
+                        # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
+
+                        frame = {}
+
+                        # parameters
+                        frame.update(
+                            migrate_parameters(
+                                uu,
+                                operation,
+                                path=["paths", url_path, method_name, "parameters"],
+                                scope=scope,
+                            )
+                        )
+
+                        # produces
+                        if "produces" in operation:
+                            frame["produces"] = uu.pop_by_path(
+                                ["paths", url_path, method_name, "produces"]
+                            )
+                        # consumes
+                        if "consumes" in operation:
+                            frame["consumes"] = uu.pop_by_path(
+                                ["paths", url_path, method_name, "consumes"]
+                            )
+
+                        # responses
+                        with scope.scope(frame or None):
+                            # requestBody
+                            request_body = scope.get(["requestBody"])
+                            if request_body is not None:
+                                uu.update_by_path(
+                                    ["paths", url_path, method_name, "requestBody"],
+                                    request_body,
+                                )
+
+                            if "responses" in operation:
+                                for spath, sd in schema_walker.walk(
+                                    operation["responses"]
+                                ):
+                                    fullpath = [
+                                        "paths",
+                                        url_path,
+                                        method_name,
+                                        "responses",
+                                        *spath,
+                                    ]
+                                    schema = uu.pop_by_path(fullpath)
+                                    content = uu.make_dict()
+                                    for produce in scope[["produces"]]:
+                                        content[produce] = {"schema": schema}
+                                    uu.update_by_path(
+                                        [*fullpath[:-1], "content"], content
+                                    )
 
 
 # todo: skip x-XXX
 def run(
-    *, src: str, savedir: str, log: str, dry_run: bool = False, sort_keys: bool = False
+    *, src: str, savedir: str, dry_run: bool = False, sort_keys: bool = False
 ) -> None:
-    logging.basicConfig(level=getattr(logging, log))
 
     resolver = get_resolver(src)
     # xxx: sort_keys for ambitious output (for 3.6 only?)
@@ -102,9 +240,14 @@ def run(
         transform=partial(transform, sort_keys=sort_keys),
     )
     with m.migrate(dry_run=dry_run, keep=True, savedir=savedir) as u:
-        scope = Scope()
+        scope = Scope(
+            {"consumes": ["application/json"], "produces": ["application/json"]}
+        )
         migrate_for_mainfile(u, scope=scope)
-        migrate_for_subfile(u, scope=scope)
+        # todo: parse toplevel parameters
+        for resolver in u.resolvers:
+            uu = u.new_child(resolver)
+            migrate_for_subfile(uu, scope=scope)
 
 
 def main(argv=None):
@@ -112,13 +255,15 @@ def main(argv=None):
 
     parser = argparse.ArgumentParser(description=None)
     parser.print_usage = parser.print_help
-    parser.add_argument("--log", default="DEBUG")
+    parser.add_argument("--logging", default="DEBUG")
     parser.add_argument("--src", required=True)
-    parser.add_argument("--savedir", required=True)
+    parser.add_argument("--savedir")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--sort-keys", action="store_true")  # drop in the end
     args = parser.parse_args(argv)
-    run(**vars(args))
+    params = vars(args)
+    logging.basicConfig(level=getattr(logging, params.pop("logging")))
+    run(**params)
 
 
 if __name__ == "__main__":

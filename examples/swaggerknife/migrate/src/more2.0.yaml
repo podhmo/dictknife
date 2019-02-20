@@ -11,9 +11,9 @@ schemes:
   - http
 
 consumes:
-  - /application/json
+  - application/json
 produces:
-  - /application/json
+  - application/json
 
 definitions:
   User:
@@ -30,7 +30,7 @@ parameters:
   userId:
     in: path
     name: userId
-    requred: true
+    required: true
     description: The ID of the user to return
     type: integer
     format: int64
@@ -58,7 +58,7 @@ paths:
             properties:
               username:
                 type: string
-      resonses:
+      responses:
         "201":
           description: Created
   /users/{userId}:
@@ -67,7 +67,7 @@ paths:
       parameters:
         - in: path
           name: userId
-          requred: true
+          required: true
           description: The ID of the user to return
           type: integer
           format: int64
@@ -115,7 +115,7 @@ paths:
           name: user
           schema:
             $ref: "#/definitions/User"
-      resonses:
+      responses:
         "201":
           description: Created
 

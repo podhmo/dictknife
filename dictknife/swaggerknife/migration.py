@@ -5,12 +5,17 @@ import tempfile
 import shutil
 from collections import ChainMap
 
-from ..jsonknife.bundler import Scanner, CachedItemAccessor
-from ..langhelpers import make_dict, pairrsplit, reify
-from ..diff import diff
-from .. import loading
+from dictknife.jsonknife.bundler import Scanner, CachedItemAccessor
+from dictknife.langhelpers import make_dict, reify
+from dictknife.jsonknife import json_pointer_to_path
+from dictknife.diff import diff
+from dictknife import loading
 
 logger = logging.getLogger(__name__)
+
+
+def is_empty_collection(coll):
+    return sum(1 for x in coll if not isinstance(x, _Empty)) == 0
 
 
 class _Empty:
@@ -78,9 +83,13 @@ class Migration:
             relpath = os.path.relpath(r.filename, start=where)
             savepath = r.filename
             if savedir:
-                savepath = os.path.relpath(
-                    os.path.abspath(r.filename).replace(where, savedir), start=where
+                savepath = os.path.join(
+                    savedir,
+                    os.path.relpath(
+                        savepath, start=os.path.dirname(self.resolver.filename)
+                    ),
                 )
+                savepath = os.path.relpath(savepath, start=where)
 
             diff = "\n".join(self.differ.diff(r, where=where))
             if not diff:
@@ -127,9 +136,8 @@ class Migration:
             if inplace:
                 savedir = None
             elif savedir is None:
-                savedir = os.path.abspath(
-                    tempfile.mkdtemp(prefix="migration-", dir=where)
-                )  # xxx
+                savedir = tempfile.mkdtemp(prefix="migration-", dir=where)  # xxx
+            savedir = os.path.normpath(os.path.abspath(savedir))
             try:
                 with self._migrate(doc=doc, where=where, savedir=savedir) as u:
                     yield u
@@ -212,40 +220,33 @@ class _Updater:
             return False  # xxx
 
     def pop(self, ref, *, resolver=None):
+        return self.pop_by_path(json_pointer_to_path(ref), resolver=resolver)
+
+    def pop_by_path(self, path, *, resolver=None):
         resolver = resolver or self.resolver
-        v = resolver.access_by_json_pointer(ref)
-        self.update(ref, _Empty(v), resolver=resolver)
+        v = resolver.access(path)
+        self.update_by_path(path, _Empty(v), resolver=resolver)
         return v
 
     def update(self, ref, v, *, resolver=None):
+        return self.update_by_path(json_pointer_to_path(ref), v, resolver=resolver)
+
+    def update_by_path(self, path, v, *, resolver=None):
         resolver = resolver or self.resolver
-        parent_ref, k = pairrsplit(ref, "/")
-        if k == "":
+        if len(path) == 1:
             d = resolver.doc
-            k, parent_ref = parent_ref, ""
             if not hasattr(d, "parents"):  # chainmap?
-                resolver.doc = d = ChainMap(self.make_dict(), d)
+                if not isinstance(d, (list, tuple)):
+                    resolver.doc = d = ChainMap(self.make_dict(), d)
         else:
-            d = resolver.access_by_json_pointer(parent_ref)
+            d = resolver.maybe_access(path[:-1]) or self.make_dict()
+
             if not hasattr(d, "parents"):  # chainmap?
-                d = ChainMap(self.make_dict(), d)
-            resolver.assign_by_json_pointer(parent_ref, d)
-        d[k] = v
+                if not isinstance(d, (list, tuple)):
+                    d = ChainMap(self.make_dict(), d)
+                    resolver.assign(path[:-1], d)
+
+        d[path[-1]] = v
 
     def iterate_items(self):
         return self.item_map.items()
-
-
-# @as_command
-# def run(*, src: str) -> None:
-#     logging.basicConfig(level=logging.DEBUG)
-
-#     resolver = get_resolver(src)
-#     with Migration(resolver).migrate(dry_run=True) as u:
-#         for k, item in u.iterate_items():
-#             if k == "definitions/person":
-#                 ref = "#/definitions/person/properties/value"
-#                 u.update(item.resolver, ref, {"type": "integer"})
-#             if k == "definitions/name":
-#                 ref = "#/definitions/name/description"
-#                 u.update(item.resolver, ref, "name of something")

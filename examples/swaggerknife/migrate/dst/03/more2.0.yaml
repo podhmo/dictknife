@@ -1,15 +1,17 @@
-consumes:
-- /application/json
-definitions:
-  User:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    - name
+components:
+  schemas:
+    User:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+  securitySchemas:
+    BasicAuth:
+      type: basic
 info:
   description: API description in Markdown.
   title: Sample API
@@ -18,12 +20,13 @@ openapi: 3.0.0
 parameters:
   userId:
     description: The ID of the user to return
-    format: int64
     in: path
-    minimum: 1
     name: userId
-    requred: true
-    type: integer
+    required: true
+    schema:
+      format: int64
+      minimum: 1
+      type: integer
 paths:
   /users:
     get:
@@ -31,7 +34,7 @@ paths:
       responses:
         '200':
           content:
-            /application/json:
+            application/json:
               schema:
                 items:
                   type: string
@@ -39,15 +42,16 @@ paths:
           description: A JSON array of user names
       summary: Returns a list of users.
     post:
-      parameters:
-      - in: body
-        name: user
-        schema:
-          properties:
-            username:
-              type: string
-          type: object
-      resonses:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+              type: object
+        required: true
+      responses:
         '201':
           description: Created
       summary: Craetes a user.
@@ -55,16 +59,17 @@ paths:
     get:
       parameters:
       - description: The ID of the user to return
-        format: int64
         in: path
-        minimum: 1
         name: userId
-        requred: true
-        type: integer
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
       responses:
         '200':
           content:
-            /application/json:
+            application/json:
               schema:
                 properties:
                   id:
@@ -85,12 +90,13 @@ paths:
       summary: Returns a user by ID.
   /users2:
     post:
-      parameters:
-      - in: body
-        name: user
-        schema:
-          $ref: '#/definitions/User'
-      resonses:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
         '201':
           description: Created
       summary: Craetes a user.
@@ -101,9 +107,9 @@ paths:
       responses:
         '200':
           content:
-            /application/json:
+            application/json:
               schema:
-                $ref: '#/definitions/User'
+                $ref: '#/components/schemas/User'
           description: A user object.
         '400':
           description: The specified user ID is invalid (not a number)
@@ -114,9 +120,6 @@ paths:
       summary: Returns a user by ID.
 security:
 - BasicAuth: []
-securityDefinitions:
-  BasicAuth:
-    type: basic
 servers:
 - description: ''
   url: 'http://api.example.com/v1'
