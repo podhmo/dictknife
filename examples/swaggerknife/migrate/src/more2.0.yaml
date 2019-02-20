@@ -30,7 +30,7 @@ parameters:
   userId:
     in: path
     name: userId
-    requred: true
+    required: true
     description: The ID of the user to return
     type: integer
     format: int64
@@ -67,7 +67,7 @@ paths:
       parameters:
         - in: path
           name: userId
-          requred: true
+          required: true
           description: The ID of the user to return
           type: integer
           format: int64

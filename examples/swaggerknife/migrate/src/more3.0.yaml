@@ -32,7 +32,7 @@ parameters:
   userId:
     in: path
     name: userId
-    requred: true
+    required: true
     description: The ID of the user to return
     schema:
       type: integer
@@ -73,7 +73,7 @@ paths:
       parameters:
         - name: userId
           in: path
-          requred: true
+          required: true
           description: The ID of the user to return
           schema:
             type: integer

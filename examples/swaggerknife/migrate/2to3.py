@@ -64,14 +64,42 @@ def migrate_parameters(uu, data, *, path, scope):
             if "$ref" in param:
                 continue
             in_value = param.get("in")
-            if in_value != "body":
-                continue
-            request_body = uu.make_dict()
-            request_body["required"] = param.get("required", True)  # default: true
-            request_body["content"] = {
-                scope[["consumes"]][0]: uu.pop_by_path([*path, i])
-            }
-            frame["requestBody"] = request_body
+
+            if in_value in ("body", "form"):
+                # todo: collectionFormat
+                param = uu.pop_by_path([*path, i])
+                content = uu.make_dict()
+                content["required"] = param.get("required", True)  # default: true
+                for k, v in param.items():
+                    if k in {
+                        "name",
+                        "in",
+                        "description",
+                        "required",
+                        "collectionFormat",
+                    }:
+                        continue
+                    # xxx: vendor extensions?
+                    content[k] = v
+
+                if in_value == "body":
+                    consume = "application/json"
+                elif in_value == "form":
+                    consume = "application/x-www-form-urlencoded"
+                frame["requestBody"] = {"content": {consume: content}}
+            else:
+                content = uu.make_dict()
+                for k in list(param.keys()):
+                    if k in {
+                        "name",
+                        "in",
+                        "description",
+                        "required",
+                        "collectionFormat",
+                    }:
+                        continue
+                    content[k] = uu.pop_by_path([*path, i, k])
+                uu.update_by_path([*path, i, "schema"], content)
     return frame
 
 
@@ -89,7 +117,9 @@ def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
     if uu.has("definitions"):
         uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
     if uu.has("securityDefinitions"):
-        uu.update_by_path(["components", "securitySchemas"], uu.pop_by_path(["securityDefinitions"]))
+        uu.update_by_path(
+            ["components", "securitySchemas"], uu.pop_by_path(["securityDefinitions"])
+        )
 
     if uu.has("paths"):
         for url_path, path_item in uu.resolver.doc["paths"].items():

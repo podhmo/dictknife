@@ -24,7 +24,7 @@ parameters:
     in: path
     minimum: 1
     name: userId
-    requred: true
+    required: true
     type: integer
 paths:
   /users:
@@ -45,14 +45,12 @@ paths:
       requestBody:
         content:
           application/json:
-            in: body
-            name: user
+            required: true
             schema:
               properties:
                 username:
                   type: string
               type: object
-        required: true
       resonses:
         '201':
           description: Created
@@ -61,12 +59,13 @@ paths:
     get:
       parameters:
       - description: The ID of the user to return
-        format: int64
         in: path
-        minimum: 1
         name: userId
-        requred: true
-        type: integer
+        required: true
+        schema:
+          format: int64
+          minimum: 1
+          type: integer
       responses:
         '200':
           content:
@@ -93,7 +92,8 @@ paths:
     post:
       parameters:
       - schema:
-          $ref: '#/components/schemas/User'
+          schema:
+            $ref: '#/components/schemas/User'
       resonses:
         '201':
           description: Created
