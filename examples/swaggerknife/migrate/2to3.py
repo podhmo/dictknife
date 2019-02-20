@@ -5,7 +5,7 @@ from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
 from dictknife.transform import normalize_dict
 from dictknife.jsonknife import get_resolver
-from dictknife.swaggerknife.migration import Migration
+from dictknife.swaggerknife.migration import Migration, is_empty_collection
 
 # todo: update ref
 # todo: move definitions
@@ -111,6 +111,8 @@ def migrate_parameters(uu, data, *, path, scope):
                         continue
                     content[k] = uu.pop_by_path([*path, i, k])
                 uu.update_by_path([*path, i, "schema"], content)
+        if is_empty_collection(data["parameters"]):
+            uu.pop_by_path(path)
     return frame
 
 
