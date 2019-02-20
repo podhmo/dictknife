@@ -3,15 +3,27 @@ from .langhelpers import make_dict
 
 
 class Accessor:
-    def __init__(self, make_dict=make_dict):
+    def __init__(self, make_dict=make_dict, zero_value=None):
         self.make_dict = make_dict
+        self.zero_value = zero_value
 
     def assign(self, d, path, value):
         for name in path[:-1]:
-            if name not in d:
+            try:
+                d = d[name]
+            except IndexError:
+                for i in range(len(d), int(name) + 1):
+                    d.append(self.make_dict())
+                d = d[name]
+            except KeyError:
                 d[name] = self.make_dict()
-            d = d[name]
-        d[path[-1]] = value
+                d = d[name]
+        try:
+            d[path[-1]] = value
+        except IndexError:
+            for i in range(len(d), path[-1] + 1):
+                d.append(self.zero_value)
+            d[path[-1]] = value
 
     def access(self, d, path):
         for name in path:
