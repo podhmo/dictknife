@@ -3,7 +3,7 @@ from functools import partial
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
 from dictknife.transform import normalize_dict
-from dictknife.jsonknife import get_resolver, path_to_json_pointer
+from dictknife.jsonknife import get_resolver
 from dictknife.swaggerknife.migration import Migration
 
 # todo: update ref
@@ -54,30 +54,52 @@ def migrate_for_mainfile(u, *, scope):
         scope.push({"produces": u.pop("produces")})
 
 
-def migrate_for_subfile(u, *, scope):
+def migrate_parameters(uu, data, *, path, scope):
+    frame = {}
+    if "parameters" in data:
+        for i, param in enumerate(data["parameters"]):
+            if "$ref" in param:
+                continue
+            in_value = param.get("in")
+            if in_value != "body":
+                continue
+            request_body = uu.make_dict()
+            request_body["required"] = param.get("required", True)  # default: true
+            request_body["content"] = {
+                scope[["consumes"]][0]: uu.pop_by_path([*path, i])
+            }
+            frame["requestBody"] = request_body
+    return frame
+
+
+def migrate_for_subfile(uu, *, scope):
     from dictknife import DictWalker
 
     schema_walker = DictWalker(["schema"])
+    if uu.has("paths"):
+        for url_path, path_item in uu.resolver.doc["paths"].items():
+            # xxx: vendor extensions?
+            if url_path.startswith("x-"):
+                continue
 
-    for resolver in u.resolvers:
-        uu = u.new_child(resolver)
-        if uu.has("paths", resolver=resolver):
-            for url_path, path_item in uu.resolver.doc["paths"].items():
-                # xxx: vendor extensions?
-                if url_path.startswith("x-"):
-                    continue
-
-                # todo: parse pathItem object
-                # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
-                operation_methods = [
-                    "get",
-                    "put",
-                    "post",
-                    "delete",
-                    "options",
-                    "head",
-                    "patch",
-                ]
+            # todo: parse pathItem object
+            # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
+            operation_methods = [
+                "get",
+                "put",
+                "post",
+                "delete",
+                "options",
+                "head",
+                "patch",
+            ]
+            frame = {}
+            frame.update(
+                migrate_parameters(
+                    uu, path_item, path=["paths", url_path, "parameters"], scope=scope
+                )
+            )
+            with scope.scope(frame or None):
                 for method_name in operation_methods:
                     operation = path_item.get(method_name)
                     if operation is None:
@@ -86,16 +108,39 @@ def migrate_for_subfile(u, *, scope):
                     # todo: parse Operation object
                     # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
 
-                    # parameters
                     frame = {}
+
+                    # parameters
+                    frame.update(
+                        migrate_parameters(
+                            uu,
+                            operation,
+                            path=["paths", url_path, method_name, "parameters"],
+                            scope=scope,
+                        )
+                    )
+
+                    # produces
                     if "produces" in operation:
-                        ref = path_to_json_pointer(
+                        frame["produces"] = uu.pop_by_path(
                             ["paths", url_path, method_name, "produces"]
                         )
-                        frame["produces"] = uu.pop(ref)
+                    # consumes
+                    if "consumes" in operation:
+                        frame["consumes"] = uu.pop_by_path(
+                            ["paths", url_path, method_name, "consumes"]
+                        )
 
                     # responses
                     with scope.scope(frame or None):
+                        # requestBody
+                        request_body = scope.get(["requestBody"])
+                        if request_body is not None:
+                            uu.update_by_path(
+                                ["paths", url_path, method_name, "requestBody"],
+                                request_body,
+                            )
+
                         if "responses" in operation:
                             for spath, sd in schema_walker.walk(operation["responses"]):
                                 fullpath = [
@@ -105,13 +150,11 @@ def migrate_for_subfile(u, *, scope):
                                     "responses",
                                     *spath,
                                 ]
-                                ref = path_to_json_pointer(fullpath)
-                                schema = uu.pop(ref)
+                                schema = uu.pop_by_path(fullpath)
                                 content = uu.make_dict()
                                 for produce in scope[["produces"]]:
                                     content[produce] = {"schema": schema}
-                                ref = path_to_json_pointer([*fullpath[:-1], "content"])
-                                uu.update(ref, content)
+                                uu.update_by_path([*fullpath[:-1], "content"], content)
 
 
 # todo: skip x-XXX
@@ -130,9 +173,14 @@ def run(
         transform=partial(transform, sort_keys=sort_keys),
     )
     with m.migrate(dry_run=dry_run, keep=True, savedir=savedir) as u:
-        scope = Scope()
+        scope = Scope(
+            {"consumes": ["application/json"], "produces": ["application/json"]}
+        )
         migrate_for_mainfile(u, scope=scope)
-        migrate_for_subfile(u, scope=scope)
+        # todo: parse toplevel parameters
+        for resolver in u.resolvers:
+            uu = u.new_child(resolver)
+            migrate_for_subfile(uu, scope=scope)
 
 
 def main(argv=None):
