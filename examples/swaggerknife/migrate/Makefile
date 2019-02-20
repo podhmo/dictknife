@@ -18,3 +18,6 @@ clean:
 	python 2to3.py --sort-keys --src src/separated/2.0/main.yaml --savedir dst/02
 03: dst
 	python 2to3.py --sort-keys --src src/more2.0.yaml --savedir dst/03
+
+2to3:
+	python 2to3.py --src src/more2.0.yaml --dry-run --savedir dst/xxxx

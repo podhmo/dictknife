@@ -55,35 +55,63 @@ def migrate_for_mainfile(u, *, scope):
 
 
 def migrate_for_subfile(u, *, scope):
+    from dictknife import DictWalker
+
+    schema_walker = DictWalker(["schema"])
+
     for resolver in u.resolvers:
         uu = u.new_child(resolver)
         if uu.has("paths", resolver=resolver):
-            from dictknife import DictWalker, Or
+            for url_path, path_item in uu.resolver.doc["paths"].items():
+                # xxx: vendor extensions?
+                if url_path.startswith("x-"):
+                    continue
 
-            method_walker = DictWalker(
-                [Or(["get", "post", "put", "delete", "patch", "head"])]
-            )
-            schema_walker = DictWalker(["schema"])
+                # todo: parse pathItem object
+                # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
+                operation_methods = [
+                    "get",
+                    "put",
+                    "post",
+                    "delete",
+                    "options",
+                    "head",
+                    "patch",
+                ]
+                for method_name in operation_methods:
+                    operation = path_item.get(method_name)
+                    if operation is None:
+                        continue
 
-            for path, sd in method_walker.walk(uu.resolver.doc["paths"]):
-                # parameters
-                # responses
-                frame = {}
-                if "produces" in sd[path[-1]]:
-                    ref = path_to_json_pointer(["paths", *path, "produces"])
-                    frame["produces"] = uu.pop(ref)
+                    # todo: parse Operation object
+                    # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
 
-                with scope.scope(frame or None):
-                    if "responses" in sd[path[-1]]:
-                        for spath, ssd in schema_walker.walk(sd[path[-1]]["responses"]):
-                            fullpath = ["paths", *path, "responses", *spath]
-                            ref = path_to_json_pointer(fullpath)
-                            schema = uu.pop(ref)
-                            content = uu.make_dict()
-                            for produce in scope[["produces"]]:
-                                content[produce] = {"schema": schema}
-                            ref = path_to_json_pointer([*fullpath[:-1], "content"])
-                            uu.update(ref, content)
+                    # parameters
+                    frame = {}
+                    if "produces" in operation:
+                        ref = path_to_json_pointer(
+                            ["paths", url_path, method_name, "produces"]
+                        )
+                        frame["produces"] = uu.pop(ref)
+
+                    # responses
+                    with scope.scope(frame or None):
+                        if "responses" in operation:
+                            for spath, sd in schema_walker.walk(operation["responses"]):
+                                fullpath = [
+                                    "paths",
+                                    url_path,
+                                    method_name,
+                                    "responses",
+                                    *spath,
+                                ]
+                                ref = path_to_json_pointer(fullpath)
+                                schema = uu.pop(ref)
+                                content = uu.make_dict()
+                                for produce in scope[["produces"]]:
+                                    content[produce] = {"schema": schema}
+                                ref = path_to_json_pointer([*fullpath[:-1], "content"])
+                                uu.update(ref, content)
 
 
 # todo: skip x-XXX
