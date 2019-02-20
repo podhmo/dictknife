@@ -1,6 +1,6 @@
 import logging
 from dictknife import Accessor
-from dictknife.langhelpers import as_jsonpointer
+from dictknife.langhelpers import as_jsonpointer, as_path_node
 
 logger = logging.getLogger(__name__)
 
@@ -41,17 +41,15 @@ def path_to_json_pointer(path):
     return "/".join((as_jsonpointer(x) for x in path))
 
 
-def normalize_json_pointer(ref):
-    if "~" not in ref:
-        return ref
-    return ref.replace("~1", "/").replace("~0", "~")
+def json_pointer_to_path(ref):
+    return [as_path_node(p) for p in ref.lstrip("#/").split("/")]
 
 
 def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
-        path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
+        path = json_pointer_to_path(query)
         return accessor.access(doc, path)
     except KeyError:
         if guess:
@@ -76,7 +74,7 @@ def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
     if query == "":
         return doc
     try:
-        path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
+        path = json_pointer_to_path(query)
         return accessor.assign(doc, path, v)
     except KeyError:
         if guess:

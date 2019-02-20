@@ -9,6 +9,7 @@ from .accessor import (  # noqa
     access_by_json_pointer,
     assign_by_json_pointer,
     path_to_json_pointer,
+    json_pointer_to_path,
 )
 from ..langhelpers import make_dict, pairrsplit
 import os.path
