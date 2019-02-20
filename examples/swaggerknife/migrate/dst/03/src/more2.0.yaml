@@ -20,12 +20,13 @@ openapi: 3.0.0
 parameters:
   userId:
     description: The ID of the user to return
-    format: int64
     in: path
-    minimum: 1
     name: userId
     required: true
-    type: integer
+    schema:
+      format: int64
+      minimum: 1
+      type: integer
 paths:
   /users:
     get:
@@ -45,13 +46,13 @@ paths:
       requestBody:
         content:
           application/json:
-            required: true
             schema:
               properties:
                 username:
                   type: string
               type: object
-      resonses:
+        required: true
+      responses:
         '201':
           description: Created
       summary: Craetes a user.
@@ -90,18 +91,22 @@ paths:
       summary: Returns a user by ID.
   /users2:
     post:
-      parameters:
-      - schema:
-          schema:
-            $ref: '#/components/schemas/User'
-      resonses:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
         '201':
           description: Created
       summary: Craetes a user.
   /users2/{userId}:
     get:
       parameters:
-      - $ref: '#/parameters/userId'
+      - schema:
+          $ref: '#/parameters/userId'
       responses:
         '200':
           content:
