@@ -1,6 +1,8 @@
 import logging
+from functools import partial
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
+from dictknife.transform import normalize_dict
 from dictknife.jsonknife import get_resolver, path_to_json_pointer
 from dictknife.swaggerknife.migration import Migration
 
@@ -10,7 +12,7 @@ from dictknife.swaggerknife.migration import Migration
 
 
 # reorder
-def transform(doc):
+def transform(doc, *, sort_keys=False):
     heavy_defs = ["definitions", "schemas", "responses", "parameters", "paths"]
     r = make_dict()
     for k, v in doc.items():
@@ -20,6 +22,8 @@ def transform(doc):
     for k in heavy_defs:
         if k in doc:
             r[k] = doc[k]
+    if sort_keys:
+        r = normalize_dict(r)  # side effect
     return r
 
 
@@ -83,14 +87,20 @@ def migrate_for_subfile(u, *, scope):
 
 
 # todo: skip x-XXX
-def run(*, src: str, savedir: str, log: str, dry_run: bool = False) -> None:
+def run(
+    *, src: str, savedir: str, log: str, dry_run: bool = False, sort_keys: bool = False
+) -> None:
     logging.basicConfig(level=getattr(logging, log))
 
     resolver = get_resolver(src)
     # xxx: sort_keys for ambitious output (for 3.6 only?)
     # xxx: sort_keys=True, TypeError is occured, compare between str and int
     # xxx: transform set by dump_options?
-    m = Migration(resolver, dump_options={"sort_keys": False}, transform=transform)
+    m = Migration(
+        resolver,
+        dump_options={"sort_keys": sort_keys},
+        transform=partial(transform, sort_keys=sort_keys),
+    )
     with m.migrate(dry_run=dry_run, keep=True, savedir=savedir) as u:
         scope = Scope()
         migrate_for_mainfile(u, scope=scope)
@@ -106,6 +116,7 @@ def main(argv=None):
     parser.add_argument("--src", required=True)
     parser.add_argument("--savedir", required=True)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--sort-keys", action="store_true")  # drop in the end
     args = parser.parse_args(argv)
     run(**vars(args))
 
