@@ -4,6 +4,7 @@ import re
 #     make_dict = dict
 # else:
 from collections import OrderedDict as make_dict  # noqa
+
 # for backword comaptibility
 from .cliutils import traceback_shortly  # noqa
 
@@ -65,3 +66,9 @@ def as_jsonpointer(k):
     if "/" not in k:
         return k
     return k.replace("~", "~0").replace("/", "~1")
+
+
+def as_path_node(ref):
+    if "~" not in ref:
+        return ref
+    return ref.replace("~1", "/").replace("~0", "~")
