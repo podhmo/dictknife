@@ -57,10 +57,7 @@ class Migration:
 
         yield self.updater
 
-        resolvers = set(item.resolver for item in self.item_map.values())
-        if not resolvers:
-            resolvers = [self.resolver]
-        for r in resolvers:
+        for r in self.updater.resolvers:
             is_first = True
             for line in self.differ.diff(r, where=where):
                 if is_first:
@@ -77,10 +74,7 @@ class Migration:
         self._prepare(doc=doc, where=where)
         yield self.updater
 
-        resolvers = set(item.resolver for item in self.item_map.values())
-        if not resolvers:
-            resolvers = [self.resolver]
-        for r in resolvers:
+        for r in self.updater.resolvers:
             relpath = os.path.relpath(r.filename, start=where)
             savepath = r.filename
             if savedir:
@@ -199,6 +193,13 @@ class _Updater:
         self.resolver = resolver
         self.item_map = item_map
         self.make_dict = make_dict
+
+    @reify
+    def resolvers(self):
+        resolvers = set(item.resolver for item in self.item_map.values())
+        if self.resolver not in resolvers:
+            resolvers.add(self.resolver)
+        return resolvers
 
     def has(self, ref, *, resolver=None):
         resolver = resolver or self.resolver
