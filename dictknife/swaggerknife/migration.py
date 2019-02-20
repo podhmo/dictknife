@@ -201,6 +201,9 @@ class _Updater:
             resolvers.add(self.resolver)
         return resolvers
 
+    def new_child(self, resolver):
+        return self.__class__(resolver, self.item_map, make_dict=self.make_dict)
+
     def has(self, ref, *, resolver=None):
         resolver = resolver or self.resolver
         try:

@@ -1,5 +1,8 @@
+import logging
 from dictknife import Accessor
 from dictknife.langhelpers import as_jsonpointer
+
+logger = logging.getLogger(__name__)
 
 
 class AccessorMixin:
@@ -49,10 +52,23 @@ def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
-        if guess:
-            path = [(int(p) if p.isdigit() else p) for p in path]
         return accessor.access(doc, path)
     except KeyError:
+        if guess:
+            new_path = []
+            has_integer = False
+            for p in path:
+                if p.isdigit():
+                    new_path.append(int(p))
+                    has_integer = True
+                else:
+                    new_path.append(p)
+            if has_integer:
+                logger.debug("jsonpointer: %r is notfound. including integer?", query)
+                try:
+                    return accessor.access(doc, new_path)
+                except KeyError:
+                    pass
         raise KeyError(query)
 
 
@@ -61,10 +77,24 @@ def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
         return doc
     try:
         path = [normalize_json_pointer(p) for p in query.lstrip("#/").split("/")]
-        if guess:
-            path = [(int(p) if p.isdigit() else p) for p in path]
         return accessor.assign(doc, path, v)
     except KeyError:
+        if guess:
+            new_path = []
+            has_integer = False
+            for p in path:
+                if p.isdigit():
+                    new_path.append(int(p))
+                    has_integer = True
+                else:
+                    new_path.append(p)
+
+            if has_integer:
+                logger.debug("jsonpointer: %r is notfound. including integer?", query)
+                try:
+                    return accessor.assign(doc, new_path, v)
+                except KeyError:
+                    pass
         raise KeyError(query)
 
 
