@@ -5,10 +5,11 @@ import tempfile
 import shutil
 from collections import ChainMap
 
-from ..jsonknife.bundler import Scanner, CachedItemAccessor
-from ..langhelpers import make_dict, pairrsplit, reify
-from ..diff import diff
-from .. import loading
+from dictknife.jsonknife.bundler import Scanner, CachedItemAccessor
+from dictknife.langhelpers import make_dict, reify
+from dictknife.jsonknife import json_pointer_to_path
+from dictknife.diff import diff
+from dictknife import loading
 
 logger = logging.getLogger(__name__)
 
@@ -212,25 +213,31 @@ class _Updater:
             return False  # xxx
 
     def pop(self, ref, *, resolver=None):
+        return self.pop_by_path(json_pointer_to_path(ref), resolver=resolver)
+
+    def pop_by_path(self, path, *, resolver=None):
         resolver = resolver or self.resolver
-        v = resolver.access_by_json_pointer(ref)
-        self.update(ref, _Empty(v), resolver=resolver)
+        v = resolver.access(path)
+        self.update_by_path(path, _Empty(v), resolver=resolver)
         return v
 
     def update(self, ref, v, *, resolver=None):
+        return self.update_by_path(json_pointer_to_path(ref), v, resolver=resolver)
+
+    def update_by_path(self, path, v, *, resolver=None):
         resolver = resolver or self.resolver
-        parent_ref, k = pairrsplit(ref, "/")
-        if k == "":
+        if len(path) == 1:
             d = resolver.doc
-            k, parent_ref = parent_ref, ""
             if not hasattr(d, "parents"):  # chainmap?
-                resolver.doc = d = ChainMap(self.make_dict(), d)
+                if not isinstance(d, (list, tuple)):
+                    resolver.doc = d = ChainMap(self.make_dict(), d)
         else:
-            d = resolver.access_by_json_pointer(parent_ref)
+            d = resolver.access(path[:-1])
             if not hasattr(d, "parents"):  # chainmap?
-                d = ChainMap(self.make_dict(), d)
-            resolver.assign_by_json_pointer(parent_ref, d)
-        d[k] = v
+                if not isinstance(d, (list, tuple)):
+                    d = ChainMap(self.make_dict(), d)
+                    resolver.assign(path[:-1], d)
+        d[path[-1]] = v
 
     def iterate_items(self):
         return self.item_map.items()
