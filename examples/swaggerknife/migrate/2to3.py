@@ -66,6 +66,9 @@ def migrate_parameters(uu, data, *, path, scope):
             itr = data["parameters"].items()
 
         for i, param in itr:
+            if "$ref" in param:
+                continue
+
             in_value = param.get("in")
 
             if in_value in ("body", "form"):

@@ -105,8 +105,7 @@ paths:
   /users2/{userId}:
     get:
       parameters:
-      - schema:
-          $ref: '#/parameters/userId'
+      - $ref: '#/parameters/userId'
       responses:
         '200':
           content:
