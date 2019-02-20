@@ -35,18 +35,27 @@ class Accessor:
         d = self.maybe_access_container(d, path, default=default)
         if d is default:
             return default
-        return d.get(path[-1])
+        return d[path[-1]]
 
     def maybe_access_container(self, d, path, *, default=None):
         for name in path[:-1]:
-            if name not in d:
+            try:
+                d = d[name]
+            except KeyError:
                 return default
-            d = d[name]
-        if not d:
+            except TypeError:
+                if not isinstance(d, (list, tuple)):
+                    raise
+                d = d[int(name)]
+        try:
+            d[path[-1]]
+            return d
+        except KeyError:
             return default
-        if path[-1] not in d:
+        except TypeError:
+            if not isinstance(d, (list, tuple)):
+                raise
             return default
-        return d
 
 
 missing = object()
