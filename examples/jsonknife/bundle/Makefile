@@ -1,5 +1,5 @@
 default: clean
-	$(MAKE) 00 01 02 03 04
+	$(MAKE) 00 01 02 03 04 05 06
 OPTS ?=
 
 clean:
@@ -36,8 +36,20 @@ dst:
 	mkdir -p dst/${DIR}
 	jsonknife ${OPTS} bundle --src "src/${DIR}/main.json#/definitions/x" --extra "src/${DIR2}/config.json#/definitions/db" > dst/${DIR}/bundle.yaml
 
+# conflictted
 04: DIR := $(shell ls src | grep 04)
 04: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+
+# conflict on samefile
+05: DIR := $(shell ls src | grep 05)
+05: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+
+06: DIR := $(shell ls src | grep 06)
+06: dst
 	mkdir -p dst/${DIR}
 	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
 

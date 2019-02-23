@@ -1,0 +1,16 @@
+x:
+  definitions:
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+y:
+  definitions:
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+        nickname:
+          type: string
