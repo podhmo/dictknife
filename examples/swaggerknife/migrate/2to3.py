@@ -280,14 +280,15 @@ def run(
             {"consumes": ["application/json"], "produces": ["application/json"]}
         )
         callbacks = []
-        logger.debug("migrate mainfile	%s", u.name)
+        logger.debug("migrate mainfile file=%s", u.name)
         migrate_for_mainfile(u, scope=scope)
         for resolver in u.resolvers:
             uu = u.new_child(resolver)
-            logger.debug("migrate subfile	%s", uu.name)
+            logger.debug("migrate subfile file=%s", uu.name)
             migrate_for_subfile(uu, scope=scope, callbacks=callbacks)
 
         # callback
+        logger.debug("callbacks callbacks=%s", len(callbacks))
         for resolver in u.resolvers:
             uu = u.new_child(resolver)
             for cb in callbacks:
