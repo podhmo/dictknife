@@ -1,0 +1,5 @@
+definitions:
+  user:
+    $ref: "bank.yaml#/definitions/user"
+  service:
+    $ref: "service.yaml#/definitions/service"

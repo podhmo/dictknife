@@ -1,0 +1,31 @@
+definitions:
+  user:
+    type: object
+    properties:
+      name:
+        type: string
+      account:
+        $ref: '#/definitions/account'
+  service:
+    type: object
+    properties:
+      name:
+        type: string
+      accounts:
+        type: array
+        items:
+          $ref: '#/definitions/account'
+  account:
+    descrition: account of the bank
+    type: object
+    properties:
+      name:
+        type: string
+  account1:
+    descrition: user of service
+    type: object
+    properties:
+      name:
+        type: string
+      registeredAt:
+        type: string

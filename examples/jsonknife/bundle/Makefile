@@ -1,5 +1,5 @@
 default: clean
-	$(MAKE) 00 01 02 03
+	$(MAKE) 00 01 02 03 04
 OPTS ?=
 
 clean:
@@ -35,3 +35,9 @@ dst:
 03: dst
 	mkdir -p dst/${DIR}
 	jsonknife ${OPTS} bundle --src "src/${DIR}/main.json#/definitions/x" --extra "src/${DIR2}/config.json#/definitions/db" > dst/${DIR}/bundle.yaml
+
+04: DIR := $(shell ls src | grep 04)
+04: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+
