@@ -10,8 +10,6 @@ from dictknife.swaggerknife.migration import Migration, is_empty_collection, is_
 # todo: update ref
 # todo: move definitions
 # todo: support parameters
-
-
 # reorder
 def transform(doc, *, sort_keys=False):
     heavy_defs = ["definitions", "schemas", "responses", "parameters", "paths"]
@@ -140,7 +138,14 @@ def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
             )
 
 
-def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
+def migrate_for_subfile(
+    uu,
+    *,
+    scope,
+    callbacks,
+    schema_walker=DictWalker(["schema"]),
+    ref_wawlker=DictWalker(["$ref"]),
+):
     migrate_refs(uu, scope=scope)
     if uu.has("definitions"):
         uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
@@ -151,6 +156,24 @@ def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
         uu.update_by_path(["components", "parameters"], uu.pop_by_path(["parameters"]))
         # for in:body
         if request_bodies:
+            names = list(request_bodies.keys())
+
+            # todo: optimizatin?
+            def fixref(uu, *, names=names):
+                for path, sd in ref_wawlker.walk(uu.resolver.doc):
+                    if "#/components/parameters" not in sd["$ref"]:
+                        return
+                    if not any(name in sd["$ref"] for name in names):
+                        return
+                    uu.update_by_path(
+                        path,
+                        sd["$ref"].replace(
+                            "#/components/parameters", "#/components/requestBodies"
+                        ),
+                    )
+
+            callbacks.append(fixref)
+
             for name, body in request_bodies.items():
                 uu.update_by_path(["components", "requestBodies", name], body)
 
@@ -274,10 +297,17 @@ def run(
         scope = Scope(
             {"consumes": ["application/json"], "produces": ["application/json"]}
         )
+        callbacks = []
         migrate_for_mainfile(u, scope=scope)
         for resolver in u.resolvers:
             uu = u.new_child(resolver)
-            migrate_for_subfile(uu, scope=scope)
+            migrate_for_subfile(uu, scope=scope, callbacks=callbacks)
+
+        # callback
+        for resolver in u.resolvers:
+            uu = u.new_child(resolver)
+            for cb in callbacks:
+                cb(uu)
 
 
 def main(argv=None):

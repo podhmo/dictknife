@@ -2,7 +2,7 @@ paths:
   /users3:
     post:
       parameters:
-      - $ref: 'components/parameters.yaml#/components/parameters/postUserBody'
+      - $ref: 'components/parameters.yaml#/components/requestBodies/postUserBody'
       responses:
         '201':
           description: Created
