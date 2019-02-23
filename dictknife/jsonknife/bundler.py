@@ -12,7 +12,7 @@ from .accessor import CachedItemAccessor
 logger = logging.getLogger("jsonknife.bundler")
 
 
-class Bundler(object):
+class Bundler:
     def __init__(self, resolver, strict=False):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
@@ -33,7 +33,7 @@ class Bundler(object):
         return self.emitter.emit(self.resolver, doc)
 
 
-class Scanner(object):
+class Scanner:
     def __init__(self, accessor, item_map, strict=False):
         self.accessor = accessor
         self.item_map = item_map
@@ -49,7 +49,7 @@ class Scanner(object):
 
     @reify
     def localref_fixer(self):  # todo: rename
-        return SwaggerLocalrefFixer()
+        return LocalrefFixer()
 
     def scan(self, doc):
         for path, sd in self.ref_walking.iterate(doc):
@@ -70,7 +70,7 @@ class Scanner(object):
                 self.accessor.pop_stack()
 
 
-class Emitter(object):
+class Emitter:
     def __init__(self, accessor, item_map):
         self.raw_accessor = Accessor()
         self.accessor = accessor
@@ -127,7 +127,7 @@ class Emitter(object):
             sd["$ref"] = new_ref
 
 
-class SwaggerLocalrefFixer(object):  # todo: rename
+class LocalrefFixer:  # todo: rename
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
         if name:
@@ -152,7 +152,7 @@ class SwaggerLocalrefFixer(object):  # todo: rename
         return item
 
 
-class SimpleConflictFixer(object):  # todo: rename
+class SimpleConflictFixer:  # todo: rename
     def __init__(self, item_map, strict=False):
         self.item_map = item_map
         self.strict = strict
