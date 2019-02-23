@@ -7,6 +7,13 @@ dst:
 clean:
 	rm -rf dst
 
+validate:
+	for i in `ls src/*.yaml| grep 3`; do $(MAKE) -s validate-one FILE=$$i; done
+validate-one: FILE ?= src/3.0.yaml
+validate-one:
+	echo ${FILE}
+	docker-compose run --rm -w /project validator ${FILE}
+
 00: dst
 	# xxx: savedir is not good parameters. emitting onto dst/00/src/00
 	python 00migrate.py ${OPTS} --src src/00/main.yaml --savedir dst/00
