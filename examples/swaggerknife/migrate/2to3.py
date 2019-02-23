@@ -103,7 +103,8 @@ def migrate_parameters(uu, data, *, path, scope):
                     consume = "application/x-www-form-urlencoded"
                 request_body["content"] = {consume: content}
 
-                frame["requestBody"] = request_body
+                # xxx:
+                frame[i if hasattr(i, "upper") else "requestBody"] = request_body
             else:
                 content = uu.make_dict()
                 for k in list(param.keys()):
@@ -147,8 +148,12 @@ def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
         request_bodies = migrate_parameters(
             uu, uu.resolver.doc, path=["parameters"], scope=scope
         )
-        # todo: move request_bodies to requestBodies
         uu.update_by_path(["components", "parameters"], uu.pop_by_path(["parameters"]))
+        # for in:body
+        if request_bodies:
+            for name, body in request_bodies.items():
+                uu.update_by_path(["components", "requestBodies", name], body)
+
     if uu.has("responses"):
         uu.update_by_path(["components", "responses"], uu.pop_by_path(["responses"]))
     if uu.has("securityDefinitions"):
@@ -270,7 +275,6 @@ def run(
             {"consumes": ["application/json"], "produces": ["application/json"]}
         )
         migrate_for_mainfile(u, scope=scope)
-        # todo: parse toplevel parameters
         for resolver in u.resolvers:
             uu = u.new_child(resolver)
             migrate_for_subfile(uu, scope=scope)

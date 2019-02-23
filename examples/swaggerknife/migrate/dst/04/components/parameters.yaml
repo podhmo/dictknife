@@ -9,3 +9,12 @@ components:
         format: int64
         minimum: 1
         type: integer
+  requestBodies:
+    postUserBody:
+      content:
+        application/json:
+          schema:
+            $ref: './definitions.yaml#/components/schemas/User'
+      description: |
+        The json body when creating user
+      required: true

@@ -27,6 +27,7 @@ validate-one:
 	python 2to3.py ${OPTS} --sort-keys --src src/more2.0.yaml --savedir dst/03
 04: dst
 	python 2to3.py ${OPTS} --sort-keys --src src/separated/more2.0/main.yaml --savedir dst/04
+	# todo bundle
 
 2to3:
 	python 2to3.py ${OPTS} --src src/more2.0.yaml --dry-run --savedir dst/xxxx

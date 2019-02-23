@@ -31,3 +31,5 @@ paths:
     $ref: "api_users2.yaml#/paths/~1users2"
   /users2/{userId}:
     $ref: "api_users2.yaml#/paths/~1users2~1{userId}"
+  /users3:
+    $ref: "api_users3.yaml#/paths/~1users3"
