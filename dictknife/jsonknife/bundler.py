@@ -128,17 +128,6 @@ class Emitter(object):
 
 
 class SwaggerLocalrefFixer(object):  # todo: rename
-    prefixes = set(["definitions", "paths", "responses", "parameters"])
-
-    def guess_prefix(self, path, item):
-        for node in reversed(path):
-            if node in self.prefixes:
-                return node
-            if node == "schema":
-                return "definitions"
-        logger.info("fix localref: prefix is not found from %s", path)
-        return "definitions"
-
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
         if name:
@@ -151,16 +140,15 @@ class SwaggerLocalrefFixer(object):  # todo: rename
             localref = localref[1:]
 
         prefix, name = pairrsplit(localref, "/")
-
-        if prefix not in self.prefixes:
-            prefix = self.guess_prefix(path, item)
-
+        if not prefix:
+            prefix = "definitions"  # xxx:
         if not name:
             name = self.guess_name(path, item)
 
         # xxx: side effect
         item.localref = "{}/{}".format(prefix, name)
-        # print("changes: {} -> {}".format(localref, item.localref), file=sys.stderr)
+        if item.localref != localref:
+            logger.info("fix localref %s -> %s", localref, item.localref)
         return item
 
 
