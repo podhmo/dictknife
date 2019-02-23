@@ -7,11 +7,11 @@ from dictknife.transform import normalize_dict
 from dictknife.jsonknife import get_resolver
 from dictknife.swaggerknife.migration import Migration, is_empty_collection, is_empty
 
-# todo: update ref
-# todo: move definitions
-# todo: support parameters
-# reorder
+logger = logging.getLogger(__name__)
+
+
 def transform(doc, *, sort_keys=False):
+    """reorder"""
     heavy_defs = ["definitions", "schemas", "responses", "parameters", "paths"]
     r = make_dict()
     for k, v in doc.items():
@@ -121,8 +121,8 @@ def migrate_parameters(uu, data, *, path, scope):
     return frame
 
 
-def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
-    for path, d in walker.walk(uu.resolver.doc):
+def migrate_refs(uu, data, *, scope, walker=DictWalker(["$ref"])):
+    for path, d in walker.walk(data):
         if "/definitions/" in d["$ref"]:
             uu.update_by_path(
                 path, d["$ref"].replace("/definitions/", "/components/schemas/", 1)
@@ -138,15 +138,81 @@ def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
             )
 
 
-def migrate_for_subfile(
-    uu,
-    *,
-    scope,
-    callbacks,
-    schema_walker=DictWalker(["schema"]),
-    ref_wawlker=DictWalker(["$ref"]),
-):
-    migrate_refs(uu, scope=scope)
+def migrate_paths(uu, data, *, scope, schema_walker=DictWalker(["schema"])):
+    for url_path, path_item in data["paths"].items():
+        # xxx: vendor extensions?
+        if url_path.startswith("x-"):
+            continue
+
+        # todo: parse pathItem object
+        # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
+        operation_methods = ["get", "put", "post", "delete", "options", "head", "patch"]
+        frame = {}
+        frame.update(
+            migrate_parameters(
+                uu, path_item, path=["paths", url_path, "parameters"], scope=scope
+            )
+        )
+        with scope.scope(frame or None):
+            for method_name in operation_methods:
+                operation = path_item.get(method_name)
+                if operation is None:
+                    continue
+
+                # todo: parse Operation object
+                # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
+
+                frame = {}
+
+                # parameters
+                frame.update(
+                    migrate_parameters(
+                        uu,
+                        operation,
+                        path=["paths", url_path, method_name, "parameters"],
+                        scope=scope,
+                    )
+                )
+
+                # produces
+                if "produces" in operation:
+                    frame["produces"] = uu.pop_by_path(
+                        ["paths", url_path, method_name, "produces"]
+                    )
+                # consumes
+                if "consumes" in operation:
+                    frame["consumes"] = uu.pop_by_path(
+                        ["paths", url_path, method_name, "consumes"]
+                    )
+
+                # responses
+                with scope.scope(frame or None):
+                    # requestBody
+                    request_body = scope.get(["requestBody"])
+                    if request_body is not None:
+                        uu.update_by_path(
+                            ["paths", url_path, method_name, "requestBody"],
+                            request_body,
+                        )
+
+                    if "responses" in operation:
+                        for spath, sd in schema_walker.walk(operation["responses"]):
+                            fullpath = [
+                                "paths",
+                                url_path,
+                                method_name,
+                                "responses",
+                                *spath,
+                            ]
+                            schema = uu.pop_by_path(fullpath)
+                            content = uu.make_dict()
+                            for produce in scope[["produces"]]:
+                                content[produce] = {"schema": schema}
+                            uu.update_by_path([*fullpath[:-1], "content"], content)
+
+
+def migrate_for_subfile(uu, *, scope, callbacks, ref_wawlker=DictWalker(["$ref"])):
+    migrate_refs(uu, uu.resolver.doc, scope=scope)
     if uu.has("definitions"):
         uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
     if uu.has("parameters"):
@@ -192,91 +258,7 @@ def migrate_for_subfile(
 
     with scope.scope(frame or None):
         if uu.has("paths"):
-            for url_path, path_item in uu.resolver.doc["paths"].items():
-                # xxx: vendor extensions?
-                if url_path.startswith("x-"):
-                    continue
-
-                # todo: parse pathItem object
-                # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
-                operation_methods = [
-                    "get",
-                    "put",
-                    "post",
-                    "delete",
-                    "options",
-                    "head",
-                    "patch",
-                ]
-                frame = {}
-                frame.update(
-                    migrate_parameters(
-                        uu,
-                        path_item,
-                        path=["paths", url_path, "parameters"],
-                        scope=scope,
-                    )
-                )
-                with scope.scope(frame or None):
-                    for method_name in operation_methods:
-                        operation = path_item.get(method_name)
-                        if operation is None:
-                            continue
-
-                        # todo: parse Operation object
-                        # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
-
-                        frame = {}
-
-                        # parameters
-                        frame.update(
-                            migrate_parameters(
-                                uu,
-                                operation,
-                                path=["paths", url_path, method_name, "parameters"],
-                                scope=scope,
-                            )
-                        )
-
-                        # produces
-                        if "produces" in operation:
-                            frame["produces"] = uu.pop_by_path(
-                                ["paths", url_path, method_name, "produces"]
-                            )
-                        # consumes
-                        if "consumes" in operation:
-                            frame["consumes"] = uu.pop_by_path(
-                                ["paths", url_path, method_name, "consumes"]
-                            )
-
-                        # responses
-                        with scope.scope(frame or None):
-                            # requestBody
-                            request_body = scope.get(["requestBody"])
-                            if request_body is not None:
-                                uu.update_by_path(
-                                    ["paths", url_path, method_name, "requestBody"],
-                                    request_body,
-                                )
-
-                            if "responses" in operation:
-                                for spath, sd in schema_walker.walk(
-                                    operation["responses"]
-                                ):
-                                    fullpath = [
-                                        "paths",
-                                        url_path,
-                                        method_name,
-                                        "responses",
-                                        *spath,
-                                    ]
-                                    schema = uu.pop_by_path(fullpath)
-                                    content = uu.make_dict()
-                                    for produce in scope[["produces"]]:
-                                        content[produce] = {"schema": schema}
-                                    uu.update_by_path(
-                                        [*fullpath[:-1], "content"], content
-                                    )
+            migrate_paths(uu, uu.resolver.doc, scope=scope)
 
 
 # todo: skip x-XXX
@@ -298,9 +280,11 @@ def run(
             {"consumes": ["application/json"], "produces": ["application/json"]}
         )
         callbacks = []
+        logger.debug("migrate mainfile	%s", u.name)
         migrate_for_mainfile(u, scope=scope)
         for resolver in u.resolvers:
             uu = u.new_child(resolver)
+            logger.debug("migrate subfile	%s", uu.name)
             migrate_for_subfile(uu, scope=scope, callbacks=callbacks)
 
         # callback
