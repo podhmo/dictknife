@@ -38,6 +38,7 @@ class Scanner:
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
+        self.seen = set()
 
     @reify
     def ref_walking(self):
@@ -55,6 +56,9 @@ class Scanner:
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
+                if item in self.seen:
+                    continue
+                self.seen.add(item)
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
