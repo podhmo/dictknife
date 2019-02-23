@@ -208,10 +208,13 @@ class _Updater:
 
     @reify
     def resolvers(self):
-        resolvers = set(item.resolver for item in self.item_map.values())
-        if self.resolver not in resolvers:
-            resolvers.add(self.resolver)
-        return resolvers
+        # deduplicate by resolver.name
+        resolvers = {
+            item.resolver.name: item.resolver for item in self.item_map.values()
+        }
+        if self.resolver.name not in resolvers:
+            resolvers[self.resolver.name] = self.resolver
+        return list(resolvers.values())
 
     def new_child(self, resolver):
         return self.__class__(resolver, self.item_map, make_dict=self.make_dict)
