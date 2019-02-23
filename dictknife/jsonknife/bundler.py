@@ -1,7 +1,7 @@
 import sys
 import logging
 import os.path
-from dictknife.langhelpers import make_dict
+from dictknife.langhelpers import make_dict, titleize
 from dictknife import DictWalker
 from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
@@ -175,14 +175,19 @@ class SimpleConflictFixer:  # todo: rename
         msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
             raise RuntimeError(msg)
-        sys.stderr.write(msg)
-        sys.stderr.write("\n")
-        i = 1
-        while True:
-            new_localref = "{}{}".format(newitem.localref, i)
-            if new_localref not in self.item_map:
-                newitem.localref = new_localref
-                break
-            i += 1
+        print(msg, file=sys.stderr)
+
+        if olditem.globalref[0] != newitem.globalref[0]:
+            dirpath, name = pairrsplit(newitem.localref, "/")
+            prefix = os.path.splitext(pairrsplit(newitem.globalref[0], "/")[1])[0]
+            newitem.localref = "{}/{}{}".format(dirpath, prefix, titleize(name))
+        else:
+            i = 1
+            while True:
+                new_localref = "{}{}".format(newitem.localref, i)
+                if new_localref not in self.item_map:
+                    newitem.localref = new_localref
+                    break
+                i += 1
         self.item_map[newitem.localref] = newitem
         return newitem

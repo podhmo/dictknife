@@ -21,7 +21,7 @@ definitions:
     properties:
       name:
         type: string
-  account1:
+  serviceAccount:
     descrition: user of service
     type: object
     properties:
