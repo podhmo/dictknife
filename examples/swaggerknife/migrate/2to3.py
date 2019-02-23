@@ -5,7 +5,7 @@ from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
 from dictknife.transform import normalize_dict
 from dictknife.jsonknife import get_resolver
-from dictknife.swaggerknife.migration import Migration, is_empty_collection
+from dictknife.swaggerknife.migration import Migration, is_empty_collection, is_empty
 
 # todo: update ref
 # todo: move definitions
@@ -62,8 +62,14 @@ def migrate_parameters(uu, data, *, path, scope):
     if "parameters" in data:
         if isinstance(data["parameters"], (list, tuple)):
             itr = enumerate(data["parameters"])
-        else:
+        elif hasattr(data["parameters"], "items"):
             itr = data["parameters"].items()
+        elif is_empty(data["parameters"]):
+            return frame
+        else:
+            raise RuntimeError(
+                "unexpected #/parameters: %{!r}".format(data["parameters"])
+            )
 
         for i, param in itr:
             if "$ref" in param:
@@ -122,20 +128,40 @@ def migrate_refs(uu, *, scope, walker=DictWalker(["$ref"])):
             uu.update_by_path(
                 path, d["$ref"].replace("/definitions/", "/components/schemas/", 1)
             )
+        if "/parameters/" in d["$ref"]:
+            uu.update_by_path(
+                path, d["$ref"].replace("/parameters/", "/components/parameters/", 1)
+            )
+
+        if "/responses/" in d["$ref"]:
+            uu.update_by_path(
+                path, d["$ref"].replace("/responses/", "/components/responses/", 1)
+            )
 
 
 def migrate_for_subfile(uu, *, scope, schema_walker=DictWalker(["schema"])):
     migrate_refs(uu, scope=scope)
     if uu.has("definitions"):
         uu.update_by_path(["components", "schemas"], uu.pop_by_path(["definitions"]))
+    if uu.has("parameters"):
+        request_bodies = migrate_parameters(
+            uu, uu.resolver.doc, path=["parameters"], scope=scope
+        )
+        # todo: move request_bodies to requestBodies
+        uu.update_by_path(["components", "parameters"], uu.pop_by_path(["parameters"]))
+    if uu.has("responses"):
+        uu.update_by_path(["components", "responses"], uu.pop_by_path(["responses"]))
     if uu.has("securityDefinitions"):
         uu.update_by_path(
-            ["components", "securitySchemas"], uu.pop_by_path(["securityDefinitions"])
+            ["components", "securitySchemes"], uu.pop_by_path(["securityDefinitions"])
         )
+
+    # todo: requestBodies
     frame = {}
     frame.update(
         migrate_parameters(uu, uu.resolver.doc, path=["parameters"], scope=scope)
     )
+
     with scope.scope(frame or None):
         if uu.has("paths"):
             for url_path, path_item in uu.resolver.doc["paths"].items():

@@ -14,6 +14,10 @@ from dictknife import loading
 logger = logging.getLogger(__name__)
 
 
+def is_empty(x):
+    return not x or isinstance(x, _Empty)
+
+
 def is_empty_collection(coll):
     return sum(1 for x in coll if not isinstance(x, _Empty)) == 0
 
