@@ -66,12 +66,6 @@ class Scanner(object):
                     if newitem is None:
                         continue
                     self.scan(doc=newitem.data)
-            except RuntimeError:
-                raise
-            except Exception as e:
-                raise RuntimeError(
-                    "{} (where={})".format(e, self.accessor.resolver.name)
-                )
             finally:
                 self.accessor.pop_stack()
 
