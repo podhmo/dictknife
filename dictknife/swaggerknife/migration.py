@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def is_empty(x):
-    return not x or isinstance(x, _Empty)
+    return not x or hasattr(x, "unwrap")
 
 
 def is_empty_collection(coll):
-    return sum(1 for x in coll if not isinstance(x, _Empty)) == 0
+    return sum(1 for x in coll if not hasattr(x, "unwrap")) == 0
 
 
 class _Empty:
@@ -27,6 +27,9 @@ class _Empty:
 
     def __init__(self, v):
         self.v = v
+
+    def unwrap(self):
+        return self.v
 
 
 class Migration:
@@ -184,18 +187,18 @@ class _Differ:
         elif isinstance(d, (list, tuple)):
             return [self.before_data(x) for x in d]
         else:
-            return d.v if isinstance(d, _Empty) else d
+            return d.unwrap() if hasattr(d, "unwrap") else d
 
     def after_data(self, d):
         if hasattr(d, "keys"):
             r = self.make_dict()
             for k, v in d.items():
-                if isinstance(v, _Empty):
+                if hasattr(v, "unwrap"):
                     continue
                 r[k] = self.after_data(v)
             return r
         elif isinstance(d, (list, tuple)):
-            return [self.after_data(x) for x in d if not isinstance(x, _Empty)]
+            return [self.after_data(x) for x in d if not hasattr(x, "unwrap")]
         else:
             return d
 
