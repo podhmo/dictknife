@@ -14,7 +14,7 @@ paths:
   /users2/{userId}:
     get:
       parameters:
-      - $ref: 'components/parameters.yaml#/parameters/userId'
+      - $ref: 'components/parameters.yaml#/components/parameters/userId'
       responses:
         '200':
           content:

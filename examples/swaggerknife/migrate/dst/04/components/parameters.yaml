@@ -1,10 +1,11 @@
-parameters:
-  userId:
-    description: The ID of the user to return
-    in: path
-    name: userId
-    required: true
-    schema:
-      format: int64
-      minimum: 1
-      type: integer
+components:
+  parameters:
+    userId:
+      description: The ID of the user to return
+      in: path
+      name: userId
+      required: true
+      schema:
+        format: int64
+        minimum: 1
+        type: integer
