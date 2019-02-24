@@ -5,7 +5,9 @@ definitions:
       name:
         type: string
       account:
-        $ref: '#/definitions/account'
+        $ref: '#/definitions/bankAccount'
+      account2:
+        $ref: '#/definitions/bankAccount'
   service:
     type: object
     properties:
@@ -14,9 +16,9 @@ definitions:
       accounts:
         type: array
         items:
-          $ref: '#/definitions/account'
+          $ref: '#/definitions/serviceAccount'
   account:
-    descrition: account of the bank
+    descrition: root account
     type: object
     properties:
       name:
@@ -28,4 +30,10 @@ definitions:
       name:
         type: string
       registeredAt:
+        type: string
+  bankAccount:
+    descrition: account of the bank
+    type: object
+    properties:
+      name:
         type: string

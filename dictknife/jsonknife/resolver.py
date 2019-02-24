@@ -7,13 +7,13 @@ from dictknife import loading
 from dictknife.walkers import DictWalker
 from dictknife.langhelpers import reify, pairrsplit
 
-from .accessor import AccessorMixin
+from .accessor import AccessingMixin
 from .relpath import normpath
 
 logger = logging.getLogger("jsonknife.resolver")
 
 
-class OneDocResolver(AccessorMixin):
+class OneDocResolver(AccessingMixin):
     def __init__(self, doc, *, name="*root*", onload=None, format=None):
         self.doc = doc
         self.name = name
@@ -29,7 +29,7 @@ class OneDocResolver(AccessorMixin):
         return self, query[1:]
 
 
-class ExternalFileResolver(AccessorMixin):
+class ExternalFileResolver(AccessingMixin):
     def __init__(
         self,
         filename,

@@ -54,19 +54,48 @@ class Scanner:
     def localref_fixer(self):  # todo: rename
         return LocalrefFixer()
 
-    def scan(self, doc, *, conflicted=None):
-        if conflicted is None:
-            conflicted = defaultdict(list)
+    def scan(self, doc):
+        conflicted = defaultdict(list)
+        self._scan_refs(doc, conflicted=conflicted)
+        self._scan_toplevel(doc, conflicted=conflicted)
+        return conflicted
+
+    def _scan_toplevel(self, doc, *, conflicted):
+        assert len(self.accessor.stack) == 1
+        for name in list(self.item_map.keys()):
+            try:
+                toplevel_item = self.accessor.access("#/" + name)
+                if "$ref" in toplevel_item.data:
+                    continue
+                ref_item = self.item_map[name]
+                if ref_item == toplevel_item:
+                    continue
+
+                self.item_map[name] = toplevel_item
+                new_item = self.conflict_fixer.fix_conflict(
+                    toplevel_item, ref_item
+                )
+                if new_item is None:
+                    continue
+                conflicted[name].append(new_item)
+            except KeyError:
+                continue
+            finally:
+                self.accessor.pop_stack()
+        assert len(self.accessor.stack) == 1
+
+    def _scan_refs(self, doc, *, conflicted):
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
                 if item in self.seen:
                     continue
                 self.seen.add(item)
+
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
-                    self.scan(doc=item.data, conflicted=conflicted)
+                    self._scan_refs(doc=item.data, conflicted=conflicted)
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(
                         self.item_map[item.localref], item
@@ -74,10 +103,9 @@ class Scanner:
                     if newitem is None:
                         continue
                     conflicted[sd["$ref"]].append(newitem)
-                    self.scan(doc=newitem.data, conflicted=conflicted)
+                    self._scan_refs(doc=newitem.data, conflicted=conflicted)
             finally:
                 self.accessor.pop_stack()
-        return conflicted
 
 
 class Emitter:
@@ -182,7 +210,6 @@ class SimpleConflictFixer:  # todo: rename
         if self.is_same_item(newitem, olditem):
             self.item_map[newitem.localref] = newitem
             return None
-
         msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
             raise RuntimeError(msg)

@@ -6,6 +6,8 @@ definitions:
         type: string
       account:
         $ref: "#/definitions/account"
+      account2:
+        $ref: "#/definitions/account"
   account:
     descrition: "account of the bank"
     type: object

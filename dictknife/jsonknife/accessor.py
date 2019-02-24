@@ -5,7 +5,7 @@ from dictknife.langhelpers import as_jsonpointer, as_path_node
 logger = logging.getLogger(__name__)
 
 
-class AccessorMixin:
+class AccessingMixin:
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):
         if doc is None:
@@ -34,12 +34,19 @@ class AccessorMixin:
 
 
 class CachedItem:
+    __slots__ = ("file", "localref", "globalref", "resolver", "data")
+
     def __init__(self, file, localref, globalref, resolver, data):
         self.file = file
         self.localref = localref
         self.globalref = globalref
         self.resolver = resolver
         self.data = data
+
+    def __repr__(self):
+        return "<{} localref={self.localref!r},  globalref={self.globalref!r}>".format(
+            self.__class__.__name__, self=self
+        )
 
 
 def path_to_json_pointer(path):
@@ -101,7 +108,7 @@ def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
         raise KeyError(query)
 
 
-class StackedAccessor(object):
+class StackedAccessor:
     def __init__(self, resolver, accessor=Accessor()):
         self.stack = [resolver]
         self.accessor = accessor
@@ -131,6 +138,15 @@ class StackedAccessor(object):
 
     def push_stack(self, resolver):
         return self.stack.append(resolver)
+
+    # shortcut
+    def as_json(self, doc=None, out=None):
+        import sys
+        import json
+
+        doc = doc or self.resolver.doc
+        out = out or sys.stderr
+        return json.dump(doc, out, indent=2, ensure_ascii=False)
 
 
 class CachedItemAccessor(StackedAccessor):
