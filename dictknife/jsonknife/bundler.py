@@ -1,11 +1,13 @@
 import sys
 import logging
 import os.path
-from dictknife.langhelpers import make_dict, titleize
+from collections import defaultdict
+
+from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
-from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
+
 from .relpath import relpath
 from .accessor import CachedItemAccessor
 
@@ -29,8 +31,8 @@ class Bundler:
 
     def bundle(self, doc=None):
         doc = doc or self.resolver.doc
-        self.scanner.scan(doc)
-        return self.emitter.emit(self.resolver, doc)
+        conflicted = self.scanner.scan(doc)
+        return self.emitter.emit(self.resolver, doc, conflicted=conflicted)
 
 
 class Scanner:
@@ -52,7 +54,9 @@ class Scanner:
     def localref_fixer(self):  # todo: rename
         return LocalrefFixer()
 
-    def scan(self, doc):
+    def scan(self, doc, *, conflicted=None):
+        if conflicted is None:
+            conflicted = defaultdict(list)
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
@@ -62,16 +66,18 @@ class Scanner:
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
-                    self.scan(doc=item.data)
+                    self.scan(doc=item.data, conflicted=conflicted)
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(
                         self.item_map[item.localref], item
                     )
                     if newitem is None:
                         continue
-                    self.scan(doc=newitem.data)
+                    conflicted[sd["$ref"]].append(newitem)
+                    self.scan(doc=newitem.data, conflicted=conflicted)
             finally:
                 self.accessor.pop_stack()
+        return conflicted
 
 
 class Emitter:
@@ -90,7 +96,7 @@ class Emitter:
     def get_item_by_localref(self, localref):
         return self.item_map[localref]
 
-    def emit(self, resolver, doc):
+    def emit(self, resolver, doc, *, conflicted):
         # side effect
         d = make_dict()
         for path, sd in self.ref_walking.iterate(doc):
@@ -103,9 +109,10 @@ class Emitter:
             data = item.data
             # replace: <file.yaml>#/<ref> -> #/<ref>
             for path, sd in self.ref_walking.iterate(data):
-                if sd["$ref"].startswith("#/"):
-                    continue
-                self.replace_ref(item.resolver, sd)
+                if not sd["$ref"].startswith("#/"):
+                    self.replace_ref(item.resolver, sd)
+                if sd["$ref"] in conflicted:
+                    self.replace_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
 
         # adhoc paths support
