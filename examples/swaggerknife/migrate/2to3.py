@@ -56,7 +56,7 @@ def migrate_for_mainfile(u, *, scope):
 
 
 def migrate_parameters(uu, data, *, path, scope):
-    frame = {}
+    frame = make_dict()
     if "parameters" in data:
         if isinstance(data["parameters"], (list, tuple)):
             itr = enumerate(data["parameters"])
@@ -147,7 +147,7 @@ def migrate_paths(uu, data, *, scope, schema_walker=DictWalker(["schema"])):
         # todo: parse pathItem object
         # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#path-item-object
         operation_methods = ["get", "put", "post", "delete", "options", "head", "patch"]
-        frame = {}
+        frame = make_dict()
         frame.update(
             migrate_parameters(
                 uu, path_item, path=["paths", url_path, "parameters"], scope=scope
@@ -162,7 +162,7 @@ def migrate_paths(uu, data, *, scope, schema_walker=DictWalker(["schema"])):
                 # todo: parse Operation object
                 # https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object
 
-                frame = {}
+                frame = make_dict()
 
                 # parameters
                 frame.update(
@@ -251,7 +251,7 @@ def migrate_for_subfile(uu, *, scope, callbacks, ref_wawlker=DictWalker(["$ref"]
         )
 
     # todo: requestBodies
-    frame = {}
+    frame = make_dict()
     frame.update(
         migrate_parameters(uu, uu.resolver.doc, path=["parameters"], scope=scope)
     )

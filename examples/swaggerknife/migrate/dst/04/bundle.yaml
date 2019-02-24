@@ -2,6 +2,35 @@ components:
   securitySchemes:
     BasicAuth:
       type: basic
+  schemas:
+    User:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      required:
+      - id
+      - name
+  parameters:
+    userId:
+      description: The ID of the user to return
+      in: path
+      name: userId
+      required: true
+      schema:
+        format: int64
+        minimum: 1
+        type: integer
+  requestBodies:
+    postUserBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+      description: |
+        The json body when creating user
+      required: true
 info:
   description: API description in Markdown.
   title: Sample API
@@ -74,7 +103,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/User'
+              $ref: '#/components/schemas/User'
         required: true
       responses:
         '201':
@@ -83,13 +112,13 @@ paths:
   /users2/{userId}:
     get:
       parameters:
-      - $ref: '#/parameters/userId'
+      - $ref: '#/components/parameters/userId'
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/definitions/User'
+                $ref: '#/components/schemas/User'
           description: A user object.
         '400':
           description: The specified user ID is invalid (not a number)
@@ -101,7 +130,7 @@ paths:
   /users3:
     post:
       parameters:
-      - $ref: '#/parameters/postUserBody'
+      - $ref: '#/components/requestBodies/postUserBody'
       responses:
         '201':
           description: Created
@@ -111,31 +140,3 @@ security:
 servers:
 - description: ''
   url: 'http://api.example.com/v1'
-definitions:
-  User:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    required:
-    - id
-    - name
-parameters:
-  userId:
-    description: The ID of the user to return
-    in: path
-    name: userId
-    required: true
-    schema:
-      format: int64
-      minimum: 1
-      type: integer
-  postUserBody:
-    content:
-      application/json:
-        schema:
-          $ref: '#/definitions/User'
-    description: |
-      The json body when creating user
-    required: true

@@ -22,11 +22,14 @@ validate-one:
 01: dst
 	# xxx: savedir is not good parameters. emitting onto dst/01/src/01
 	python 2to3.py ${OPTS} ${EXTRA_OPTS} --src src/2.0.yaml --savedir dst/01
+
 02: dst
 	python 2to3.py ${OPTS} ${EXTRA_OPTS} --src src/separated/2.0/main.yaml --savedir dst/02
 	jsonknife bundle --src dst/02/main.yaml --dst dst/02/bundle.yaml
+
 03: dst
 	python 2to3.py ${OPTS} ${EXTRA_OPTS} --src src/more2.0.yaml --savedir dst/03
+
 04: dst
 	python 2to3.py ${OPTS} ${EXTRA_OPTS} --src src/separated/more2.0/main.yaml --savedir dst/04
 	jsonknife bundle --src dst/04/main.yaml --dst dst/04/bundle.yaml
