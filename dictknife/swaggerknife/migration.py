@@ -11,7 +11,7 @@ from dictknife.jsonknife import json_pointer_to_path
 from dictknife.diff import diff
 from dictknife import loading
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(".".join(__name__.split(".")[1:]))
 
 
 def is_empty(x):
