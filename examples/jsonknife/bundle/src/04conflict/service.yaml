@@ -1,0 +1,18 @@
+definitions:
+  service:
+    type: object
+    properties:
+      name:
+        type: string
+      accounts:
+        type: array
+        items:
+          $ref: "#/definitions/account"
+  account:
+    descrition: "user of service"
+    type: object
+    properties:
+      name:
+        type: string
+      registeredAt:
+        type: string

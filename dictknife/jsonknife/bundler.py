@@ -1,18 +1,20 @@
 import sys
 import logging
 import os.path
-from dictknife.langhelpers import make_dict
+from collections import defaultdict
+
+from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
-from dictknife.langhelpers import reify, pairrsplit
 from dictknife import Accessor
 from dictknife import deepmerge
+
 from .relpath import relpath
 from .accessor import CachedItemAccessor
 
 logger = logging.getLogger("jsonknife.bundler")
 
 
-class Bundler(object):
+class Bundler:
     def __init__(self, resolver, strict=False):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
@@ -29,15 +31,16 @@ class Bundler(object):
 
     def bundle(self, doc=None):
         doc = doc or self.resolver.doc
-        self.scanner.scan(doc)
-        return self.emitter.emit(self.resolver, doc)
+        conflicted = self.scanner.scan(doc)
+        return self.emitter.emit(self.resolver, doc, conflicted=conflicted)
 
 
-class Scanner(object):
+class Scanner:
     def __init__(self, accessor, item_map, strict=False):
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
+        self.seen = set()
 
     @reify
     def ref_walking(self):
@@ -49,34 +52,61 @@ class Scanner(object):
 
     @reify
     def localref_fixer(self):  # todo: rename
-        return SwaggerLocalrefFixer()
+        return LocalrefFixer()
 
     def scan(self, doc):
+        conflicted = defaultdict(list)
+        self._scan_refs(doc, conflicted=conflicted)
+        self._scan_toplevel(doc, conflicted=conflicted)
+        return conflicted
+
+    def _scan_toplevel(self, doc, *, conflicted):
+        assert len(self.accessor.stack) == 1
+        for name in list(self.item_map.keys()):
+            try:
+                toplevel_item = self.accessor.access("#/" + name)
+                if "$ref" in toplevel_item.data:
+                    continue
+                ref_item = self.item_map[name]
+                if ref_item == toplevel_item:
+                    continue
+
+                self.item_map[name] = toplevel_item
+                new_item = self.conflict_fixer.fix_conflict(toplevel_item, ref_item)
+                if new_item is None:
+                    continue
+                conflicted[name].append(new_item)
+            except KeyError:
+                continue
+            finally:
+                self.accessor.pop_stack()
+        assert len(self.accessor.stack) == 1
+
+    def _scan_refs(self, doc, *, conflicted):
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
+                if item in self.seen:
+                    continue
+                self.seen.add(item)
+
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
                     self.item_map[item.localref] = item
-                    self.scan(doc=item.data)
+                    self._scan_refs(doc=item.data, conflicted=conflicted)
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(
                         self.item_map[item.localref], item
                     )
                     if newitem is None:
                         continue
-                    self.scan(doc=newitem.data)
-            except RuntimeError:
-                raise
-            except Exception as e:
-                raise RuntimeError(
-                    "{} (where={})".format(e, self.accessor.resolver.name)
-                )
+                    conflicted[sd["$ref"]].append(newitem)
+                    self._scan_refs(doc=newitem.data, conflicted=conflicted)
             finally:
                 self.accessor.pop_stack()
 
 
-class Emitter(object):
+class Emitter:
     def __init__(self, accessor, item_map):
         self.raw_accessor = Accessor()
         self.accessor = accessor
@@ -92,7 +122,7 @@ class Emitter(object):
     def get_item_by_localref(self, localref):
         return self.item_map[localref]
 
-    def emit(self, resolver, doc):
+    def emit(self, resolver, doc, *, conflicted):
         # side effect
         d = make_dict()
         for path, sd in self.ref_walking.iterate(doc):
@@ -105,9 +135,10 @@ class Emitter(object):
             data = item.data
             # replace: <file.yaml>#/<ref> -> #/<ref>
             for path, sd in self.ref_walking.iterate(data):
-                if sd["$ref"].startswith("#/"):
-                    continue
-                self.replace_ref(item.resolver, sd)
+                if not sd["$ref"].startswith("#/"):
+                    self.replace_ref(item.resolver, sd)
+                if sd["$ref"] in conflicted:
+                    self.replace_ref(item.resolver, sd)
             self.raw_accessor.assign(d, name.split("/"), data)
 
         # adhoc paths support
@@ -133,18 +164,7 @@ class Emitter(object):
             sd["$ref"] = new_ref
 
 
-class SwaggerLocalrefFixer(object):  # todo: rename
-    prefixes = set(["definitions", "paths", "responses", "parameters"])
-
-    def guess_prefix(self, path, item):
-        for node in reversed(path):
-            if node in self.prefixes:
-                return node
-            if node == "schema":
-                return "definitions"
-        logger.info("fix localref: prefix is not found from %s", path)
-        return "definitions"
-
+class LocalrefFixer:  # todo: rename
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
         if name:
@@ -157,20 +177,19 @@ class SwaggerLocalrefFixer(object):  # todo: rename
             localref = localref[1:]
 
         prefix, name = pairrsplit(localref, "/")
-
-        if prefix not in self.prefixes:
-            prefix = self.guess_prefix(path, item)
-
+        if not prefix:
+            prefix = "definitions"  # xxx:
         if not name:
             name = self.guess_name(path, item)
 
         # xxx: side effect
         item.localref = "{}/{}".format(prefix, name)
-        # print("changes: {} -> {}".format(localref, item.localref), file=sys.stderr)
+        if item.localref != localref:
+            logger.info("fix localref %s -> %s", localref, item.localref)
         return item
 
 
-class SimpleConflictFixer(object):  # todo: rename
+class SimpleConflictFixer:  # todo: rename
     def __init__(self, item_map, strict=False):
         self.item_map = item_map
         self.strict = strict
@@ -189,18 +208,23 @@ class SimpleConflictFixer(object):  # todo: rename
         if self.is_same_item(newitem, olditem):
             self.item_map[newitem.localref] = newitem
             return None
-
-        msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
-            raise RuntimeError(msg)
-        sys.stderr.write(msg)
-        sys.stderr.write("\n")
-        i = 1
-        while True:
-            new_localref = "{}{}".format(newitem.localref, i)
-            if new_localref not in self.item_map:
-                newitem.localref = new_localref
-                break
-            i += 1
+            raise RuntimeError(
+                "conficted. %r <-> %r" % (olditem.globalref, newitem.globalref)
+            )
+        logger.info("conficted. %r <-> %r", (olditem.globalref, newitem.globalref))
+
+        if olditem.globalref[0] != newitem.globalref[0]:
+            dirpath, name = pairrsplit(newitem.localref, "/")
+            prefix = os.path.splitext(pairrsplit(newitem.globalref[0], "/")[1])[0]
+            newitem.localref = "{}/{}{}".format(dirpath, prefix, titleize(name))
+        else:
+            i = 1
+            while True:
+                new_localref = "{}{}".format(newitem.localref, i)
+                if new_localref not in self.item_map:
+                    newitem.localref = new_localref
+                    break
+                i += 1
         self.item_map[newitem.localref] = newitem
         return newitem

@@ -1,36 +1,56 @@
-default: 00 01 02 03 04 05 06 07 08 09 10
+default: clean
+	$(MAKE) 00 01 02 03 04 05 06
+TEE := 2>&1 >
 OPTS ?=
 
+clean:
+	rm -rf dst
 dst:
 	mkdir -p dst
+00: DIR := $(shell ls src | grep 00)
 00: dst
-	python 00*.py src/00/main.yaml > dst/00.yaml
-01: dst
-	python 01*.py src/00/main.yaml > dst/01.yaml
-02: dst
-	python 02*.py src/00/main.yaml > dst/02.yaml
+	mkdir -p dst/${DIR}
+	python 00*.py src/00*/main.yaml ${TEE} dst/${DIR}/bundle.yaml
+	python 01with-version*.py src/00*/main.yaml ${TEE} dst/${DIR}/with-version.yaml
+	python 02xref.py src/00*/main.yaml ${TEE} dst/${DIR}/xref.yaml
 
 ## commands
-# all
+01: DIR := $(shell ls src | grep 01)
+01: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml ${TEE} dst/${DIR}/bundle.yaml
+	jsonknife ${OPTS} bundle --src src/${DIR}/person.yaml ${TEE} dst/${DIR}/onefile-person.yaml
+	jsonknife ${OPTS} bundle --src "src/${DIR}/person.yaml#/definitions/person" ${TEE} dst/${DIR}/onedefinition-hasref.yaml
+	jsonknife ${OPTS} bundle --src "src/${DIR}/primitive/name.yaml#/definitions/point" ${TEE} dst/${DIR}/onedefinition-primitive.yaml
+	jsonknife ${OPTS} bundle --src "src/${DIR}/team.yaml#/definitions/team" ${TEE} dst/${DIR}/onedefinition-external-object.yaml
+
+# regression test for nodup
+02: DIR := $(shell ls src | grep 02)
+02: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src "src/${DIR}/config.json" ${TEE} dst/${DIR}/config.yaml
+	jsonknife ${OPTS} bundle --src "src/${DIR}/config2.json" ${TEE} dst/${DIR}/config2.yaml
+
+03: DIR := $(shell ls src | grep 03)
+03: DIR2 := $(shell ls src | grep 02)
 03: dst
-	jsonknife ${OPTS} bundle --src src/03/main.yaml > dst/03.yaml
-# onefile
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src "src/${DIR}/main.json#/definitions/x" --extra "src/${DIR2}/config.json#/definitions/db" ${TEE} dst/${DIR}/bundle.yaml
+
+# conflictted
+04: DIR := $(shell ls src | grep 04)
 04: dst
-	jsonknife ${OPTS} bundle --src src/03/person.yaml > dst/04.yaml
-# one definition (xxx)
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+
+# conflict on samefile
+05: DIR := $(shell ls src | grep 05)
 05: dst
-	jsonknife ${OPTS} bundle --src "src/03/person.yaml#/definitions/person" > dst/05.yaml
-# one definition, no ref
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+
+06: DIR := $(shell ls src | grep 06)
 06: dst
-	jsonknife ${OPTS} bundle --src "src/03/primitive/name.yaml#/definitions/point" > dst/06.yaml
-# one definition, external file ref
-07: dst
-	jsonknife ${OPTS} bundle --src "src/03/team.yaml#/definitions/team" > dst/07.yaml
-# fix conflict, when same data reference
-08: dst
-	jsonknife ${OPTS} bundle --src "src/08/config.json" > dst/08.yaml
-09: dst
-	jsonknife ${OPTS} bundle --src "src/08/config2.json" > dst/09.yaml
-# multi references
-10: dst
-	jsonknife ${OPTS} bundle --src "src/10/main.json#/definitions/x" --extra "src/08/config.json#/definitions/db" > dst/10.yaml
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+

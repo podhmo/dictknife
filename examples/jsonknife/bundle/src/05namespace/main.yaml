@@ -1,0 +1,10 @@
+definitions:
+  xuser:
+    $ref:  "user.yaml#/x/definitions/user"
+  yuser:
+    $ref:  "user.yaml#/y/definitions/user"
+  both:
+    x:
+      $ref: "#/definitions/xuser"
+    y:
+      $ref: "#/definitions/yuser"

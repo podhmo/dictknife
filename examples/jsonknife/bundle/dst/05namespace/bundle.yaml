@@ -1,0 +1,26 @@
+definitions:
+  xuser:
+    $ref: '#/x/definitions/user'
+  yuser:
+    $ref: '#/y/definitions/user'
+  both:
+    x:
+      $ref: '#/definitions/xuser'
+    y:
+      $ref: '#/definitions/yuser'
+x:
+  definitions:
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+y:
+  definitions:
+    user:
+      type: object
+      properties:
+        name:
+          type: string
+        nickname:
+          type: string

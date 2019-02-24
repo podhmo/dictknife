@@ -1,0 +1,12 @@
+definitions:
+  user:
+    $ref: "bank.yaml#/definitions/user"
+  service:
+    $ref: "service.yaml#/definitions/service"
+  account:
+    descrition: root account
+    type: object
+    properties:
+      name:
+        type: string
+
