@@ -1,0 +1,16 @@
+parameters:
+  userId:
+    in: path
+    name: userId
+    required: true
+    description: The ID of the user to return
+    type: integer
+    format: int64
+    minimum: 1
+  postUserBody:
+    description: |
+      The json body when creating user
+    in: body
+    name: user
+    schema:
+      $ref: "./definitions.yaml#/definitions/User"

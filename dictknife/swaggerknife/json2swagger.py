@@ -2,7 +2,7 @@ import logging
 from dictknife.langhelpers import make_dict
 from prestring import NameStore
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(".".join(__name__.split(".")[1:]))
 
 
 def resolve_type(val):
@@ -29,7 +29,9 @@ class NameResolver:
 
 def make_signature(info):
     if info.get("type2") == "array" or info["type"] == "object":
-        return frozenset((k, v["type"], v.get("type2")) for k, v in info["children"].items())
+        return frozenset(
+            (k, v["type"], v.get("type2")) for k, v in info["children"].items()
+        )
     else:
         return frozenset((info["type"], info.get("type2")))
 
@@ -38,7 +40,13 @@ class Detector:
     resolve_type = staticmethod(resolve_type)
 
     def make_info(self):
-        return {"freq": 0, "freq2": 0, "type": "any", "children": make_dict(), "values": []}
+        return {
+            "freq": 0,
+            "freq2": 0,
+            "type": "any",
+            "children": make_dict(),
+            "values": [],
+        }
 
     def detect(self, d, name, info=None):
         s = make_dict()
@@ -134,7 +142,8 @@ class Emitter:
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
         required = [
-            name for name, f in info["children"].items()
+            name
+            for name, f in info["children"].items()
             if (f.get("freq2") or f["freq"]) == info["freq"]
         ]
         if required:

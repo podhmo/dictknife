@@ -11,11 +11,15 @@ from dictknife.jsonknife import json_pointer_to_path
 from dictknife.diff import diff
 from dictknife import loading
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(".".join(__name__.split(".")[1:]))
+
+
+def is_empty(x):
+    return not x or hasattr(x, "unwrap")
 
 
 def is_empty_collection(coll):
-    return sum(1 for x in coll if not isinstance(x, _Empty)) == 0
+    return sum(1 for x in coll if not hasattr(x, "unwrap")) == 0
 
 
 class _Empty:
@@ -23,6 +27,9 @@ class _Empty:
 
     def __init__(self, v):
         self.v = v
+
+    def unwrap(self):
+        return self.v
 
 
 class Migration:
@@ -94,9 +101,9 @@ class Migration:
             diff = "\n".join(self.differ.diff(r, where=where))
             if not diff:
                 if savedir is None:
-                    logger.debug("skip %s", relpath)
+                    logger.debug("skip file %s", relpath)
                 else:
-                    logger.info("copy %s -> %s", relpath, (savepath or relpath))
+                    logger.info("copy file %s -> %s", relpath, (savepath or relpath))
                     try:
                         shutil.copy(r.filename, savepath)
                     except FileNotFoundError:
@@ -104,7 +111,7 @@ class Migration:
                         shutil.copy(r.filename, savepath)
                 continue
 
-            logger.info("update %s -> %s", relpath, (savepath or relpath))
+            logger.info("update file %s -> %s", relpath, (savepath or relpath))
             loading.dumpfile(
                 self.transform(self.differ.after_data(r.doc)),
                 savepath,
@@ -122,7 +129,10 @@ class Migration:
         keep=False
     ):
         logger.info(
-            "migrate (dry_run=%r, inplace=%r, where=%r)", dry_run, inplace, where
+            "start migration (dry_run=%r, inplace=%r, where=%r)",
+            dry_run,
+            inplace,
+            where,
         )
         if dry_run:
             return self._migrate_dryrun_and_diff(doc=doc, where=where)
@@ -180,34 +190,42 @@ class _Differ:
         elif isinstance(d, (list, tuple)):
             return [self.before_data(x) for x in d]
         else:
-            return d.v if isinstance(d, _Empty) else d
+            return d.unwrap() if hasattr(d, "unwrap") else d
 
     def after_data(self, d):
         if hasattr(d, "keys"):
             r = self.make_dict()
             for k, v in d.items():
-                if isinstance(v, _Empty):
+                if hasattr(v, "unwrap"):
                     continue
                 r[k] = self.after_data(v)
             return r
         elif isinstance(d, (list, tuple)):
-            return [self.after_data(x) for x in d if not isinstance(x, _Empty)]
+            return [self.after_data(x) for x in d if not hasattr(x, "unwrap")]
         else:
             return d
 
 
 class _Updater:
-    def __init__(self, resolver, item_map, *, make_dict=make_dict):
+    def __init__(self, resolver, item_map, *, make_dict=make_dict, where=None):
         self.resolver = resolver
         self.item_map = item_map
         self.make_dict = make_dict
+        self.where = where
+
+    @reify
+    def name(self):
+        return os.path.relpath(self.resolver.name, start=self.where)
 
     @reify
     def resolvers(self):
-        resolvers = set(item.resolver for item in self.item_map.values())
-        if self.resolver not in resolvers:
-            resolvers.add(self.resolver)
-        return resolvers
+        # deduplicate by resolver.name
+        resolvers = {
+            item.resolver.name: item.resolver for item in self.item_map.values()
+        }
+        if self.resolver.name not in resolvers:
+            resolvers[self.resolver.name] = self.resolver
+        return list(resolvers.values())
 
     def new_child(self, resolver):
         return self.__class__(resolver, self.item_map, make_dict=self.make_dict)
@@ -225,13 +243,15 @@ class _Updater:
     def pop_by_path(self, path, *, resolver=None):
         resolver = resolver or self.resolver
         v = resolver.access(path)
-        self.update_by_path(path, _Empty(v), resolver=resolver)
+        self.update_by_path(path, _Empty(v), resolver=resolver, skip_logging=True)
         return v
 
     def update(self, ref, v, *, resolver=None):
         return self.update_by_path(json_pointer_to_path(ref), v, resolver=resolver)
 
-    def update_by_path(self, path, v, *, resolver=None):
+    def update_by_path(self, path, v, *, resolver=None, skip_logging=False):
+        if skip_logging:
+            logger.debug("update file=%s path=%s", self.name, path)
         resolver = resolver or self.resolver
         if len(path) == 1:
             d = resolver.doc

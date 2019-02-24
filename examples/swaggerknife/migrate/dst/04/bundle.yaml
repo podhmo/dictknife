@@ -1,14 +1,7 @@
 components:
-  parameters:
-    userId:
-      description: The ID of the user to return
-      in: path
-      name: userId
-      required: true
-      schema:
-        format: int64
-        minimum: 1
-        type: integer
+  securitySchemes:
+    BasicAuth:
+      type: basic
   schemas:
     User:
       properties:
@@ -19,9 +12,25 @@ components:
       required:
       - id
       - name
-  securitySchemes:
-    BasicAuth:
-      type: basic
+  parameters:
+    userId:
+      description: The ID of the user to return
+      in: path
+      name: userId
+      required: true
+      schema:
+        format: int64
+        minimum: 1
+        type: integer
+  requestBodies:
+    postUserBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+      description: |
+        The json body when creating user
+      required: true
 info:
   description: API description in Markdown.
   title: Sample API
@@ -118,6 +127,14 @@ paths:
         default:
           description: Unexpected error
       summary: Returns a user by ID.
+  /users3:
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/postUserBody'
+      responses:
+        '201':
+          description: Created
+      summary: Craetes a user.
 security:
 - BasicAuth: []
 servers:

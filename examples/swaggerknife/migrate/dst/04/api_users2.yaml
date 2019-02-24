@@ -1,0 +1,31 @@
+paths:
+  /users2:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: 'components/definitions.yaml#/components/schemas/User'
+        required: true
+      responses:
+        '201':
+          description: Created
+      summary: Craetes a user.
+  /users2/{userId}:
+    get:
+      parameters:
+      - $ref: 'components/parameters.yaml#/components/parameters/userId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: 'components/definitions.yaml#/components/schemas/User'
+          description: A user object.
+        '400':
+          description: The specified user ID is invalid (not a number)
+        '404':
+          description: A user with the specified ID was not found.
+        default:
+          description: Unexpected error
+      summary: Returns a user by ID.

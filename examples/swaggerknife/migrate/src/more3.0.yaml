@@ -20,7 +20,17 @@ components:
       required:
         - id
         - name
-  securitySchemas:
+  parameters:
+    userId:
+      in: path
+      name: userId
+      required: true
+      description: The ID of the user to return
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+  securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
@@ -28,16 +38,6 @@ components:
 security:
   - BasicAuth: []
 
-parameters:
-  userId:
-    in: path
-    name: userId
-    required: true
-    description: The ID of the user to return
-    schema:
-      type: integer
-      format: int64
-      minimum: 1
 
 paths:
   /users:
@@ -104,7 +104,7 @@ paths:
     get:
       summary: Returns a user by ID.
       parameters:
-        - $ref: "#/parameters/userId"
+        - $ref: "#/components/parameters/userId"
       responses:
         "200":
           description: A user object.
