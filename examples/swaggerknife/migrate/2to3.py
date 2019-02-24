@@ -1,5 +1,7 @@
 import logging
+import itertools
 from functools import partial
+
 from dictknife import DictWalker
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
@@ -226,17 +228,39 @@ def migrate_for_subfile(uu, *, scope, callbacks, ref_wawlker=DictWalker(["$ref"]
 
             # todo: optimizatin?
             def fixref(uu, *, names=names):
+                will_be_remove_paths_if_empty = set()
                 for path, sd in ref_wawlker.walk(uu.resolver.doc):
-                    if "#/components/parameters" not in sd["$ref"]:
-                        return
-                    if not any(name in sd["$ref"] for name in names):
-                        return
-                    uu.update_by_path(
-                        path,
-                        sd["$ref"].replace(
+                    ref = sd["$ref"]
+                    if is_empty(ref):
+                        continue
+                    if "#/components/parameters" not in ref:
+                        continue
+                    if not any(name in ref for name in names):
+                        continue
+                    uu.pop_by_path(path[:-1])
+                    new_value = {
+                        "$ref": ref.replace(
                             "#/components/parameters", "#/components/requestBodies"
-                        ),
-                    )
+                        )
+                    }
+                    if path[0] == "paths":
+                        new_path = itertools.takewhile(
+                            lambda x: x != "parameters", path
+                        )
+                        uu.update_by_path([*new_path, "requestBody"], new_value)
+                    elif path[0] == "components":
+                        # #/components/parameters/<name>
+                        uu.update_by_path(
+                            ["components", "requestBodies", path[2]], new_value
+                        )
+                    else:
+                        raise RuntimeError("unexpected path: {}".format(path))
+
+                    will_be_remove_paths_if_empty.add(tuple(path[:-2]))
+
+                for path in will_be_remove_paths_if_empty:
+                    if is_empty_collection(uu.resolver.access(path)):
+                        uu.pop_by_path(path)
 
             callbacks.append(fixref)
 

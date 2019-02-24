@@ -129,8 +129,8 @@ paths:
       summary: Returns a user by ID.
   /users3:
     post:
-      parameters:
-      - $ref: '#/components/requestBodies/postUserBody'
+      requestBody:
+        $ref: '#/components/requestBodies/postUserBody'
       responses:
         '201':
           description: Created
