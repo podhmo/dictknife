@@ -72,9 +72,7 @@ class Scanner:
                     continue
 
                 self.item_map[name] = toplevel_item
-                new_item = self.conflict_fixer.fix_conflict(
-                    toplevel_item, ref_item
-                )
+                new_item = self.conflict_fixer.fix_conflict(toplevel_item, ref_item)
                 if new_item is None:
                     continue
                 conflicted[name].append(new_item)
@@ -210,10 +208,11 @@ class SimpleConflictFixer:  # todo: rename
         if self.is_same_item(newitem, olditem):
             self.item_map[newitem.localref] = newitem
             return None
-        msg = "conficted. {!r} <-> {!r}".format(olditem.globalref, newitem.globalref)
         if self.strict:
-            raise RuntimeError(msg)
-        print(msg, file=sys.stderr)
+            raise RuntimeError(
+                "conficted. %r <-> %r" % (olditem.globalref, newitem.globalref)
+            )
+        logger.info("conficted. %r <-> %r", (olditem.globalref, newitem.globalref))
 
         if olditem.globalref[0] != newitem.globalref[0]:
             dirpath, name = pairrsplit(newitem.localref, "/")
