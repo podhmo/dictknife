@@ -35,7 +35,7 @@ def get_credentials(
     *,
     cache_path: t.Optional[str] = None,
     scopes: t.Sequence[str],
-    logger: t.Any = logger,
+    logger: t.Any = logger
 ) -> OAuth2Credentials:
     config_path = os.path.expanduser(config_path)
     if cache_path is None:
@@ -61,7 +61,7 @@ def get_credentials_failback_webbrowser(
     *,
     cache_path: t.Optional[str] = None,
     scopes: t.Optional[t.Sequence[str]] = None,
-    logger: t.Any = logger,
+    logger: t.Any = logger
 ) -> OAuth2Credentials:
     if scopes is None:
         import webbrowser
