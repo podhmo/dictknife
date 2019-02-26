@@ -33,6 +33,7 @@ setup(
     install_requires=[],
     extras_require={
         "testing": ["PyYAML", "jsonpatch"],
+        "lint": ["flake8"],
         "docs": ["sphinx", "recommonmark", "sphinx_rtd_theme"],
         "load": ["PyYAML", "toml"],
         "command": ["PyYAML", "magicalimport", "prestring"],
