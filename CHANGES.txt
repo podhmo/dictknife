@@ -1,3 +1,7 @@
+0.10.3
+
+- Fix syntax error on Python 3.5, on loading/_gsuite.py #119
+
 0.10.2
 
 - loading, adjustment yaml's output
