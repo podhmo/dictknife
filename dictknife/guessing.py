@@ -10,11 +10,11 @@ class Guesser:
 
     @reify
     def is_float(self):
-        return re.compile("-?(?:\d*\.\d+(?:e-\d+)?|nan|inf)$").match
+        return re.compile(r"-?(?:\d*\.\d+(?:e-\d+)?|nan|inf)$").match
 
     @reify
     def is_int(self):
-        return re.compile("-?(?:0|[1-9]\d*)$").match
+        return re.compile(r"-?(?:0|[1-9]\d*)$").match
 
     def is_list(self, v):
         return isinstance(v, (list, tuple))
