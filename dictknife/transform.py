@@ -40,6 +40,7 @@ def normalize_dict(d):  # side effect!
             normalize_dict(x)
     return d
 
+
 def only_num(d):
     return {
         k: v
