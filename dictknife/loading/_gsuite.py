@@ -76,7 +76,7 @@ def get_credentials_failback_webbrowser(
     while True:
         try:
             return get_credentials(config_path, scopes=scopes, cache_path=cache_path, logger=logger)
-        except InvalidClientSecretsError as e:
+        except InvalidClientSecretsError:
             import webbrowser
             url = "https://console.cloud.google.com/apis/credentials"
             print("please save credentials.json at {!r}.".format(config_path), file=sys.stderr)
