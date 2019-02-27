@@ -9,7 +9,7 @@ def apply(q, v):
 
 
 def repr(self):
-    return '<{self.__class__.__name__} args={args!r}>'.format(self=self, args=self.args)
+    return "<{self.__class__.__name__} args={args!r}>".format(self=self, args=self.args)
 
 
 class Regexp(object):
@@ -26,10 +26,12 @@ class Regexp(object):
 
 class Any(object):
     def __repr__(self):
-        return '<{self.__class__.__name__}>'.format(self=self)
+        return "<{self.__class__.__name__}>".format(self=self)
 
     def __call__(self, v):
         return True
+
+
 ANY = Any()
 
 
