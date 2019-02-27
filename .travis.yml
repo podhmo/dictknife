@@ -9,4 +9,4 @@ install:
 - script:
   - python setup.py test
   - make ci
-  - flake8 --show-source --ignore=E501
+  - make lint
