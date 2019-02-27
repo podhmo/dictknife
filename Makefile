@@ -6,7 +6,7 @@ docs: runlib
 .PHONY: docs
 
 lint:
-	flake8 --show-source --ignore=E501,W503 dictknife
+	flake8 --show-source --ignore=E501,E121,W503 dictknife
 
 # integration tests (regression tests)
 WHERE ?= .
