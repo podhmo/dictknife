@@ -6,7 +6,8 @@ python:
   - "nightly"
 install:
   - pip install -e .[testing,load,command,lint]
-- script:
+script:
   - python setup.py test
   - make ci
   - make lint
+
