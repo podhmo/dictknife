@@ -1,6 +1,6 @@
 import sys
 import os.path
-from .raw import setup_extra_parser
+from .raw import setup_extra_parser  # noqa
 from dictknife.langhelpers import make_dict
 
 

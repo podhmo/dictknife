@@ -50,7 +50,7 @@ class reify(object):
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__
-        except:
+        except:  # noqa
             pass
 
     def __get__(self, inst, objtype=None):

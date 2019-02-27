@@ -151,7 +151,7 @@ class Migration:
             try:
                 with self._migrate(doc=doc, where=where, savedir=savedir) as u:
                     yield u
-            except Exception as e:
+            except Exception:
                 if not keep and savedir:
                     logger.info("rollback. remove %s", savedir)
                     shutil.rmtree(savedir)

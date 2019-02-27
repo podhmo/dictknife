@@ -2,13 +2,15 @@ import re
 import contextlib
 from collections import namedtuple
 from ._lazyimport import m
-from .raw import setup_extra_parser
+from .raw import setup_extra_parser  # noqa
 
 _loader = None
 Guessed = namedtuple("Guessed", "spreadsheet_id, range, sheet_id")
 
 
-def guess(pattern: str, *, sheet_rx=re.compile("/spreadsheets/d/([a-zA-Z0-9-_]+)")) -> Guessed:
+def guess(
+    pattern: str, *, sheet_rx=re.compile("/spreadsheets/d/([a-zA-Z0-9-_]+)")
+) -> Guessed:
     if not pattern.startswith("http") or "://" not in pattern:
         # like 1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps#/sheet1!A1:B2
         splitted = pattern.split("#/", 1)
@@ -19,6 +21,7 @@ def guess(pattern: str, *, sheet_rx=re.compile("/spreadsheets/d/([a-zA-Z0-9-_]+)
 
     # like  https://docs.google.com/spreadsheets/d/1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps/edit#gid=0
     import urllib.parse as p
+
     parsed = p.urlparse(pattern)
 
     m = sheet_rx.search(parsed.path)

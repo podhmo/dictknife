@@ -1,10 +1,12 @@
 # markdown table format
-from .raw import setup_extra_parser
 from dictknife.langhelpers import make_dict
+from .raw import setup_extra_parser  # noqa
 import itertools
 
 
-def load(fp, *, loader=None, errors=None, make_dict=make_dict, null_value="null", **kwargs):
+def load(
+    fp, *, loader=None, errors=None, make_dict=make_dict, null_value="null", **kwargs
+):
     keys = None
     while keys is None:
         line = next(fp)
@@ -65,17 +67,24 @@ def dump(rows, fp, *, sort_keys=False, null_value="null", **kwargs):
 
     print("| {} |".format(" | ".join([str(k) for k in keys])), file=fp)
     print(
-        "| {} |".format(" | ".join([("---:" if maybe_nums[k] else ":---") for k in keys])), file=fp
+        "| {} |".format(
+            " | ".join([("---:" if maybe_nums[k] else ":---") for k in keys])
+        ),
+        file=fp,
     )
     for row in slines:
         print(
             "| {} |".format(
                 " | ".join(
                     [
-                        ("" if k not in row else str(null_value if row[k] is None else row[k]))
+                        (
+                            ""
+                            if k not in row
+                            else str(null_value if row[k] is None else row[k])
+                        )
                         for k in keys
                     ]
                 )
             ),
-            file=fp
+            file=fp,
         )
