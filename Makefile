@@ -5,9 +5,8 @@ docs: runlib
 	$(MAKE) html -C docs
 .PHONY: docs
 
-runlib:
-	$(MAKE) -C examples/library
-	$(MAKE) -C examples/library2
+lint:
+	flake8 --show-source --ignore=E501 dictknife
 
 # integration tests (regression tests)
 WHERE ?= .

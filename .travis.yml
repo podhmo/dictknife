@@ -5,7 +5,8 @@ python:
   - "3.7-dev" # 3.7 development branch
   - "nightly"
 install:
-  - pip install -e .[testing,load,command]
-script:
- - python setup.py test
- - make ci
+  - pip install -e .[testing,load,command,lint]
+- script:
+  - python setup.py test
+  - make ci
+  - make lint
