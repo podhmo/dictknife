@@ -21,9 +21,18 @@ def cut(*, src, dst, refs):
     loading.dumpfile(d, dst)
 
 
-def deref(*, src, dst, refs, unwrap, wrap):
+def deref(*, src, dst, refs, unwrap, wrap, input_format, output_format, format):
     warnings.warn("deref() is deprecated, please using `select()` instead of it.")
-    return select(src=src, dst=dst, refs=refs, unwrap=unwrap, wrapped=wrapped)
+    return select(
+        src=src,
+        dst=dst,
+        refs=refs,
+        unwrap=unwrap,
+        wrap=wrap,
+        input_format=input_format,
+        output_format=output_format,
+        format=format,
+    )
 
 
 def select(
