@@ -1,4 +1,4 @@
-defaut: clean 00 01 02 03
+defaut: clean 00 01 02 03 04
 OPTS ?= 
 
 clean:
@@ -32,5 +32,9 @@ dst:
 	dictknife ${OPTS} cat src/03extra-option/people.json -o csv 2>&1 > dst/03people.ng.csv || exit 0
 
 # merge list
-# 04:
-# 	dictknife ${OPTS} cat 
+04:
+	dictknife ${OPTS} cat src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-default.json
+	dictknife ${OPTS} cat --merge-method=addtoset src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-addtoset.json
+	dictknife ${OPTS} cat --merge-method=append src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-append.json
+	dictknife ${OPTS} cat --merge-method=merge src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-merge.json
+	dictknife ${OPTS} cat --merge-method=replace src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-replace.json
