@@ -33,8 +33,8 @@ dst:
 
 # merge list
 04:
-	dictknife ${OPTS} cat src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-default.json
-	dictknife ${OPTS} cat --merge-method=addtoset src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-addtoset.json
-	dictknife ${OPTS} cat --merge-method=append src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-append.json
-	dictknife ${OPTS} cat --merge-method=merge src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-merge.json
-	dictknife ${OPTS} cat --merge-method=replace src/04merge-list/a.json src/04merge-list/x.json > dst/04merge-replace.json
+	dictknife ${OPTS} cat src/04merge-list/a.json src/04merge-list/x.json --dst dst/04merge-default.yaml
+	dictknife ${OPTS} cat --merge-method=addtoset src/04merge-list/a.json src/04merge-list/x.json --dst dst/04merge-addtoset.yaml
+	dictknife ${OPTS} cat --merge-method=append src/04merge-list/a.json src/04merge-list/x.json --dst dst/04merge-append.yaml
+	dictknife ${OPTS} cat --merge-method=merge src/04merge-list/a.json src/04merge-list/x.json --dst dst/04merge-merge.yaml
+	dictknife ${OPTS} cat --merge-method=replace src/04merge-list/a.json src/04merge-list/x.json --dst dst/04merge-replace.yaml
