@@ -39,7 +39,8 @@ def cat(
     errors=None,
     size=None,
     slurp=False,
-    extra=None
+    extra=None,
+    merge_method="addtoset"
 ):
     from dictknife import deepmerge
 
@@ -58,13 +59,14 @@ def cat(
                 sd = itertools.islice(sd, size)
 
             if hasattr(sd, "keys"):
-                d = deepmerge(d, sd)
+                d = deepmerge(d, sd, method=merge_method)
             elif len(files) == 1:
                 d = sd
             else:
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
-                d.extend(sd)
+                d = deepmerge(d, sd, method=merge_method)
+
         loading.dumpfile(
             d, dst, format=output_format or format, sort_keys=sort_keys, extra=extra
         )
@@ -310,6 +312,9 @@ def main():
         help="see pydoc codecs.Codec",
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument(
+        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+    )
 
     # concat (deprecated)
     fn = concat
@@ -340,6 +345,9 @@ def main():
         help="see pydoc codecs.Codec",
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument(
+        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+    )
 
     # transform
     fn = transform
