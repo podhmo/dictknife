@@ -98,8 +98,6 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     while True:
         try:
             tk = next(tokens)
-            if tk.startswith(separator) and not d:
-                d = []
             if tk == delimiter:
                 L.append(d)
                 d = accessor.make_dict()
@@ -121,6 +119,13 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
             elif k.startswith("@"):
                 # assigning variable:
                 accessor.assign(variables, k[1:].split(separator), guess(v))
+            elif k.startswith(separator):
+                if k == separator:
+                    d[""] = guess(v)
+                else:
+                    if "" not in d:
+                        d[""] = accessor.make_dict()
+                    accessor.assign(d[""], k[1:].split(separator), guess(v))
             else:
                 accessor.assign(d, k.split(separator), guess(v))
         except StopIteration:
@@ -129,7 +134,7 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     if tk != delimiter:
         L.append(d)
 
-    if len(L) == 1:
+    if len(L) == 1 and tk != delimiter:
         return L[0]
     return L
 

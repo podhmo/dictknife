@@ -27,7 +27,7 @@ output:
 11: output
 	dictknife mkdict /name foo /name bar /name boo > output/11.json
 12: output
-	dictknife mkdict /x foo /y bar /x boo > output/12.json
+	dictknife mkdict x foo ";" y bar ";" x boo > output/12.json
 13: output
-	dictknife mkdict /x foo 0/y bar 0/z boo > output/13.json
+	dictknife mkdict x foo y bar z boo ";" > output/13.json
 
