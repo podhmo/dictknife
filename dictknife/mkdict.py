@@ -98,6 +98,8 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     while True:
         try:
             tk = next(tokens)
+            if tk.startswith(separator) and not d:
+                d = []
             if tk == delimiter:
                 L.append(d)
                 d = accessor.make_dict()
