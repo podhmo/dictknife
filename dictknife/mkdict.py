@@ -91,10 +91,10 @@ def mkdict(
     )
 
 
-def _mkdict(tokens, *, separator, delimiter, accessor, guess):
+def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
     L = []
     d = accessor.make_dict()
-    variables = {}
+    variables = {}  # chain map?
 
     while True:
         try:
@@ -103,6 +103,11 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
                 L.append(d)
                 d = accessor.make_dict()
                 continue
+            elif tk == "}}":  # escaped
+                tk = "}"
+            elif tk == "}":  # end block
+                assert depth > 0
+                return d
 
             k = str(tk)
             v = next(tokens)
@@ -114,6 +119,20 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
             elif v.startswith("&"):
                 # reference:
                 v = accessor.maybe_access(variables, v[1:].split(separator))
+
+            # mkdict ob { name foo age 20 }
+            # mkdict ob { father { name foo age 20 } }
+            if v == "{{":  # escaped
+                v = "{"
+            elif v == "{":  # start block
+                v = _mkdict(
+                    tokens,
+                    separator=separator,
+                    delimiter=delimiter,
+                    accessor=accessor,
+                    guess=guess,
+                    depth=depth + 1,
+                )
 
             if k == "":
                 v = guess(v)
@@ -138,6 +157,7 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     if tk != delimiter:
         L.append(d)
 
+    # finalize
     if len(L) == 1 and tk != delimiter:
         return L[0]
     return L
