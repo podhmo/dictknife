@@ -1,4 +1,4 @@
-default: 00 01 02 03 04 05 06 07 08 09 10 11 12 13
+default: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14
 
 output:
 	mkdir -p output
@@ -30,4 +30,5 @@ output:
 	dictknife mkdict x foo ";" y bar ";" x boo > output/12.json
 13: output
 	dictknife mkdict x foo y bar z boo ";" > output/13.json
-
+14: output
+	dictknife mkdict @ob.name foo @ob.age 20 id 1 "" "&ob" ";" id 2 "&ob" > output/14.json

@@ -116,7 +116,11 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
                 v = accessor.maybe_access(variables, v[1:].split(separator))
 
             if k == "":
-                d = guess(v)
+                v = guess(v)
+                if hasattr(v, "update"):
+                    d.update(guess(v))
+                else:
+                    d = guess(v)
             elif k.startswith("@@"):  # escaped
                 accessor.assign(d, k[1:].split(separator), guess(v))
             elif k.startswith("@"):
