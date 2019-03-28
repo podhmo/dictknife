@@ -9,6 +9,10 @@ class Guesser:
         self.default = default or self.guess_default
 
     @reify
+    def is_bool(self):
+        return re.compile(r"[Tt]rue|[Ff]alse").match
+
+    @reify
     def is_float(self):
         return re.compile(r"-?(?:\d*\.\d+(?:e-\d+)?|nan|inf)$").match
 
@@ -29,6 +33,8 @@ class Guesser:
             return self.modifier.modify_dict(self.guess, v)
         elif not hasattr(v, "strip"):
             return v
+        elif self.is_bool(v):
+            return v.lower() == "true"
         elif self.is_int(v):
             return int(v)
         elif self.is_float(v):
