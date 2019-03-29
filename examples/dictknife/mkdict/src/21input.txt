@@ -1,0 +1,3 @@
+@father { name A age 20 } @mother { name B age 20 }
+name X age 0 father "&father" mother "&mother"
+name Y age 1 father "&father" mother "&mother"

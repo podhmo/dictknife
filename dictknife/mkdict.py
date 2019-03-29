@@ -86,7 +86,8 @@ def mkdict(
     separator="/",
     delimiter=";",
     accessor=_AccessorSupportList(make_dict),
-    guess=guess
+    guess=guess,
+    shared=None
 ):
     """
     ## examples
@@ -131,15 +132,32 @@ def mkdict(
     """
     tokens = iter(tokenize(line))
     return _mkdict(
-        tokens, separator=separator, delimiter=delimiter, accessor=accessor, guess=guess
+        tokens,
+        separator=separator,
+        delimiter=delimiter,
+        accessor=accessor,
+        guess=guess,
+        shared=shared,
     )
 
 
-def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0, variables=None):
+def _mkdict(
+    tokens,
+    *,
+    separator,
+    delimiter,
+    accessor,
+    guess,
+    depth=0,
+    variables=None,
+    shared=None
+):
     L = []
     d = accessor.make_dict()
-    variables = ChainMap({}, variables) if variables else {}
+    shared = {} if shared is None else shared
+    variables = shared if variables is None else ChainMap({}, variables)
 
+    tk = None
     while True:
         try:
             tk = next(tokens)
@@ -230,7 +248,15 @@ def tokenize(line):
     lexer = shlex.shlex(line, punctuation_chars=True)
     lexer.whitespace += "="
     for token in lexer:
-        yield token.strip("""'"-""")
+        tk = token.strip("""'"-""")
+        if tk == "@" or tk == "&":
+            while True:
+                tk2 = next(lexer).strip("""'"-""")
+                tk = tk + tk2
+                if tk2 == "@" or tk2 == "&":
+                    continue
+                break
+        yield tk
 
 
 if sys.version_info[:2] < (3, 6):

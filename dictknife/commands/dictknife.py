@@ -227,8 +227,11 @@ def mkdict(
 
     if not extra:
         r = []
+        variables = {}
         for code in sys.stdin:
-            d = mkdict(code, separator=separator)
+            d = mkdict(code, separator=separator, shared=variables)
+            if not d:
+                continue
             if isinstance(d, list):
                 r.extend(d)
             else:
