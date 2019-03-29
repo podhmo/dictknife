@@ -1,5 +1,7 @@
 import shlex
 import sys
+from collections import ChainMap
+
 from .guessing import guess
 from .langhelpers import make_dict
 from .accessing import Accessor
@@ -91,10 +93,10 @@ def mkdict(
     )
 
 
-def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
+def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0, variables=None):
     L = []
     d = accessor.make_dict()
-    variables = {}  # chain map?
+    variables = ChainMap({}, variables) if variables else {}
 
     while True:
         try:
@@ -114,7 +116,24 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
                 return L
 
             k = str(tk)
-            v = next(tokens)
+
+            if k == "{{":  # escaped
+                k = "{"
+                v = next(tokens)
+            elif k == "{":  # start block (but no effect)
+                # dictknife mkdict { name foo age 20 }
+                k = ""
+                v = _mkdict(
+                    tokens,
+                    separator=separator,
+                    delimiter=delimiter,
+                    accessor=accessor,
+                    guess=guess,
+                    depth=depth + 1,
+                    variables=variables,
+                )
+            else:
+                v = next(tokens)
 
             if not hasattr(v, "encode"):
                 pass
@@ -139,6 +158,7 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
                     accessor=accessor,
                     guess=guess,
                     depth=depth + 1,
+                    variables=variables,
                 )
 
             if k == "":
