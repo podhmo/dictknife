@@ -15,7 +15,7 @@ dst:
 
 # array with delimiter(;)
 03: dst
-	dictknife mkdict --name foo --age 20 ";" --name bar ${TEE} dst/$@.json
+	dictknife mkdict --name foo --age 20 ok true ng False ";" --name bar ${TEE} dst/$@.json
 04: dst
 	dictknife mkdict --squash --name foo --age 20 ";" --name bar ${TEE} dst/$@.json
 
