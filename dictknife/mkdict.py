@@ -1,5 +1,7 @@
 import shlex
 import sys
+from collections import ChainMap
+
 from .guessing import guess
 from .langhelpers import make_dict
 from .accessing import Accessor
@@ -91,10 +93,10 @@ def mkdict(
     )
 
 
-def _mkdict(tokens, *, separator, delimiter, accessor, guess):
+def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0, variables=None):
     L = []
     d = accessor.make_dict()
-    variables = {}
+    variables = ChainMap({}, variables) if variables else {}
 
     while True:
         try:
@@ -103,9 +105,35 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
                 L.append(d)
                 d = accessor.make_dict()
                 continue
+            elif tk == "}}":  # escaped
+                tk = "}"
+            elif tk == "}":  # end block
+                assert depth > 0
+                if len(L) == 0 and d:
+                    return d
+                if d:
+                    L.append(d)
+                return L
 
             k = str(tk)
-            v = next(tokens)
+
+            if k == "{{":  # escaped
+                k = "{"
+                v = next(tokens)
+            elif k == "{":  # start block (but no effect)
+                # dictknife mkdict { name foo age 20 }
+                k = ""
+                v = _mkdict(
+                    tokens,
+                    separator=separator,
+                    delimiter=delimiter,
+                    accessor=accessor,
+                    guess=guess,
+                    depth=depth + 1,
+                    variables=variables,
+                )
+            else:
+                v = next(tokens)
 
             if not hasattr(v, "encode"):
                 pass
@@ -114,6 +142,24 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
             elif v.startswith("&"):
                 # reference:
                 v = accessor.maybe_access(variables, v[1:].split(separator))
+
+            # dictknife mkdict ob { name foo age 20 }
+            # dictknife mkdict ob { father { name foo age 20 } }
+            # dictknife mkdict ob { items { "" 1 ";" "" 2 } }
+            # dictknife mkdict ob { items { "" 1 ";" } }
+            # dictknife mkdict ob { item { "" 1 } }
+            if v == "{{":  # escaped
+                v = "{"
+            elif v == "{":  # start block
+                v = _mkdict(
+                    tokens,
+                    separator=separator,
+                    delimiter=delimiter,
+                    accessor=accessor,
+                    guess=guess,
+                    depth=depth + 1,
+                    variables=variables,
+                )
 
             if k == "":
                 v = guess(v)
@@ -138,6 +184,7 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess):
     if tk != delimiter:
         L.append(d)
 
+    # finalize
     if len(L) == 1 and tk != delimiter:
         return L[0]
     return L

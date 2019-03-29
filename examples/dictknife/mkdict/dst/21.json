@@ -1,0 +1,26 @@
+[
+  {
+    "name": "X",
+    "age": 0,
+    "father": {
+      "name": "A",
+      "age": 20
+    },
+    "mother": {
+      "name": "B",
+      "age": 20
+    }
+  },
+  {
+    "name": "Y",
+    "age": 1,
+    "father": {
+      "name": "A",
+      "age": 20
+    },
+    "mother": {
+      "name": "B",
+      "age": 20
+    }
+  }
+]

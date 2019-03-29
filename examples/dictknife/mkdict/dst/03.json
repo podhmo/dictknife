@@ -1,7 +1,9 @@
 [
   {
     "name": "foo",
-    "age": 20
+    "age": 20,
+    "ok": true,
+    "ng": false
   },
   {
     "name": "bar"
