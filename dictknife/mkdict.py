@@ -79,6 +79,7 @@ class _AccessorSupportList(Accessor):
         return d.get(name)
 
 
+# examples : (find-file "../examples/dictknife/mkdict")
 def mkdict(
     line,
     *,
@@ -162,7 +163,6 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0, variables
                 k = "{"
                 v = next(tokens)
             elif k == "{":  # start block (but no effect)
-                # dictknife mkdict { name foo age 20 }
                 k = ""
                 v = _mkdict(
                     tokens,
@@ -184,11 +184,6 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0, variables
                 # reference:
                 v = accessor.maybe_access(variables, v[1:].split(separator))
 
-            # dictknife mkdict ob { name foo age 20 }
-            # dictknife mkdict ob { father { name foo age 20 } }
-            # dictknife mkdict ob { items { "" 1 ";" "" 2 } }
-            # dictknife mkdict ob { items { "" 1 ";" } }
-            # dictknife mkdict ob { item { "" 1 } }
             if v == "{{":  # escaped
                 v = "{"
             elif v == "{":  # start block
