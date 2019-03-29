@@ -72,6 +72,7 @@ dst:
 # block with variables
 21: dst
 	dictknife mkdict @father { name A age 20 } @mother { name B age 20 } name X age 0 father "&father" mother "&mother" ";" name Y age 1 father "&father" mother "&mother" ${TEE} dst/$@.json
+	cat src/21input.txt | dictknife mkdict ${TEE} dst/$@-2.json
 22: dst
 	dictknife mkdict @father { name A age 20 } @mother { name B age 20 } { name X age 0 father "&father" mother "&mother" } ";" { name Y age 1 father "&father" mother "&mother" } ${TEE} dst/$@.json
 
