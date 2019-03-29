@@ -87,6 +87,47 @@ def mkdict(
     accessor=_AccessorSupportList(make_dict),
     guess=guess
 ):
+    """
+    ## examples
+
+    ```
+    mkdict name foo age 20
+    => {"name": "foo", "age": 20}
+
+    # with separator(/)
+    mkdict ob/name foo ob/age 20
+    => {"ob": {"name": "foo", "age": 20}}
+
+    # with delimiter(;)
+    mkdict v 1 ";" v 2
+    => [{"v": 1}, {"v": 2}]
+
+    # with block({ and })
+    mkdict ob { name foo age 20 }
+    => {"ob": {"name": "foo", "age": 20}}
+
+    # with variables
+    mkdict @father { name F age 40 } name x father "&father" ";" name y father "&father"
+    => [{"name": "x", "father": {"name": "F", "age": 40}}, {"name": "y", "father": {"name": "F", "age": 40}}]
+
+    # this is also ok (grouping by block)
+    mkdict @father { name F age 40 } { name x father "&father" } ";" { name y father "&father" }
+    ```
+
+    ## grammer
+
+    ```
+    <Tokens> :: ε | <Token> <Tokens> | <Token> <Delimiter> <Tokens> | <LBrace> <Tokens> <RBrace> <Tokens>
+    <Token> :: <Characters> | <Characters> <Separator> <Characters>
+    <LBrace> :: "{"
+    <RBrace> :: "}"
+    <Delimiter> :: ";"
+    <Separator> :: "/"
+    <Reference> :: "&"
+    <Assign> :: "@"
+    <Characters> :: ("{{" | "}}" | "@@" | "&&" | <Reference> | <Assign> | ["A"-"Z""a"-"z""0"-"9"]) # and UTF-8 Chars
+    ```
+    """
     tokens = iter(tokenize(line))
     return _mkdict(
         tokens, separator=separator, delimiter=delimiter, accessor=accessor, guess=guess
