@@ -1,4 +1,4 @@
-default: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20
+default: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 dst:
 	mkdir -p dst
@@ -46,3 +46,12 @@ dst:
 	dictknife mkdict ob { item { "" 1 } } > dst/19.json
 20: dst  # ng
 	dictknife mkdict ob { x { y z }} a b > dst/20.json
+
+# block with variables
+21: dst
+	dictknife mkdict @father { name A age 20 } @mother { name B age 20 } name X age 0 father "&father" mother "&mother" ";" name Y age 1 father "&father" mother "&mother" > dst/21.json
+22: dst
+	dictknife mkdict @father { name A age 20 } @mother { name B age 20 } { name X age 0 father "&father" mother "&mother" } ";" { name Y age 1 father "&father" mother "&mother" } > dst/22.json
+
+23: dst
+	dictknife mkdict @v 10 x0 "&v" x1 { v "&v" } x2 { @v 20 v "&v" } x3 { v "&v" } x4 { v "&v" @v 100 y { v "&v" } } @v 11 x5 "&v" > dst/23.json
