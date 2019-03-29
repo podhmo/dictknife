@@ -107,7 +107,11 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
                 tk = "}"
             elif tk == "}":  # end block
                 assert depth > 0
-                return d
+                if len(L) == 0 and d:
+                    return d
+                if d:
+                    L.append(d)
+                return L
 
             k = str(tk)
             v = next(tokens)
@@ -120,8 +124,11 @@ def _mkdict(tokens, *, separator, delimiter, accessor, guess, depth=0):
                 # reference:
                 v = accessor.maybe_access(variables, v[1:].split(separator))
 
-            # mkdict ob { name foo age 20 }
-            # mkdict ob { father { name foo age 20 } }
+            # dictknife mkdict ob { name foo age 20 }
+            # dictknife mkdict ob { father { name foo age 20 } }
+            # dictknife mkdict ob { items { "" 1 ";" "" 2 } }
+            # dictknife mkdict ob { items { "" 1 ";" } }
+            # dictknife mkdict ob { item { "" 1 } }
             if v == "{{":  # escaped
                 v = "{"
             elif v == "{":  # start block
