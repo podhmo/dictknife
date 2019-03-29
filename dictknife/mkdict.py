@@ -248,7 +248,15 @@ def tokenize(line):
     lexer = shlex.shlex(line, punctuation_chars=True)
     lexer.whitespace += "="
     for token in lexer:
-        yield token.strip("""'"-""")
+        tk = token.strip("""'"-""")
+        if tk == "@" or tk == "&":
+            while True:
+                tk2 = next(lexer).strip("""'"-""")
+                tk = tk + tk2
+                if tk2 == "@" or tk2 == "&":
+                    continue
+                break
+        yield tk
 
 
 if sys.version_info[:2] < (3, 6):
