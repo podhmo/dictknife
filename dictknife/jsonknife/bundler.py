@@ -1,6 +1,7 @@
 import logging
 import os.path
 from collections import defaultdict
+from functools import partial
 
 from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
@@ -13,16 +14,35 @@ from .accessor import CachedItemAccessor
 logger = logging.getLogger("jsonknife.bundler")
 
 
+def create_scanner_factory_from_flavor(flavor: str):
+    # thid is temporary, implementation
+    if flavor == "openapiv2":
+        return partial(
+            Scanner, localref_fixer=LocalrefFixer(default_position="definitions")
+        )
+    elif flavor == "openapiv3":
+        return partial(
+            Scanner, localref_fixer=LocalrefFixer(default_position="components/schema")
+        )
+    else:
+        raise ValueError(
+            "unexpected flavor {!r}, available flavors are ['openapiv2', 'openapiv3']".format(
+                flavor
+            )
+        )
+
+
 class Bundler:
-    def __init__(self, resolver, strict=False):
+    def __init__(self, resolver, strict=False, *, scanner_factory=None):
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
         self.item_map = make_dict()  # localref -> item
         self.strict = strict
+        self._scanner_factory = scanner_factory or Scanner
 
     @reify
     def scanner(self):
-        return Scanner(self.accessor, self.item_map, strict=self.strict)
+        return self._scanner_factory(self.accessor, self.item_map, strict=self.strict)
 
     @reify
     def emitter(self):
@@ -35,11 +55,16 @@ class Bundler:
 
 
 class Scanner:
-    def __init__(self, accessor, item_map, strict=False):
+    def __init__(self, accessor, item_map, strict=False, localref_fixer=None):
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
         self.seen = set()
+
+        # todo: rename
+        self.localref_fixer = localref_fixer or LocalrefFixer(
+            default_position="definitions"
+        )
 
     @reify
     def ref_walking(self):
@@ -48,10 +73,6 @@ class Scanner:
     @reify
     def conflict_fixer(self):  # todo: rename
         return SimpleConflictFixer(self.item_map, strict=self.strict)
-
-    @reify
-    def localref_fixer(self):  # todo: rename
-        return LocalrefFixer()
 
     def scan(self, doc):
         conflicted = defaultdict(list)
@@ -164,6 +185,9 @@ class Emitter:
 
 
 class LocalrefFixer:  # todo: rename
+    def __init__(self, *, default_position: str) -> None:
+        self.default_position = default_position
+
     def guess_name(self, path, item):
         name = pairrsplit(item.globalref[1], "/")[1]
         if name:
@@ -177,7 +201,8 @@ class LocalrefFixer:  # todo: rename
 
         prefix, name = pairrsplit(localref, "/")
         if not prefix:
-            prefix = "definitions"  # xxx:
+            # xxx: "definitions" or "components/schemas"?
+            prefix = self.default_position
         if not name:
             name = self.guess_name(path, item)
 
@@ -211,7 +236,7 @@ class SimpleConflictFixer:  # todo: rename
             raise RuntimeError(
                 "conficted. %r <-> %r" % (olditem.globalref, newitem.globalref)
             )
-        logger.info("conficted. %r <-> %r", (olditem.globalref, newitem.globalref))
+        logger.info("conficted. %r <-> %r", olditem.globalref, newitem.globalref)
 
         if olditem.globalref[0] != newitem.globalref[0]:
             dirpath, name = pairrsplit(newitem.localref, "/")

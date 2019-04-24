@@ -1,3 +1,4 @@
-definitions:
-  user:
-    $ref: "user.yaml"
+components:
+  schemas:
+    user:
+      $ref: "user.yaml"

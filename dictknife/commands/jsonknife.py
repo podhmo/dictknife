@@ -81,17 +81,15 @@ def bundle(
     input_format: str,
     output_format: str,
     format: str,
+    flavor: str,
     extras: list = None
 ):
     from dictknife.jsonknife import bundle
 
     if ref is not None:
-        src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
-    loading.dumpfile(
-        bundle(src, format=input_format or format, extras=extras),
-        dst,
-        format=output_format or format,
-    )
+        src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
+    result = bundle(src, format=input_format or format, extras=extras, flavor=flavor)
+    loading.dumpfile(result, dst, format=output_format or format)
 
 
 def examples(
@@ -186,6 +184,7 @@ def main():
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", default=None)
+    sparser.add_argument("--flavor", choices=["openapiv3", "openapiv2"], default="openapiv3")
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)

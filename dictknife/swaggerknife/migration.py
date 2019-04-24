@@ -5,7 +5,7 @@ import tempfile
 import shutil
 from collections import ChainMap
 
-from dictknife.jsonknife.bundler import Scanner, CachedItemAccessor
+from dictknife.jsonknife.bundler import Scanner, CachedItemAccessor, LocalrefFixer
 from dictknife.langhelpers import make_dict, reify
 from dictknife.jsonknife import json_pointer_to_path
 from dictknife.diff import diff
@@ -58,7 +58,12 @@ class Migration:
     def _prepare(self, *, doc, where):
         logger.debug("prepare (where=%s)", where)
         accessor = CachedItemAccessor(self.resolver)
-        scanner = Scanner(accessor, self.item_map, strict=True)
+        scanner = Scanner(
+            accessor,
+            self.item_map,
+            strict=True,
+            localref_fixer=LocalrefFixer(default_position="components/schemas"),
+        )
         scanner.scan(self.resolver.doc)
 
     @contextlib.contextmanager
