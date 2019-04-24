@@ -1,9 +1,6 @@
 components:
   schemas:
     user:
-      $ref: '#/components/schema/user'
-  schema:
-    user:
       type: object
       propreties:
         name:

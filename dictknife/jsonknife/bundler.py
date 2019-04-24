@@ -22,7 +22,7 @@ def create_scanner_factory_from_flavor(flavor: str):
         )
     elif flavor == "openapiv3":
         return partial(
-            Scanner, localref_fixer=LocalrefFixer(default_position="components/schema")
+            Scanner, localref_fixer=LocalrefFixer(default_position="components/schemas")
         )
     else:
         raise ValueError(
