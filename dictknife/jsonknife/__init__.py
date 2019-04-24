@@ -1,5 +1,5 @@
 from .expander import Expander  # noqa
-from .bundler import Bundler  # noqa
+from .bundler import Bundler, create_scanner_factory_from_flavor  # noqa
 from .resolver import (  # noqa
     get_resolver,
     get_resolver_from_filename,  # backward compatibility
@@ -21,7 +21,9 @@ def expand(filename, *, onload=None, doc=None, format=None):
     return expander.expand()
 
 
-def bundle(filename, *, onload=None, doc=None, format=None, extras=None):
+def bundle(
+    filename, *, onload=None, doc=None, format=None, extras=None, flavor="openapiv2"
+):
     jsonref = ""
     if filename:
         filename, jsonref = pairrsplit(filename, "#/")
@@ -52,6 +54,8 @@ def bundle(filename, *, onload=None, doc=None, format=None, extras=None):
             assign_by_json_pointer(doc, ejsonref, {"$ref": eref})
 
     resolver = get_resolver(filename, doc=doc, onload=onload, format=format)
-    bundler = Bundler(resolver)
+    bundler = Bundler(
+        resolver, scanner_factory=create_scanner_factory_from_flavor(flavor)
+    )
     r = bundler.bundle(resolver.doc)
     return r
