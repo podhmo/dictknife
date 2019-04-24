@@ -68,7 +68,12 @@ class Scanner:
 
     @reify
     def ref_walking(self):
-        return DictWalker(["$ref"])
+        from dictknife.operators import And
+
+        def cond(k, d):
+            return hasattr(d, "startswith")
+
+        return DictWalker([And(["$ref", cond])])
 
     @reify
     def conflict_fixer(self):  # todo: rename
@@ -134,7 +139,12 @@ class Emitter:
 
     @reify
     def ref_walking(self):
-        return DictWalker(["$ref"])
+        from dictknife.operators import And
+
+        def cond(k, d):
+            return hasattr(d, "startswith")
+
+        return DictWalker([And(["$ref", cond])])
 
     def get_item_by_globalref(self, globalref):
         return self.accessor.cache[globalref]

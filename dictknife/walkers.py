@@ -79,9 +79,9 @@ class DictWalker(object):
             return
 
         if hasattr(d, "keys"):
-            for k in list(d.keys()):
+            for k, v in list(d.items()):
                 ctx.push(k)
-                if apply(qs[0], k):
+                if apply(qs[0], k, v):
                     q = qs.popleft()
                     yield from self._walk(ctx, qs, d[k], depth - 1)
                     if len(qs) == 0:
