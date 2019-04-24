@@ -68,6 +68,7 @@ def as_jsonpointer(k):
     return k.replace("~", "~0").replace("/", "~1")
 
 
+# todo: rename to as_pathnode
 def as_path_node(ref):
     if "~" not in ref:
         return ref
