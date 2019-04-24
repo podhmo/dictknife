@@ -3,7 +3,7 @@ from collections import defaultdict
 from dictknife.jsonknife import get_resolver
 from .event import Event
 from .context import Context
-from .walker import OpenAPIWalker
+from .visitors import OpenAPIVisitor
 
 
 def run(src: str):
@@ -29,11 +29,11 @@ def make_stream(src: str) -> t.Iterable[Event]:
 
     def provide():
         resolver = get_resolver(src)
-        walker = OpenAPIWalker()
+        visitor = OpenAPIVisitor()
         ctx = Context(resolver, emit=q.put)
 
         try:
-            walker.walk(ctx, resolver.doc)
+            visitor.visit(ctx, resolver.doc)
         finally:
             q.put(None)
 
