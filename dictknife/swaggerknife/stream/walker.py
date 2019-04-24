@@ -61,12 +61,7 @@ class SchemaWalker(Walker):
 
     def __call__(self, ctx: Context, d: dict):
         if "$ref" in d:
-            sd, teardown = ctx.resolve(d["$ref"])
-            try:
-                self(ctx, sd)
-            finally:
-                teardown()
-                return
+            return ctx.resolve_ref(d["$ref"], cont=self)
 
         typ = d.get("type", "object")
         if typ == "array":

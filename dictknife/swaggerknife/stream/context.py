@@ -43,7 +43,14 @@ class Context:
                 teardown()
         return v
 
-    def resolve(self, ref) -> t.Tuple[dict, t.Callable[[], None]]:
+    def resolve_ref(self, ref, *, cont):
+        sd, teardown = self._resolve(ref)
+        try:
+            return cont(self, sd)
+        finally:
+            teardown()
+
+    def _resolve(self, ref) -> t.Tuple[dict, t.Callable[[], None]]:
         subresolver, query = self.resolver.resolve(ref)
         self.resolvers.append(subresolver)
         d = subresolver.doc
