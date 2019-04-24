@@ -1,4 +1,5 @@
 import typing as t
+from collections import defaultdict
 from dictknife.jsonknife import get_resolver
 from .event import Event
 from .context import Context
@@ -6,8 +7,18 @@ from .walker import OpenAPIWalker
 
 
 def run(src: str):
-    for ev in make_stream(src):
+    for ev in dedup_stream(make_stream(src)):
         print(ev)
+
+
+def dedup_stream(stream: t.Iterable[Event]) -> t.Iterable[Event]:
+    # todo: optimization by walker
+    seen = defaultdict(int)
+    for ev in stream:
+        k = (ev.file, tuple(ev.path))
+        if seen[k] == 0:
+            yield ev
+        seen[k] += 1
 
 
 def make_stream(src: str) -> t.Iterable[Event]:
