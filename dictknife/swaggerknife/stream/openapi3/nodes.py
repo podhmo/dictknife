@@ -1,6 +1,6 @@
 import logging
-from .interfaces import Visitor, Node
-from .context import Context
+from ..interfaces import Visitor, Node
+from ..context import Context
 from . import names
 
 logger = logging.getLogger(__name__)

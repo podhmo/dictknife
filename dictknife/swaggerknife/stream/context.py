@@ -1,6 +1,11 @@
 import typing as t
-from .resolver import Resolver
+from dictknife.jsonknife.accessor import AccessingMixin
 from .event import Event
+
+
+class Resolver(AccessingMixin):
+    def resolve(self, ref: str, format: str = None) -> t.Tuple["Resolver", str]:
+        ...
 
 
 class Context:

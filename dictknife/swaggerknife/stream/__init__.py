@@ -3,7 +3,7 @@ from collections import defaultdict
 from dictknife.jsonknife import get_resolver
 from .event import Event
 from .context import Context
-from .visitors import OpenAPIVisitor
+from .openapi3 import OpenAPIVisitor
 
 
 def run(src: str):

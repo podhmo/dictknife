@@ -1,7 +1,7 @@
 import logging
 from dictknife.langhelpers import reify
-from .context import Context
-from .interfaces import Visitor
+from ..context import Context
+from ..interfaces import Visitor
 from . import nodes
 
 logger = logging.getLogger(__name__)
