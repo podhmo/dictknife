@@ -1,8 +1,12 @@
-definitions:
-  user:
-    type: object
-    propreties:
-      name:
-        type: string
-      age:
-        type: integer
+components:
+  schemas:
+    user:
+      $ref: '#/components/schema/user'
+  schema:
+    user:
+      type: object
+      propreties:
+        name:
+          type: string
+        age:
+          type: integer

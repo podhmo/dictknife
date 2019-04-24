@@ -1,0 +1,3 @@
+definitions:
+  user:
+    $ref: "user.yaml"
