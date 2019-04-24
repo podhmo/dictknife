@@ -1,0 +1,15 @@
+components:
+  schemas:
+    people:
+      type: array
+      items:
+        $ref: '#/components/schemas/person'
+    person:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: intger
+      required:
+      - name

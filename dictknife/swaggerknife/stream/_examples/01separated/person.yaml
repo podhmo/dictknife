@@ -1,0 +1,6 @@
+components:
+  schemas:
+    people:
+      $ref: "../00separated/people.yaml"
+    person:
+      $ref: "../00separated/person.yaml"
