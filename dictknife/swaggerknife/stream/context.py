@@ -23,20 +23,18 @@ class Context:
     def resolver(self) -> Resolver:
         return self.resolvers[-1]
 
-    def push(self, name: str) -> t.Callable[[None], None]:
+    def push_name(self, name: str) -> t.Callable[[None], None]:
         self.path.append(name)
-        return self._push_teardown
+        return self._push_name_teardown
 
-    def _push_teardown(self):
+    def _push_name_teardown(self):
         return self.path.pop()
-
-    pop = _push_teardown
 
     def run(self, name, fn, *args, **kwargs):
         v = None
         teardown = None
         try:
-            teardown = self.push(name)
+            teardown = self.push_name(name)
             v = fn(self, *args, **kwargs)
         finally:
             if teardown is not None:

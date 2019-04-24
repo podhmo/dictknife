@@ -34,7 +34,7 @@ class OpenAPIWalker(Walker):
         return ComponentsWalker()
 
     def __call__(self, ctx: Context, d: dict):
-        teardown = ctx.push(ctx.resolver.name)
+        teardown = ctx.push_name(ctx.resolver.name)
         if "components" in d:
             ctx.run("components", self.components, d["components"])
         teardown()
