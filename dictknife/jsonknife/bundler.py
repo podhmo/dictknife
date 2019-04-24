@@ -236,7 +236,7 @@ class SimpleConflictFixer:  # todo: rename
             raise RuntimeError(
                 "conficted. %r <-> %r" % (olditem.globalref, newitem.globalref)
             )
-        logger.info("conficted. %r <-> %r", (olditem.globalref, newitem.globalref))
+        logger.info("conficted. %r <-> %r", olditem.globalref, newitem.globalref)
 
         if olditem.globalref[0] != newitem.globalref[0]:
             dirpath, name = pairrsplit(newitem.localref, "/")
