@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 # - oneOf
 # - allOf
 # - anyOf
+# - ref
 
 
 class ReferenceNode(Node):

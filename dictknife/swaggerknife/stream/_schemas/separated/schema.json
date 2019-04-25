@@ -1,0 +1,206 @@
+{
+  "definitions": {
+    "additionalProperties": false,
+    "description": "The Schema Object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. This object is an extended subset of the JSON Schema Specification Wright Draft 00.  Further information about the properties can be found in JSON Schema Core and JSON Schema Validation. Unless stated otherwise, the property definitions follow the JSON Schema specification as referenced here.",
+    "patternProperties": {
+      "^x-": {}
+    },
+    "properties": {
+      "additionalProperties": {
+        "default": true,
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Schema"
+          },
+          {
+            "$ref": "#/definitions/Reference"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "allOf": {
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Schema"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        },
+        "type": "array"
+      },
+      "anyOf": {
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Schema"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        },
+        "type": "array"
+      },
+      "default": {},
+      "deprecated": {
+        "default": false,
+        "type": "boolean"
+      },
+      "description": {
+        "type": "string"
+      },
+      "discriminator": {
+        "$ref": "#/definitions/Discriminator"
+      },
+      "enum": {
+        "items": {},
+        "minItems": 1,
+        "type": "array"
+      },
+      "example": {},
+      "exclusiveMaximum": {
+        "default": false,
+        "type": "boolean"
+      },
+      "exclusiveMinimum": {
+        "default": false,
+        "type": "boolean"
+      },
+      "format": {
+        "type": "string"
+      },
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Schema"
+          },
+          {
+            "$ref": "#/definitions/Reference"
+          }
+        ]
+      },
+      "maxItems": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "maxLength": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "maxProperties": {
+        "minimum": 0,
+        "type": "integer"
+      },
+      "maximum": {
+        "type": "number"
+      },
+      "minItems": {
+        "default": 0,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "minLength": {
+        "default": 0,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "minProperties": {
+        "default": 0,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "minimum": {
+        "type": "number"
+      },
+      "multipleOf": {
+        "exclusiveMinimum": true,
+        "minimum": 0,
+        "type": "number"
+      },
+      "not": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/Schema"
+          },
+          {
+            "$ref": "#/definitions/Reference"
+          }
+        ]
+      },
+      "nullable": {
+        "default": false,
+        "type": "boolean"
+      },
+      "oneOf": {
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Schema"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        },
+        "type": "array"
+      },
+      "pattern": {
+        "format": "regex",
+        "type": "string"
+      },
+      "properties": {
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Schema"
+            },
+            {
+              "$ref": "#/definitions/Reference"
+            }
+          ]
+        },
+        "type": "object"
+      },
+      "readOnly": {
+        "default": false,
+        "type": "boolean"
+      },
+      "required": {
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "type": "array",
+        "uniqueItems": true
+      },
+      "title": {
+        "type": "string"
+      },
+      "type": {
+        "enum": [
+          "array",
+          "boolean",
+          "integer",
+          "number",
+          "object",
+          "string"
+        ],
+        "type": "string"
+      },
+      "uniqueItems": {
+        "default": false,
+        "type": "boolean"
+      },
+      "writeOnly": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
+    "type": "object"
+  }
+}
