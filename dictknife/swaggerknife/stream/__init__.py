@@ -6,8 +6,8 @@ from .context import Context
 from .openapi3 import OpenAPIVisitor
 
 
-def run(src: str):
-    for ev in dedup_stream(make_stream(src)):
+def run(src: str, *, create_visitor=OpenAPIVisitor):
+    for ev in dedup_stream(make_stream(src, create_visitor=create_visitor)):
         print(ev)
 
 
@@ -21,15 +21,16 @@ def dedup_stream(stream: t.Iterable[Event]) -> t.Iterable[Event]:
         seen[k] += 1
 
 
-def make_stream(src: str) -> t.Iterable[Event]:
+def make_stream(src: str, *, create_visitor=None) -> t.Iterable[Event]:
     import threading
     import queue
 
+    create_visitor = create_visitor or OpenAPIVisitor
     q = queue.Queue()
 
     def provide():
         resolver = get_resolver(src)
-        visitor = OpenAPIVisitor()
+        visitor = create_visitor()
         ctx = Context(resolver, emit=q.put)
 
         try:
@@ -46,3 +47,16 @@ def make_stream(src: str) -> t.Iterable[Event]:
         yield v
         q.task_done()
     th.join()
+
+
+def main(create_visitor=None):
+    import argparse
+    import logging
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("src")
+    parser.add_argument("--log", default="INFO")
+    args = parser.parse_args()
+
+    logging.basicConfig(level=getattr(logging, args.log))
+    run(args.src, create_visitor=create_visitor)
