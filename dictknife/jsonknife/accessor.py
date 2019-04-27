@@ -1,8 +1,19 @@
 import logging
+
 from dictknife import Accessor
+from dictknife import operators
 from dictknife.langhelpers import as_jsonpointer, as_path_node
 
+
 logger = logging.getLogger(__name__)
+
+
+def _is_string(k, d):
+    return hasattr(d, "startswith")
+
+
+# detect: {$ref: "<ref path>"}
+is_ref = operators.And(["$ref", _is_string])
 
 
 class AccessingMixin:

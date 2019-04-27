@@ -10,6 +10,8 @@ from dictknife import deepmerge
 
 from .relpath import relpath
 from .accessor import CachedItemAccessor
+from .accessor import is_ref
+
 
 logger = logging.getLogger("jsonknife.bundler")
 
@@ -68,12 +70,7 @@ class Scanner:
 
     @reify
     def ref_walking(self):
-        from dictknife.operators import And
-
-        def cond(k, d):
-            return hasattr(d, "startswith")
-
-        return DictWalker([And(["$ref", cond])])
+        return DictWalker([is_ref])
 
     @reify
     def conflict_fixer(self):  # todo: rename
@@ -144,12 +141,7 @@ class Emitter:
 
     @reify
     def ref_walking(self):
-        from dictknife.operators import And
-
-        def cond(k, d):
-            return hasattr(d, "startswith")
-
-        return DictWalker([And(["$ref", cond])])
+        return DictWalker([is_ref])
 
     def get_item_by_globalref(self, globalref):
         return self.accessor.cache[globalref]
