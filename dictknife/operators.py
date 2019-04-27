@@ -1,9 +1,9 @@
 import re
 
 
-def apply(q, v):
+def apply(q, v, *args):
     if callable(q):
-        return q(v)
+        return q(v, *args)
     else:
         return q == v
 
@@ -20,7 +20,7 @@ class Regexp(object):
             rx = re.compile(rx)
         self.args = rx
 
-    def __call__(self, v):
+    def __call__(self, v, *args):
         return self.args.search(v)
 
 
@@ -28,7 +28,7 @@ class Any(object):
     def __repr__(self):
         return "<{self.__class__.__name__}>".format(self=self)
 
-    def __call__(self, v):
+    def __call__(self, v, *args):
         return True
 
 
@@ -41,8 +41,8 @@ class Not(object):
     def __init__(self, value):
         self.args = value
 
-    def __call__(self, v):
-        return not apply(self.args, v)
+    def __call__(self, v, *args):
+        return not apply(self.args, v, *args)
 
 
 class Or(object):
@@ -51,9 +51,9 @@ class Or(object):
     def __init__(self, args):
         self.args = args
 
-    def __call__(self, v):
+    def __call__(self, v, *args):
         for e in self.args:
-            if apply(e, v):
+            if apply(e, v, *args):
                 return True
         return False
 
@@ -64,8 +64,8 @@ class And(object):
     def __init__(self, args):
         self.args = args
 
-    def __call__(self, v):
+    def __call__(self, v, *args):
         for e in self.args:
-            if not apply(e, v):
+            if not apply(e, v, *args):
                 return False
         return True
