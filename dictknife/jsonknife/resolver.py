@@ -77,9 +77,13 @@ class ExternalFileResolver(AccessingMixin):
                 self.onload(self.doc, self)
             return self.doc
         except Exception as e:
-            raise e.__class__("{} (where={})".format(e, self.name)).with_traceback(
-                e.__traceback__
-            ) from None
+            try:
+                exc = e.__class__("{} (where={})".format(e, self.name)).with_traceback(
+                    e.__traceback__
+                )
+            except Exception:
+                raise e from None
+            raise exc from None
 
     def new(self, filename, doc=None, rawfilename=None, format=None):
         rawfilename = rawfilename or filename
