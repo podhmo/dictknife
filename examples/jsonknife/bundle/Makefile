@@ -54,3 +54,9 @@ dst:
 	mkdir -p dst/${DIR}
 	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
 	jsonknife ${OPTS} bundle --flavor=openapiv2 --src src/${DIR}/main.v2.yaml --dst dst/${DIR}/bundle.v2.yaml
+
+# with two definitions, same name
+07: DIR := $(shell ls src | grep 07)
+07: dst
+	mkdir -p dst/${DIR}
+	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
