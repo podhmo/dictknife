@@ -1,0 +1,18 @@
+additionalProperties: false
+definitions:
+  Components:
+    $ref: 'definitions/Components.yaml#/definitions/Components'
+description: This is the root document object for the API specification. It combines
+  what previously was the Resource Listing and API Declaration (version 1.2 and earlier)
+  together into one document.
+patternProperties:
+  ^x-: {}
+properties:
+  components:
+    $ref: '#/definitions/Components'
+  openapi:
+    pattern: ^3\.0\.\d(-.+)?$
+    type: string
+required:
+- openapi
+type: object

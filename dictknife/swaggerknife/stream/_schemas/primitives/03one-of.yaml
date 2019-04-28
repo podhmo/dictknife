@@ -1,0 +1,44 @@
+definitions:
+  Schema:
+    type: object
+    properties:
+      type:
+        type: string
+      patternProperties:
+        type: object
+        additionalProperties:
+          oneOf:
+            - { $ref: "#/definitions/Schema" }
+            - { $ref: "#/definitions/Reference" }
+      properties:
+        type: object
+        patternProperties:
+          "^[a-zA-Z0-9\\.\\-_]+$":
+            oneOf:
+              - { $ref: "#/definitions/Schema" }
+              - { $ref: "#/definitions/Reference" }
+    required:
+      - type
+  Reference:
+    type: object
+    properties:
+      $ref:
+        type: string
+        format: uniref
+    required:
+      - $ref
+type: object
+properties:
+  type:
+    type: string
+  definitions:
+    patternProperties:
+      "^[a-zA-Z0-9\\.\\-_]+$":
+        $ref: "#/definitions/Schema"
+  properties:
+    patternProperties:
+      "^[a-zA-Z0-9\\.\\-_]+$":
+        oneOf:
+          - { $ref: "#/definitions/Schema" }
+          - { $ref: "#/definitions/Reference" }
+

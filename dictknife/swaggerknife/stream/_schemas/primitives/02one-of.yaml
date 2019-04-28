@@ -1,0 +1,19 @@
+definitions:
+  value:
+    oneOf:
+      - { $ref: "#/definitions/one" }
+      - { $ref: "#/definitions/two" }
+  one:
+    type: object
+    propeties:
+      one:
+        type: string
+  two:
+    type: object
+    propeties:
+      two:
+        type: string
+
+properties:
+  value:
+    "$ref": "#/definitions/value"
