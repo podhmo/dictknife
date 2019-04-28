@@ -168,6 +168,7 @@ class Emitter:
             if d["$ref"].startswith("#/"):
                 keep_refs.add(d["$ref"])
 
+        # tree shaking
         if keep_refs:
             for ref, data in self.registered:
                 if ref in keep_refs:
