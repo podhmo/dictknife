@@ -156,11 +156,17 @@ class Emitter:
         for ref, data in self.registered:
             self.resolver.assign_by_json_pointer(ref, data, doc=new_doc)
 
-        # # fix other refs
-        # for path, d in self.ref_walker.walk(new_doc):
-        #     if not d["$ref"].startswith("#/"):
-        #         continue
-        #     d["$ref"] = "{}.{}{}".format(d["$ref"].lstrip("#/"), self.format, d["$ref"])
+        # finding unseparated reference
+        keep_refs = set()
+        for path, d in self.ref_walker.walk(new_doc):
+            if d["$ref"].startswith("#/"):
+                keep_refs.add(d["$ref"])
+
+        if keep_refs:
+            for ref, data in self.registered:
+                if ref in keep_refs:
+                    continue
+                self.resolver.maybe_remove_by_json_pointer(ref, doc=new_doc)
 
         new_filepath = relpath("{}.{}".format(name, self.format), where=self.here)
         logger.info("emit file %s", new_filepath)

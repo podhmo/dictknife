@@ -43,6 +43,11 @@ class AccessingMixin:
             doc = self.doc
         return assign_by_json_pointer(doc, jsonref, value, guess=guess)
 
+    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return maybe_remove_by_json_pointer(doc, jsonref)
+
 
 class CachedItem:
     __slots__ = ("file", "localref", "globalref", "resolver", "data")
@@ -117,6 +122,13 @@ def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
                 except KeyError:
                     pass
         raise KeyError(query)
+
+
+def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
+    if query == "":
+        return
+    path = json_pointer_to_path(query)
+    return accessor.maybe_remove(doc, path)
 
 
 class StackedAccessor:
