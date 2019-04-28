@@ -44,7 +44,7 @@ def select(
     wrap,
     input_format: str,
     output_format: str,
-    format: str
+    format: str,
 ):
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
@@ -82,7 +82,7 @@ def bundle(
     output_format: str,
     format: str,
     flavor: str,
-    extras: list = None
+    extras: list = None,
 ):
     from dictknife.jsonknife import bundle
 
@@ -90,6 +90,19 @@ def bundle(
         src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
     result = bundle(src, format=input_format or format, extras=extras, flavor=flavor)
     loading.dumpfile(result, dst, format=output_format or format)
+
+
+def separate(
+    *, src: str, dst: str = None, input_format: str, output_format: str, format: str
+):
+    from dictknife.jsonknife import separate
+
+    separate(
+        src,
+        dst=dst,
+        input_format=input_format or format,
+        output_format=output_format or format,
+    )
 
 
 def examples(
@@ -101,7 +114,7 @@ def examples(
     input_format: str,
     output_format: str,
     format: str,
-    use_expand: bool = False
+    use_expand: bool = False,
 ):
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
@@ -111,7 +124,7 @@ def examples(
         from dictknife.jsonknife import bundle, expand
 
         if ref is not None:
-            src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip('#/'))
+            src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
         data = bundle(src, format=input_format or format)
         data = expand(None, doc=data)
     else:
@@ -184,11 +197,23 @@ def main():
     sparser.add_argument("--src", default=None)
     sparser.add_argument("--dst", default=None)
     sparser.add_argument("--ref", default=None)
-    sparser.add_argument("--flavor", choices=["openapiv3", "openapiv2"], default="openapiv3")
+    sparser.add_argument(
+        "--flavor", choices=["openapiv3", "openapiv2"], default="openapiv3"
+    )
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("--extra", default=None, nargs="+", dest="extras")
+
+    # separate
+    fn = separate
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None)
+    sparser.add_argument("--dst", default=None)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
     # examples
     fn = examples

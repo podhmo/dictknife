@@ -6,7 +6,6 @@ from dictknife import DictWalker
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit, make_dict
 
-
 from .resolver import ExternalFileResolver
 from .accessor import is_ref
 from .relpath import relpath, fixref
@@ -16,24 +15,32 @@ logger = logging.getLogger(".".join(__name__.split(".")[1:]))
 
 
 # todo: support ~0 and ~1
-# todo: support recursion
 # todo: multiple files input
 # todo: aggregate primitive types
-# todo: guess targets from ns
 # todo: test
 
 
+def _with_format(name: str, *, format: str = None, default=".yaml"):
+    if os.path.splitext(name)[1]:
+        return name
+    ext = format or default
+    if not ext.startswith("."):
+        ext = "." + ext
+    return name + ext
+
+
 class Separator:  # todo: rename
-    def __init__(self, resolver):
+    def __init__(self, resolver, *, format=None):
         self.resolver = resolver
+        self.format = format
 
     @reify
     def scanner(self):
-        return Scanner(self.resolver)
+        return Scanner(self.resolver, format=self.format)
 
     @reify
     def emitter(self):
-        return Emitter(self.resolver)
+        return Emitter(self.resolver, format=self.format)
 
     def separate(self, doc=None, *, name="main"):
         doc = doc or self.resolver.doc
@@ -49,7 +56,7 @@ class Scanner:
     def __init__(self, resolver: ExternalFileResolver, *, here=None, format=None):
         self.resolver = resolver
         self.here = here or resolver.name
-        self.format = format or "yaml"
+        self.format = format
 
     @reify
     def ref_walker(self) -> DictWalker:
@@ -76,7 +83,7 @@ class Scanner:
                     "$ref": "#/{}".format(fullname),
                     "path": "/".split(fullname),
                     # "is_self_recursion": is_self_recursion,  # ?
-                    "new_filepath": "{}.{}".format(new_filepath, self.format),
+                    "new_filepath": _with_format(new_filepath, format=self.format),
                 }
             )
         return defs
@@ -104,7 +111,7 @@ class Emitter:
     def __init__(self, resolver, *, here: str = None, format=None):
         self.resolver = resolver
         self.here = here or resolver.name
-        self.format = format or "yaml"
+        self.format = format
         self.registered = []  # List[Tuple[str, dict]]
 
     @reify
@@ -132,9 +139,11 @@ class Emitter:
         for _, d in self.ref_walker.walk(data):
             ref = d["$ref"]
             if ref.startswith("#/"):
-                ref = "{filepath}.{ext}{ref}".format(
-                    filepath=relpath(d["$ref"].lstrip("#/"), where=self.here),
-                    ext=self.format,
+                ref = "{filepath}{ref}".format(
+                    filepath=_with_format(
+                        relpath(d["$ref"].lstrip("#/"), where=self.here),
+                        format=self.format,
+                    ),
                     ref=d["$ref"],
                 )
             d["$ref"] = fixref(ref, where=self.here, to=def_item["new_filepath"])
@@ -168,28 +177,6 @@ class Emitter:
                     continue
                 self.resolver.maybe_remove_by_json_pointer(ref, doc=new_doc)
 
-        new_filepath = relpath("{}.{}".format(name, self.format), where=self.here)
+        new_filepath = relpath(_with_format(name, format=self.format), where=self.here)
         logger.info("emit file %s", new_filepath)
         loading.dumpfile(new_doc, new_filepath)
-
-
-def main():
-    import argparse
-    from dictknife.jsonknife import get_resolver
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("src")
-    parser.add_argument("--log", default="INFO")
-
-    args = parser.parse_args()
-    logging.basicConfig(level=getattr(logging, args.log))
-
-    resolver = get_resolver(args.src)
-    separator = Separator(resolver)
-
-    separator.separate()
-    # emitter
-
-
-if __name__ == "__main__":
-    main()
