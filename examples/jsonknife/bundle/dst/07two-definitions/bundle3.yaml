@@ -1,0 +1,18 @@
+propeties:
+  people:
+    $ref: '#/definitions/people'
+  person:
+    $ref: '#/definitions/person'
+definitions:
+  people:
+    items:
+      $ref: '#/definitions/person'
+  person:
+    type: object
+    propeties:
+      name:
+        type: string
+      age:
+        type: integer
+    required:
+    - name

@@ -1,0 +1,9 @@
+propeties:
+  father:
+    $ref: "#/definitions/people"
+  mother:
+    $ref: "#/definitions/people"
+
+definitions:
+  people:
+    $ref: "people.yaml#/definitions/people"
