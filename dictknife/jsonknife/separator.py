@@ -140,14 +140,10 @@ class Emitter:
         for _, d in self.ref_walker.walk(data):
             ref = d["$ref"]
             if ref.startswith("#/"):
-                ref = "{filepath}{ref}".format(
-                    filepath=_with_format(
-                        relpath(d["$ref"].lstrip("#/"), where=self.here),
-                        format=self.format,
-                    ),
-                    ref=d["$ref"],
+                filepath = _with_format(
+                    relpath(d["$ref"].lstrip("#/"), where=self.here), format=self.format
                 )
-            d["$ref"] = fixref(ref, where=self.here, to=def_item["new_filepath"])
+            d["$ref"] = fixref(ref, where=filepath, to=def_item["new_filepath"])
 
         # abspath -> relpath
         filepath = os.path.relpath(
