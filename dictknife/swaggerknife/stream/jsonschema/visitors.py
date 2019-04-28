@@ -28,6 +28,31 @@ class SchemaVisitor(Visitor):
     def __call__(self, ctx: Context, d: dict):
         if hasattr(d, "get") and "$ref" in d:
             return ctx.resolve_ref(d["$ref"], cont=self)
+
+        if not hasattr(d, "get"):
+            return
+
+        if "properties" in d:
+            for name, prop in d["properties"].items():
+                ctx.run(name, self, prop)
+        for k in ["additionalProperties", "items"]:
+            if k in d:
+                ctx.run(k, self, d[k])
+        if "patternProperties" in d:
+            teardown = ctx.push_name("patternProperties")
+            try:
+                for k, v in d["patternProperties"].items():
+                    ctx.run(k, self, v)
+            finally:
+                teardown()
+        for k in ["oneOf", "allOf", "anyOf"]:
+            if k in d:
+                teardown = ctx.push_name(k)
+                try:
+                    for i, x in enumerate(d[k]):
+                        ctx.run(i, self, x)
+                finally:
+                    teardown()
         return self.node(ctx, d, self)
 
     @reify

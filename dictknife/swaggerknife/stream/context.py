@@ -19,6 +19,7 @@ class Context:
         self.resolvers = [resolver]
         self._emit = emit
         self.history = history or [[]]
+        self._seen = set()
 
     @property
     def path(self) -> t.List[str]:
@@ -36,20 +37,22 @@ class Context:
         return self.path.pop()
 
     def run(self, name, fn, *args, **kwargs):
-        v = None
         teardown = None
         try:
             teardown = self.push_name(name)
-            v = fn(self, *args, **kwargs)
+            return fn(self, *args, **kwargs)
         finally:
             if teardown is not None:
                 teardown()
-        return v
 
-    def resolve_ref(self, ref, *, cont):
-        sd, teardown = self._resolve(ref)
+    def resolve_ref(self, ref, *, cont) -> None:
+        sd, query, teardown = self._resolve(ref)
+        k = (self.resolver.name, query)
         try:
-            return cont(self, sd)
+            if k in self._seen:
+                return
+            self._seen.add(k)
+            cont(self, sd)
         finally:
             teardown()
 
@@ -65,7 +68,7 @@ class Context:
             path.extend(query.lstrip("#/").split("/"))
 
         self.history.append(path)
-        return d, self._resolve_teardown
+        return d, query, self._resolve_teardown
 
     def _resolve_teardown(self):
         self.history.pop()
