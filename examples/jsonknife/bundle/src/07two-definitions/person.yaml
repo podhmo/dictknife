@@ -1,0 +1,10 @@
+definitions:
+  person:
+    type: object
+    propeties:
+      name:
+        type: string
+      age:
+        type: integer
+    required:
+      - name

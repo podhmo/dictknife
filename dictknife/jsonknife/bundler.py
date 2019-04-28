@@ -117,7 +117,12 @@ class Scanner:
 
                 item = self.localref_fixer.fix_localref(path, item)
                 if item.localref not in self.item_map:
-                    self.item_map[item.localref] = item
+                    if not (
+                        "$ref" in item.data
+                        and sd["$ref"].startswith("#/")
+                        and item.data["$ref"].endswith(sd["$ref"])
+                    ):
+                        self.item_map[item.localref] = item
                     self._scan_refs(doc=item.data, conflicted=conflicted)
                 if item.globalref != self.item_map[item.localref].globalref:
                     newitem = self.conflict_fixer.fix_conflict(

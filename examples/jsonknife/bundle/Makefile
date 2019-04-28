@@ -1,5 +1,5 @@
 default: clean
-	$(MAKE) 00 01 02 03 04 05 06
+	$(MAKE) 00 01 02 03 04 05 06 07
 TEE := 2>&1 >
 OPTS ?=
 
@@ -54,3 +54,12 @@ dst:
 	mkdir -p dst/${DIR}
 	jsonknife ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
 	jsonknife ${OPTS} bundle --flavor=openapiv2 --src src/${DIR}/main.v2.yaml --dst dst/${DIR}/bundle.v2.yaml
+
+# with two definitions, same name
+07: DIR := $(shell ls src | grep 07)
+07: dst
+	mkdir -p dst/${DIR}
+	jsonknife --debug ${OPTS} bundle --src src/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+	jsonknife --debug ${OPTS} bundle --src src/${DIR}/main2.yaml --dst dst/${DIR}/bundle2.yaml
+	jsonknife --debug ${OPTS} bundle --src src/${DIR}/main3.yaml --dst dst/${DIR}/bundle3.yaml
+	jsonknife --debug ${OPTS} bundle --src src/${DIR}/main4.yaml --dst dst/${DIR}/bundle4.yaml
