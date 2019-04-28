@@ -1,0 +1,6 @@
+components:
+  schemas:
+    DateWithExample:
+      $ref: 'Date.yaml#/components/schemas/Date'
+      description: Date schema extended with a `default` value... Or not?
+      default: 2000-01-01

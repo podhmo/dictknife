@@ -1,0 +1,9 @@
+components:
+  schemas:
+    Date:
+      type: string
+      format: date
+    DateWithExample:
+      $ref: '#/components/schemas/Date'
+      description: Date schema extended with a `default` value... Or not?
+      default: 2000-01-01

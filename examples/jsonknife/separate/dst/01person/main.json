@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "person": {
+      "$ref": "definitions/person.json#/definitions/person"
+    }
+  },
+  "properties": {
+    "person": {
+      "$ref": "#/definitions/person"
+    }
+  },
+  "type": "object"
+}
