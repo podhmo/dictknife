@@ -30,26 +30,27 @@ def _with_format(name: str, *, format: str = None, default=".yaml"):
 
 
 class Separator:  # todo: rename
-    def __init__(self, resolver, *, format=None):
+    def __init__(self, resolver, *, format=None, here=None):
         self.resolver = resolver
         self.format = format
+        self.here = here
 
     @reify
     def scanner(self):
-        return Scanner(self.resolver, format=self.format)
+        return Scanner(self.resolver, format=self.format, here=self.here)
 
     @reify
     def emitter(self):
-        return Emitter(self.resolver, format=self.format)
+        return Emitter(self.resolver, format=self.format, here=self.here)
 
-    def separate(self, doc=None, *, name="main"):
+    def separate(self, doc=None, *, name="main", dst=None):
         doc = doc or self.resolver.doc
 
         ns_map = self.scanner.scan(doc)
         for ns, def_items in ns_map.items():
             for def_item in def_items:
                 self.emitter.emit(def_item)
-        self.emitter.emit_main(doc=doc, name=name)
+        self.emitter.emit_main(doc=doc, name=name, dst=dst)
 
 
 class Scanner:
@@ -159,7 +160,7 @@ class Emitter:
         # todo: to dumper
         loading.dumpfile(doc, def_item["new_filepath"])
 
-    def emit_main(self, *, doc: dict = None, name: str = "main"):
+    def emit_main(self, *, doc: dict = None, dst: str = None, name: str = "main"):
         doc = doc or self.resolver.doc
         new_doc = copy.deepcopy(doc)
         for ref, data in self.registered:
@@ -177,6 +178,7 @@ class Emitter:
                     continue
                 self.resolver.maybe_remove_by_json_pointer(ref, doc=new_doc)
 
-        new_filepath = relpath(_with_format(name, format=self.format), where=self.here)
-        logger.info("emit file %s", new_filepath)
-        loading.dumpfile(new_doc, new_filepath)
+        if dst is None:
+            dst = relpath(_with_format(name, format=self.format), where=self.here)
+        logger.info("emit file %s", dst)
+        loading.dumpfile(new_doc, dst)

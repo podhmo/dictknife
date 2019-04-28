@@ -64,5 +64,5 @@ def bundle(
 
 def separate(src: str, *, dst: str = None, input_format=None, output_format=None):
     resolver = get_resolver(src, format=input_format)
-    separator = Separator(resolver, format=output_format)
-    separator.separate(name=dst or "main")
+    separator = Separator(resolver, format=output_format, here=dst or None)
+    separator.separate(name="main", dst=dst)
