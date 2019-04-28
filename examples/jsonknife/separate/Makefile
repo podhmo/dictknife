@@ -1,5 +1,5 @@
 default: clean
-	$(MAKE) 00 01 02
+	$(MAKE) 00 01 02 03 04
 TEE := 2>&1 >
 OPTS ?=
 
@@ -31,4 +31,21 @@ dst:
 	mkdir -p dst/${DIR}
 	jsonknife separate --src src/${DIR}/schema.yaml --dst dst/${DIR}/main.yaml
 	jsonknife bundle --src dst/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+	dictknife diff -S src/${DIR}/schema.yaml dst/${DIR}/bundle.yaml | tee dst/${DIR}/a.diff
+
+# complex structure
+03: DIR := $(shell ls src | grep 03)
+03: dst
+	mkdir -p dst/${DIR}
+	jsonknife separate --src src/${DIR}/schema.yaml --dst dst/${DIR}/main.yaml
+	jsonknife bundle --src dst/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
+	dictknife diff -S src/${DIR}/schema.yaml dst/${DIR}/bundle.yaml | tee dst/${DIR}/a.diff
+
+# openapi doc (PET Store)
+# https://github.com/swagger-api/swagger-codegen/blob/master/modules/swagger-codegen/src/test/resources/2_0/petstore.yaml
+04: DIR := $(shell ls src | grep 04)
+04: dst
+	mkdir -p dst/${DIR}
+	jsonknife separate --src src/${DIR}/schema.yaml --dst dst/${DIR}/main.yaml
+	jsonknife --debug bundle --src dst/${DIR}/main.yaml --dst dst/${DIR}/bundle.yaml
 	dictknife diff -S src/${DIR}/schema.yaml dst/${DIR}/bundle.yaml | tee dst/${DIR}/a.diff

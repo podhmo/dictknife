@@ -1,0 +1,9 @@
+definitions:
+  Reference:
+    type: object
+    properties:
+      $ref:
+        type: string
+        format: uniref
+    required:
+    - $ref
