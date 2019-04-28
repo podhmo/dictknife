@@ -1,0 +1,23 @@
+{
+  "definitions": {
+    "address": {
+      "properties": {
+        "city": {
+          "$ref": "name.json#/definitions/name"
+        },
+        "state": {
+          "type": "string"
+        },
+        "street_address": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "street_address",
+        "city",
+        "state"
+      ],
+      "type": "object"
+    }
+  }
+}

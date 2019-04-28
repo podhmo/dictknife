@@ -1,0 +1,18 @@
+definitions:
+  Amount:
+    type: object
+    description: |
+      some description
+    properties:
+      value:
+        format: double
+        type: number
+        minimum: 0.01
+        maximum: 1000000000000000
+        description: |
+          some description
+      currency:
+        $ref: 'Currency.yaml#/definitions/Currency'
+    required:
+    - value
+    - currency

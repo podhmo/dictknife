@@ -1,0 +1,20 @@
+definitions:
+  Schema:
+    $ref: 'definitions/Schema.yaml#/definitions/Schema'
+  Reference:
+    $ref: 'definitions/Reference.yaml#/definitions/Reference'
+type: object
+properties:
+  type:
+    type: string
+  definitions:
+    patternProperties:
+      ^[a-zA-Z0-9\.\-_]+$:
+        $ref: '#/definitions/Schema'
+  properties:
+    patternProperties:
+      ^[a-zA-Z0-9\.\-_]+$:
+        oneOf:
+        - $ref: '#/definitions/Schema'
+        - $ref: '#/definitions/Reference'
+additionalProperties: false

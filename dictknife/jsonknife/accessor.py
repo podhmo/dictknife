@@ -1,8 +1,19 @@
 import logging
+
 from dictknife import Accessor
+from dictknife import operators
 from dictknife.langhelpers import as_jsonpointer, as_path_node
 
+
 logger = logging.getLogger(__name__)
+
+
+def _is_string(k, d):
+    return hasattr(d, "startswith")
+
+
+# detect: {$ref: "<ref path>"}
+is_ref = operators.And(["$ref", _is_string])
 
 
 class AccessingMixin:
@@ -31,6 +42,11 @@ class AccessingMixin:
         if doc is None:
             doc = self.doc
         return assign_by_json_pointer(doc, jsonref, value, guess=guess)
+
+    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+        if doc is None:
+            doc = self.doc
+        return maybe_remove_by_json_pointer(doc, jsonref)
 
 
 class CachedItem:
@@ -106,6 +122,13 @@ def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
                 except KeyError:
                     pass
         raise KeyError(query)
+
+
+def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
+    if query == "":
+        return
+    path = json_pointer_to_path(query)
+    return accessor.maybe_remove(doc, path)
 
 
 class StackedAccessor:

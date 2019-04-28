@@ -20,6 +20,8 @@ def fixpath(relpath, *, where, to):
 
 
 def fixref(ref, *, where, to):
+    if where == to:
+        return ref
     fpath, jsref = pairrsplit(ref, "#")
     if not fpath:
         filepath = os.path.relpath(os.path.abspath(where), start=os.path.dirname(to))

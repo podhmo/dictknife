@@ -10,6 +10,7 @@ from dictknife.langhelpers import reify, pairrsplit
 from .accessor import AccessingMixin
 from .relpath import normpath
 
+
 logger = logging.getLogger("jsonknife.resolver")
 
 
