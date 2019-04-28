@@ -6,9 +6,8 @@ from .context import Context
 from .openapi3 import OpenAPIVisitor
 
 
-def run(src: str, *, create_visitor=OpenAPIVisitor):
-    for ev in dedup_stream(make_stream(src, create_visitor=create_visitor)):
-        print(ev)
+def run(src: str, *, create_visitor=OpenAPIVisitor) -> t.Iterable[Event]:
+    return make_stream(src, create_visitor=create_visitor)
 
 
 def dedup_stream(stream: t.Iterable[Event]) -> t.Iterable[Event]:
@@ -49,7 +48,7 @@ def make_stream(src: str, *, create_visitor=None) -> t.Iterable[Event]:
     th.join()
 
 
-def main(create_visitor=None):
+def main(create_visitor=None) -> t.Iterable[Event]:
     import argparse
     import logging
 
@@ -59,4 +58,4 @@ def main(create_visitor=None):
     args = parser.parse_args()
 
     logging.basicConfig(level=getattr(logging, args.log))
-    run(args.src, create_visitor=create_visitor)
+    return run(args.src, create_visitor=create_visitor)
