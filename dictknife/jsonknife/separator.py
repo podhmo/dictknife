@@ -143,6 +143,8 @@ class Emitter:
                 filepath = _with_format(
                     relpath(d["$ref"].lstrip("#/"), where=self.here), format=self.format
                 )
+            else:
+                filepath = self.resolver.name
             d["$ref"] = fixref(ref, where=filepath, to=def_item["new_filepath"])
 
         # abspath -> relpath
