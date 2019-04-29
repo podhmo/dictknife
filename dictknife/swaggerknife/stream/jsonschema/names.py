@@ -13,13 +13,15 @@ class types:
     allOf = "allOf"
     oneOf = "oneOf"
     anyOf = "anyOf"
+    not_ = "not"
 
     unknown = "unknown"
 
 
 class flavors:
-    primitive_type = "primitive_type"
     new_type = "new_type"
+    primitive_type = "primitive_type"
+    combine_type = "combine_type"
 
     field_of_something = "field_of_something"
     toplevel_properties = "toplevel_properties"

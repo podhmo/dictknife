@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 _primitive_types = set(["string", "integer", "float", "boolean", "number"])
-_composite_types = set(["oneOf", "anyOf", "allof", "not"])
+_combine_types = set(["oneOf", "anyOf", "allof", "not"])
 _object_attributes = set(["properties", "additionalProperties", "patternProperties"])
 _array_attributes = set(["items"])
 
@@ -31,6 +31,8 @@ def _guess_event_name(d, *, retry=False, default=names.types.unknown, strict=Fal
         name = names.types.anyOf
     elif "allOf" in d:
         name = names.types.allOf
+    elif "not" in d:
+        name = names.types.not_
     elif not retry:
         if any(x in d for x in _object_attributes):
             d["type"] = "object"
@@ -64,6 +66,8 @@ class SchemaNode(Node):
         elif name == names.types.object:
             if any(x in d for x in _object_attributes):
                 flavors.append(names.flavors.has_extra_propeties)
+        elif name in _combine_types:
+            flavors.append(names.flavors.combine_type)
         elif name in _primitive_types:
             keys = {k: True for k in d.keys()}
             keys.pop("type", None)
