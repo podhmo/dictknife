@@ -1,5 +1,8 @@
 import typing as t
+import os.path  # xxx
 from dictknife.jsonknife.accessor import AccessingMixin
+from dictknife.langhelpers import pairrsplit
+from dictknife.jsonknife.relpath import fixref
 from .event import Event
 
 
@@ -28,6 +31,14 @@ class Context:
     @property
     def resolver(self) -> Resolver:
         return self.resolvers[-1]
+
+    def get_uid(self, ref, *, to=None) -> str:
+        uid = fixref(ref, where=self.filename, to=".")
+        filepath, jsref = pairrsplit(uid, "#")
+        uid = "{}#/{}".format(
+            os.path.normpath(os.path.abspath(filepath)), jsref.lstrip("/")
+        )
+        return uid.replace(os.getcwd(), "")  # xxx
 
     def push_name(self, name: str) -> t.Callable[[None], None]:
         self.path.append(name)
@@ -78,12 +89,16 @@ class Context:
     def filename(self) -> str:
         return self.resolver.name
 
+    @property
+    def root_filename(self) -> str:
+        return self.resolvers[0].name
+
     def emit(
         self,
         data: dict,
         *,
         name: str,
-        flavors: t.List[str] = None,
+        predicates: t.List[str] = None,
         annotation: dict = None
     ) -> None:
         self._emit(
@@ -92,8 +107,9 @@ class Context:
                 path=self.path[1:],
                 data=data,
                 file=self.filename,
+                root_file=self.root_filename,
                 history=self.history,
-                flavors=flavors or [],
+                predicates=predicates or [],
                 annotation=annotation or {},
             )
         )

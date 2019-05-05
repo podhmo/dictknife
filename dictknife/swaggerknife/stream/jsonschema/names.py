@@ -18,7 +18,7 @@ class types:
     unknown = "unknown"
 
 
-class flavors:
+class predicates:
     new_type = "new_type"
     primitive_type = "primitive_type"
     combine_type = "combine_type"
@@ -31,8 +31,12 @@ class flavors:
     has_format = "has_format"
     has_links = "has_links"
 
-    has_extra_propeties = "has_extra_propeties"
+    has_properties = "has_properties"
+    has_extra_properties = "has_extra_properties"
 
 
 class annotations:
+    name = "name"
     links = "links"
+    properties = "properties"
+    extra_properties = "extra_properties"

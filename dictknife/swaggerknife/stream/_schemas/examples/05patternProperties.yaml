@@ -1,0 +1,29 @@
+definitions:
+  Point:
+    type: integer
+  Points:
+    patternProperties:
+      "^point[0-9]+":
+        "$ref": "#/definitions/Point"
+  Schema:
+    additionalProperties: false
+    patternProperties:
+      ^x-: {}
+    properties:
+      description:
+        type: string
+      type:
+        enum:
+        - array
+        - boolean
+        - integer
+        - number
+        - object
+        - string
+        type: string
+    type: object
+properties:
+  schema:
+    $ref: "#/definitions/Schema"
+  points:
+    $ref: "#/definitions/Points"

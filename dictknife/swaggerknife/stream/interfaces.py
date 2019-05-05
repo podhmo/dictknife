@@ -11,12 +11,6 @@ class Visitor:
     def visit(self, ctx: Context, d: dict):
         return self(ctx, d)
 
-    @property
-    def registry(self) -> "Registry":
-        raise NotImplementedError(
-            "please implementation on {self.__class__!r}".foramt(self=self)
-        )
-
 
 class Node:
     def __call__(self, ctx: Context, d: dict, visitor: Visitor):
@@ -26,15 +20,3 @@ class Node:
 
     def accept(self, ctx: Context, d: dict, visitor: Visitor):
         return self(ctx, d, visitor)
-
-
-class Registry:
-    def resolve_visitor_from_ref(self, s: str) -> Visitor:
-        raise NotImplementedError(
-            "please implementation on {self.__class__!r}".foramt(self=self)
-        )
-
-    def resolve_node_from_string(self, s: str) -> Node:
-        raise NotImplementedError(
-            "please implementation on {self.__class__!r}".foramt(self=self)
-        )

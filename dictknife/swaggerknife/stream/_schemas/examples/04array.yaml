@@ -1,0 +1,24 @@
+definitions:
+  name:
+    type: string
+  people:
+    type: array
+    items:
+      $ref: "#/definitions/person"
+  person:
+    type: object
+    properties:
+      name:
+        $ref: "#/definitions/name"
+      age:
+        type: integer
+      parents:
+        $ref: "#/definitions/people"  # todo: anonymous definition
+    required:
+      - name
+type: object
+properties:
+  father:
+    $ref: "#/definitions/person"
+  mother:
+    $ref: "#/definitions/person"

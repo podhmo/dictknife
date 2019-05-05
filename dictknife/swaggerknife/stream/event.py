@@ -1,6 +1,6 @@
 import typing as t
 import json
-import pathlib
+import os.path  # xxx:
 from dictknife.langhelpers import as_jsonpointer
 
 VERBOSE = False
@@ -9,8 +9,8 @@ VERBOSE = False
 def _serialize_default(ev: "Event", *, verbose=VERBOSE) -> str:
     try:
         d = {"event": ev.name}
-        d["ref"] = ev.fullref
-        d["flavors"] = sorted(ev.flavors)
+        d["uid"] = ev.uid
+        d["predicates"] = sorted(ev.predicates)
         if verbose:
             d["history"] = ev.history
         return json.dumps(d)
@@ -23,7 +23,16 @@ def _serialize_default(ev: "Event", *, verbose=VERBOSE) -> str:
 
 
 class Event:
-    __slots__ = ("name", "path", "data", "file", "history", "flavors", "annotated")
+    __slots__ = (
+        "name",
+        "path",
+        "data",
+        "root_file",
+        "file",
+        "history",
+        "predicates",
+        "annotated",
+    )
     serializer: t.Callable[["Event"], str] = staticmethod(_serialize_default)
 
     def __init__(
@@ -33,16 +42,18 @@ class Event:
         path: t.List[str],
         data: dict,
         file: str,
-        flavors: t.List[str],
+        root_file: str,
+        predicates: t.List[str],
         history: t.List[t.List[str]] = None,
-        annotation: dict = None,  # flavor -> any
+        annotation: dict = None,  # predicate -> any
     ) -> None:
         self.name = name
         self.path = path
         self.data = data
-        self.flavors = set(flavors or [])
+        self.predicates = set(predicates or [])
 
         self.file = file
+        self.root_file = root_file
         self.history = history or []
         self.annotated = annotation
 
@@ -57,9 +68,6 @@ class Event:
         return "/".join(as_jsonpointer(x) for x in self.path)
 
     @property
-    def fullref(self) -> str:
-        file = str(pathlib.Path(self.file).relative_to(pathlib.Path().absolute()))
-        ref = self.ref
-        if not ref:
-            return file
-        return "{file}#/{ref}".format(file=file, ref=ref)
+    def uid(self) -> str:
+        uid = "{}#/{}".format(os.path.abspath(self.file), self.ref.lstrip("#/"))
+        return uid.replace(os.getcwd(), "")  # xxx

@@ -5,12 +5,12 @@ definitions:
       - { $ref: "#/definitions/two" }
   one:
     type: object
-    propeties:
+    properties:
       one:
         type: string
   two:
     type: object
-    propeties:
+    properties:
       two:
         type: string
 
