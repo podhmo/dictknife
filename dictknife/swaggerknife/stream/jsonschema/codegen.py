@@ -19,6 +19,7 @@ class _LazyName:
 
 
 # todo: toplevel properties
+# todo: oneOf,anyof,allOf
 # todo: anonymous definition(nested definition)
 # todo: pattern properties, additionalProperties
 
@@ -80,9 +81,6 @@ class Generator:
                     """r.append((re.compile({k!r}), {cls}()))""", k=k, cls=visitor_cls
                 )
             m.return_("r")
-            # m.return_(
-            #     """[(re.compile(k), k) for self._extra_properties["patternProperties"]]"""
-            # )
 
     def gen_visitor(self, ev: Event, *, m=None, clsname: str = None) -> None:
         m = self.m
@@ -107,6 +105,8 @@ class Generator:
                         json.dumps(ev.get_annotated(names.annotations.extra_properties))
                     ),
                 )
+            if names.predicates.has_links in ev.predicates:
+                m.stmt(f"_links = {[name for name, ref in self._iterate_links(ev)]!r}")
             m.sep()
 
             if self.has_pattern_properties(ev):
