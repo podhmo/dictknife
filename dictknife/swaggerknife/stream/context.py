@@ -78,7 +78,14 @@ class Context:
     def filename(self) -> str:
         return self.resolver.name
 
-    def emit(self, data: dict, *, name: str, flavors: t.List[str] = None) -> None:
+    def emit(
+        self,
+        data: dict,
+        *,
+        name: str,
+        flavors: t.List[str] = None,
+        annotation: dict = None
+    ) -> None:
         self._emit(
             Event(
                 name=name,
@@ -87,5 +94,6 @@ class Context:
                 file=self.filename,
                 history=self.history,
                 flavors=flavors or [],
+                annotation=annotation or {},
             )
         )

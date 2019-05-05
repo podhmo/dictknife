@@ -29,5 +29,10 @@ class flavors:
     has_name = "has_name"
     has_enum = "has_enum"
     has_format = "has_format"
+    has_links = "has_links"
 
     has_extra_propeties = "has_extra_propeties"
+
+
+class annotations:
+    links = "links"

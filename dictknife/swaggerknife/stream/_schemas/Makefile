@@ -1,11 +1,16 @@
+# CMD ?= python -m dictknife.swaggerknife.stream.jsonschema
+CMD ?= python -m dictknife.swaggerknife.stream.jsonschema.codegen
+
+# OPTS ?= --log=DEBUG
+
 default:
-	@python -m dictknife.swaggerknife.stream.jsonschema separated/main.yaml --log=DEBUG 
+	@$(CMD) separated/main.yaml ${OPTS}
 
 00:
-	@python -m dictknife.swaggerknife.stream.jsonschema examples/00*.yaml
+	@$(CMD) examples/00*.yaml ${OPTS}
 01:
-	@python -m dictknife.swaggerknife.stream.jsonschema examples/01*.yaml
+	@$(CMD) examples/01*.yaml ${OPTS}
 02:
-	@python -m dictknife.swaggerknife.stream.jsonschema examples/02*.yaml
+	@$(CMD) examples/02*.yaml ${OPTS}
 03:
-	@python -m dictknife.swaggerknife.stream.jsonschema examples/03*.yaml
+	@$(CMD) examples/03*.yaml ${OPTS}

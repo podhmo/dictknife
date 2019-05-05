@@ -1,9 +1,11 @@
 definitions:
+  name:
+    type: string
   person:
     type: object
-    propeties:
+    properties:
       name:
-        type: string
+        $ref: "#/definitions/name"
       age:
         type: integer
     required:

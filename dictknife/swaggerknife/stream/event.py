@@ -10,7 +10,7 @@ def _serialize_default(ev: "Event", *, verbose=VERBOSE) -> str:
     try:
         d = {"event": ev.name}
         d["ref"] = ev.fullref
-        d["flavors"] = ev.flavors
+        d["flavors"] = sorted(ev.flavors)
         if verbose:
             d["history"] = ev.history
         return json.dumps(d)
@@ -23,7 +23,7 @@ def _serialize_default(ev: "Event", *, verbose=VERBOSE) -> str:
 
 
 class Event:
-    __slots__ = ("name", "path", "data", "file", "history", "flavors")
+    __slots__ = ("name", "path", "data", "file", "history", "flavors", "annotated")
     serializer: t.Callable[["Event"], str] = staticmethod(_serialize_default)
 
     def __init__(
@@ -35,17 +35,22 @@ class Event:
         file: str,
         flavors: t.List[str],
         history: t.List[t.List[str]] = None,
+        annotation: dict = None,  # flavor -> any
     ) -> None:
         self.name = name
         self.path = path
         self.data = data
-        self.flavors = flavors or []
+        self.flavors = set(flavors or [])
 
         self.file = file
         self.history = history or []
+        self.annotated = annotation
 
     def __str__(self):
         return self.serializer(self)
+
+    def get_annotated(self, name, *, default=None):
+        return self.annotated.get(name, default)
 
     @property
     def ref(self) -> str:
