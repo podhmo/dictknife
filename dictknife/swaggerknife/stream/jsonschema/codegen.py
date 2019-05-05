@@ -77,6 +77,8 @@ class Generator:
         with m.class_(clsname, "Visitor"):
             m.stmt(f"schema_type = {ev.name!r}")
             m.stmt(f"predicates = {ev.predicates!r}")
+
+            m.stmt(f"_uid = {ev.uid!r}")
             if names.predicates.has_properties in ev.predicates:
                 m.stmt(
                     f"_properties = {ev.get_annotated(names.annotations.properties)!r}"
@@ -168,10 +170,8 @@ class Generator:
                 with m.def_(name, "self"):
 
                     def to_str(ref: str = ref):
-                        # name = self.visitors[ref]
-                        if ref not in self.visitors:
-                            breakpoint()
-                        name = self.visitors.get(ref) or "<missing>"
+                        name = self.visitors[ref]
+                        # name = self.visitors.get(ref) or "<missing>"
                         logger.debug("resolve clasname: %s -> %s", ref, name)
                         return name
 
@@ -192,8 +192,6 @@ def main():
 
     stream: t.Iterable[Event] = main(create_visitor=ToplevelVisitor)
     for ev in stream:
-        if "/Components" in ev.uid: 
-            print("!!", ev)
         if names.predicates.toplevel_properties in ev.predicates:
             toplevels.append(ev)
             continue
@@ -201,7 +199,6 @@ def main():
             g.gen_visitor(ev)
 
     for ev in toplevels:
-        print("!!!!", ev)
         if ev.uid.endswith("#/"):
             g.gen_visitor(ev, clsname="toplevel")
     print(g.m)

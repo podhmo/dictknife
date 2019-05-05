@@ -33,7 +33,18 @@ class Context:
         return self.resolvers[-1]
 
     def get_uid(self, ref, *, to=None) -> str:
-        uid = fixref(ref, where=self.filename, to=".")
+        # todo: cache?
+        stack = [(self.resolver, ref)]
+        while True:
+            resolver, ref = stack[-1]
+            sresolver, sref = resolver.resolve(ref)
+            sd = sresolver.access_by_json_pointer(sref)
+            if not hasattr(sd, "get") or "$ref" not in sd:
+                break
+            stack.append((sresolver, sd["$ref"]))
+
+        resolver, ref = stack[-1]
+        uid = fixref(ref, where=resolver.filename, to=to or ".")
         filepath, jsref = pairrsplit(uid, "#")
         uid = "{}#/{}".format(
             os.path.normpath(os.path.abspath(filepath)), jsref.lstrip("/")
