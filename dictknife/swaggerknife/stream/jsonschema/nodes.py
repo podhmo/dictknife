@@ -121,4 +121,13 @@ class SchemaNode(Node):
 
         if extra_properties:
             annotation[names.annotations.extra_properties] = extra_properties
+            if "patternProperties" in d:
+                links = []
+                for name, prop in d["patternProperties"].items():
+                    if _is_ref(prop):
+                        links.append((name, ctx.get_uid(prop["$ref"])))
+                    else:
+                        links.append((name, None))  # fixme
+                annotation[names.annotations.pattern_properties_links] = links
+
         ctx.emit(d, name=typename, predicates=predicates, annotation=annotation)

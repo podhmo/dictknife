@@ -60,12 +60,29 @@ class Generator:
 
     def gen_pattern_properties_regexes(self, ev: Event, *, m=None) -> None:
         m = self.m
+        m.stmt("@reify  # visitor")
         with m.def_("_pattern_properties_regexes", "self"):
             m.import_("re")
-            m.stmt("## todo: visitor")
-            m.return_(
-                """[(re.compile(k), k) for self._extra_properties["patternProperties"]]"""
-            )
+            m.stmt("r = []")
+            for k, ref in ev.get_annotated(names.annotations.pattern_properties_links):
+                if ref is None:
+                    m.stmt("""r.append((re.compile({k!r}), None))""", k=k)
+                    continue
+
+                def to_str(ref: str = ref):
+                    name = self.visitors[ref]
+                    # name = self.visitors.get(ref) or "<missing>"
+                    logger.debug("resolve clasname: %s -> %s", ref, name)
+                    return name
+
+                visitor_cls = _LazyName(to_str)
+                m.stmt(
+                    """r.append((re.compile({k!r}), {cls}()))""", k=k, cls=visitor_cls
+                )
+            m.return_("r")
+            # m.return_(
+            #     """[(re.compile(k), k) for self._extra_properties["patternProperties"]]"""
+            # )
 
     def gen_visitor(self, ev: Event, *, m=None, clsname: str = None) -> None:
         m = self.m
@@ -138,32 +155,45 @@ class Generator:
                     with m.for_("rx, visitor in self._pattern_properties_regexes"):
                         with m.for_("k, v in d.items()"):
                             m.stmt("m = rx.search(rx)")
-                            with m.if_("m is not None"):
+                            with m.if_("m is not None and visitor is not None"):
                                 m.stmt("ctx.run(k, visitor.visit, v)")
                 if self.has_additional_properties(ev):
                     m.sep()
                     m.stmt("# additionalProperties")
-                    if ev.data["additionalProperties"] is False:
-                        with m.for_("k, v in d.items()"):
-                            with m.if_("if k in self._properties"):
-                                self._gen_logging(
-                                    m,
-                                    "logger.warning('unexpected property is found: %r, where=%s', k, self.__class__.__name__)",
-                                )
-                                m.stmt("continue")
-                                # m.stmt(f"raise RuntimeError('additionalProperties is False, but unexpected property is found (k=%s, where=%s)' %  (k, self.__class__.__name__))")
-                            m.stmt("ctx.run(k, self.additional_properties.visit, v)")
-                    else:
-                        with m.for_("k, v in d.items()"):
-                            with m.if_("if k in self._properties"):
-                                m.stmt("continue")
-                            m.stmt("ctx.run(k, self.additional_properties.visit, v)")
 
-                    # with m.for_("rx, visitor in self._additional_properties_regexes"):
-                    #     with m.for_("k, v in d.items()"):
-                    #         m.stmt("m = rx.search(rx)")
-                    #         with m.if_("m is not None"):
-                    #             m.stmt("ctx.run(k, visitor.visit, v)")
+                    def _on_continue():
+                        m.stmt("continue")
+
+                    if ev.data["additionalProperties"] is False:
+
+                        def _on_continue_with_warning():
+                            # m.stmt(f"raise RuntimeError('additionalProperties is False, but unexpected property is found (k=%s, where=%s)' %  (k, self.__class__.__name__))")
+                            self._gen_logging(
+                                m,
+                                "logger.warning('unexpected property is found: %r, where=%s', k, self.__class__.__name__)",
+                            )
+                            m.stmt("continue")
+
+                        _on_continue = _on_continue_with_warning  # noqa
+
+                    with m.for_("k, v in d.items()"):
+                        with m.if_("if k in self._properties"):
+                            m.stmt("continue")
+                        if self.has_pattern_properties(ev):
+                            with m.for_(
+                                "rx, visitor in self._pattern_properties_regexes"
+                            ):
+                                m.stmt("m = rx.search(rx)")
+                                with m.if_("m is not None"):
+                                    m.stmt("continue")
+
+                        if ev.data["additionalProperties"] is False:
+                            self._gen_logging(
+                                m,
+                                "logger.warning('unexpected property is found: %r, where=%s', k, self.__class__.__name__)",
+                            )
+                        else:
+                            m.stmt("ctx.run(k, self.additional_properties.visit, v)")
 
             for name, ref in self._iterate_links(ev):
                 m.stmt("@reify  # visitor")

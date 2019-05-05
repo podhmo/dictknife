@@ -38,5 +38,6 @@ class predicates:
 class annotations:
     name = "name"
     links = "links"
+    pattern_properties_links = "pattern_properties_links"
     properties = "properties"
     extra_properties = "extra_properties"
