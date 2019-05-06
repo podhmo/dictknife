@@ -130,6 +130,8 @@ class Generator:
             with m.def_("__call__", "self", "ctx: Context", "d: dict"):
                 if ev.name == names.types.array:
                     m.return_("[self._visit(ctx, x) for x in d]")
+                elif ev.name == names.types.oneOf:
+                    pass
                 elif names.predicates.primitive_type in ev.predicates:
                     # drop schema definitions?
                     m.return_("self._visit(ctx, d)  # todo: simplify")

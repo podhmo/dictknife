@@ -9,6 +9,8 @@ definitions:
       one:
         type: string
   two:
+    $ref: "#/definitions/twotwo"
+  twotwo:
     type: object
     properties:
       two:

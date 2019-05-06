@@ -1,4 +1,7 @@
 import logging
+import copy
+from dictknife import DictWalker, And, Accessor, deepmerge
+from dictknife.langhelpers import reify
 from ..interfaces import Visitor, Node
 from ..context import Context
 from . import names
@@ -13,10 +16,14 @@ _object_extra_attributes = set(["additionalProperties", "patternProperties"])
 _array_attributes = set(["items"])
 
 
-def _is_ref(d):
+def _is_string(k, d) -> bool:
+    return hasattr(d, "startswith")
+
+
+def _has_ref(d) -> bool:
     if not hasattr(d, "get"):
         return False
-    return "$ref" in d
+    return "$ref" in d and _is_string("$ref", d["$ref"])
 
 
 def _guess_event_name(d, *, retry=False, default=names.types.unknown, strict=False):
@@ -52,12 +59,103 @@ def _guess_event_name(d, *, retry=False, default=names.types.unknown, strict=Fal
     return name
 
 
+class _Expander:
+    def __init__(self):
+        self._kid = 0
+        self.pool = {}  # kid -> object
+        self.seen = {}  # resolver, path -> kid
+
+    def genid(self):
+        self._kid += 1
+        return self._kid
+
+    @reify
+    def ref_walker(self):
+        return DictWalker([And(["$ref", _is_string])])
+
+    @reify
+    def accessor(self):
+        return Accessor()
+
+    def expand(self, ctx: Context, data: dict) -> dict:
+        pool = self.pool
+        seen = self.seen
+        genid = self.genid
+        accessor = self.accessor
+        ref_walker = self.ref_walker
+
+        r = copy.deepcopy(data)
+        # todo: merge code with ..context:Context.get_uid()
+        # todo: drop description?
+        q = []
+        q.append((ctx.resolver, r))
+        assigned = set()
+
+        while q:
+            resolver, d = q.pop()
+
+            for path, sd in ref_walker.walk(d):
+                kid = genid()
+
+                k = (resolver, "/".join(map(str, path)).lstrip("#/"))
+                if k in seen:
+                    assigned_kid = seen[k]
+                    assigned.add(assigned_kid)
+                    sd["$ref"] = f"#/definitions/{assigned_kid}"
+                    continue
+
+                seen[k] = kid
+                ref = sd["$ref"]
+                stack = [(resolver, ref)]
+
+                found = False
+                while True:
+                    resolver, ref = stack[-1]
+                    k = (resolver, ref.lstrip("#/"))
+                    if k in seen:
+                        assigned_kid = seen[k]
+                        assigned.add(assigned_kid)
+                        sd["$ref"] = f"#/definitions/{assigned_kid}"
+                        break
+
+                    seen[k] = kid
+                    sresolver, sref = resolver.resolve(ref)
+
+                    sd = sresolver.access_by_json_pointer(sref)
+                    if not hasattr(sd, "get") or "$ref" not in sd:
+                        found = True
+                        stack.append((sresolver, sd))
+                        break
+                    stack.append((sresolver, sd["$ref"]))
+
+                if not found:
+                    continue
+                sresolver, sd = stack[-1]
+                new_sd = copy.deepcopy(sd)
+                pool[kid] = new_sd
+                assigned.add(kid)
+                accessor.assign(r, path, f"#/definitions/{kid}")
+                q.append((sresolver, new_sd))
+
+        if not assigned:
+            return r
+        return deepmerge(
+            r, {"definitions": {str(kid): pool[kid] for kid in sorted(assigned)}}
+        )
+
+
 class SchemaNode(Node):
+    @reify
+    def expander(self):
+        return _Expander()
+
     def __call__(self, ctx: Context, d: dict, visitor: Visitor, *, retry=False):
         typename = _guess_event_name(d)
         predicates = []
         annotation = {}
+
         extra_properties = {}
+        expanded = None
 
         # has name
         # <file>#/definitions/<name>
@@ -90,6 +188,9 @@ class SchemaNode(Node):
                 extra_properties[x] = d[x]
         elif typename in _combine_types:
             predicates.append(names.predicates.combine_type)
+            # todo: lazy evaluation
+            expanded = self.expander.expand(ctx, d)
+
         elif typename in _primitive_types:
             keys = {k: True for k in d.keys()}
             keys.pop("type", None)
@@ -113,7 +214,7 @@ class SchemaNode(Node):
             links = []
             # todo: full name (unique)
             for name, prop in d["properties"].items():
-                if _is_ref(prop):
+                if _has_ref(prop):
                     links.append((name, ctx.get_uid(prop["$ref"])))
             if links:
                 predicates.append(names.predicates.has_links)
@@ -124,10 +225,12 @@ class SchemaNode(Node):
             if "patternProperties" in d:
                 links = []
                 for name, prop in d["patternProperties"].items():
-                    if _is_ref(prop):
+                    if _has_ref(prop):
                         links.append((name, ctx.get_uid(prop["$ref"])))
                     else:
                         links.append((name, None))  # fixme
                 annotation[names.annotations.pattern_properties_links] = links
 
+        if expanded:
+            annotation[names.annotations.expanded] = expanded
         ctx.emit(d, name=typename, predicates=predicates, annotation=annotation)
