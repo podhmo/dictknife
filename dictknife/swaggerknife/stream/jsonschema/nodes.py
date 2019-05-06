@@ -3,7 +3,7 @@ import copy
 from dictknife import DictWalker, And, Accessor, deepmerge
 from dictknife.langhelpers import reify
 from ..interfaces import Visitor, Node
-from ..context import Context
+from ..context import Context, MiniReprDict
 from . import names
 
 logger = logging.getLogger(__name__)
@@ -152,7 +152,7 @@ class SchemaNode(Node):
     def __call__(self, ctx: Context, d: dict, visitor: Visitor, *, retry=False):
         typename = _guess_event_name(d)
         predicates = []
-        annotation = {}
+        annotations = {}
 
         extra_properties = {}
         expanded = None
@@ -161,7 +161,7 @@ class SchemaNode(Node):
         # <file>#/definitions/<name>
         if len(ctx.path) > 2 and ctx.path[-2] == "definitions":
             predicates.append(names.predicates.has_name)
-            annotation[names.annotations.name] = ctx.path[-1]
+            annotations[names.annotations.name] = ctx.path[-1]
         elif "definitions" not in ctx.path:
             predicates.append(names.predicates.toplevel_properties)  # ???
         elif len(ctx.path) > 2:
@@ -209,7 +209,7 @@ class SchemaNode(Node):
         # refs (neighbour refs)
         if "properties" in d:
             predicates.append(names.predicates.has_properties)
-            annotation[names.annotations.properties] = set(d["properties"].keys())
+            annotations[names.annotations.properties] = set(d["properties"].keys())
 
             links = []
             # todo: full name (unique)
@@ -218,10 +218,12 @@ class SchemaNode(Node):
                     links.append((name, ctx.get_uid(prop["$ref"])))
             if links:
                 predicates.append(names.predicates.has_links)
-                annotation[names.annotations.links] = links
+                annotations[names.annotations.links] = links
 
         if extra_properties:
-            annotation[names.annotations.extra_properties] = extra_properties
+            annotations[names.annotations.extra_properties] = MiniReprDict(
+                extra_properties
+            )
             if "patternProperties" in d:
                 links = []
                 for name, prop in d["patternProperties"].items():
@@ -229,8 +231,8 @@ class SchemaNode(Node):
                         links.append((name, ctx.get_uid(prop["$ref"])))
                     else:
                         links.append((name, None))  # fixme
-                annotation[names.annotations.pattern_properties_links] = links
+                annotations[names.annotations.pattern_properties_links] = links
 
         if expanded:
-            annotation[names.annotations.expanded] = expanded
-        ctx.emit(d, name=typename, predicates=predicates, annotation=annotation)
+            annotations[names.annotations.expanded] = MiniReprDict(expanded)
+        ctx.emit(d, name=typename, predicates=predicates, annotations=annotations)

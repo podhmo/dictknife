@@ -45,7 +45,7 @@ class Event:
         root_file: str,
         predicates: t.List[str],
         history: t.List[t.List[str]] = None,
-        annotation: dict = None,  # predicate -> any
+        annotations: dict = None,  # predicate -> any
     ) -> None:
         self.name = name
         self.path = path
@@ -55,7 +55,7 @@ class Event:
         self.file = file
         self.root_file = root_file
         self.history = history or []
-        self.annotated = annotation
+        self.annotated = annotations
 
     def __str__(self):
         return self.serializer(self)

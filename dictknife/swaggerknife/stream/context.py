@@ -11,13 +11,18 @@ class Resolver(AccessingMixin):
         ...
 
 
+class MiniReprDict(dict):
+    def __repr__(self):
+        return f"<{self.__class__.__name__} keys={list(self.keys())!r}>"
+
+
 class Context:
     def __init__(
         self,
         resolver: Resolver,
         emit: t.Callable[[Event], None],
         *,
-        history: t.List[t.List[str]] = None
+        history: t.List[t.List[str]] = None,
     ):
         self.resolvers = [resolver]
         self._emit = emit
@@ -110,7 +115,7 @@ class Context:
         *,
         name: str,
         predicates: t.List[str] = None,
-        annotation: dict = None
+        annotations: dict = None,
     ) -> None:
         self._emit(
             Event(
@@ -121,6 +126,6 @@ class Context:
                 root_file=self.root_filename,
                 history=self.history,
                 predicates=predicates or [],
-                annotation=annotation or {},
+                annotations=annotations or {},
             )
         )
