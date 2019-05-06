@@ -114,7 +114,7 @@ class Context:
         data: dict,
         *,
         name: str,
-        predicates: t.List[str] = None,
+        roles: t.List[str] = None,
         annotations: dict = None,
     ) -> None:
         self._emit(
@@ -125,7 +125,7 @@ class Context:
                 file=self.filename,
                 root_file=self.root_filename,
                 history=self.history,
-                predicates=predicates or [],
+                roles=roles or [],
                 annotations=annotations or {},
             )
         )

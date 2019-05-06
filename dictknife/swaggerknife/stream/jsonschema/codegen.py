@@ -37,7 +37,7 @@ class Generator:
             self.m.stmt("logger = getLogger(__name__)  # noqa")
 
     def _iterate_links(self, ev: Event) -> t.Iterable[t.Tuple[str, str]]:
-        if names.predicates.has_links not in ev.predicates:
+        if names.roles.has_links not in ev.roles:
             return []
         return ev.get_annotated(names.annotations.links)
 
@@ -50,13 +50,13 @@ class Generator:
 
     def has_pattern_properties(self, ev: Event) -> bool:
         return (
-            names.predicates.has_extra_properties in ev.predicates
+            names.roles.has_extra_properties in ev.roles
             and "patternProperties" in ev.data
         )
 
     def has_additional_properties(self, ev: Event) -> bool:
         return (
-            names.predicates.has_extra_properties in ev.predicates
+            names.roles.has_extra_properties in ev.roles
             and "additionalProperties" in ev.data
         )
 
@@ -92,21 +92,21 @@ class Generator:
 
         with m.class_(clsname, "Visitor"):
             m.stmt(f"schema_type = {ev.name!r}")
-            m.stmt(f"predicates = {ev.predicates!r}")
+            m.stmt(f"roles = {ev.roles!r}")
 
             m.stmt(f"_uid = {ev.uid!r}")
-            if names.predicates.has_properties in ev.predicates:
+            if names.roles.has_properties in ev.roles:
                 m.stmt(
                     f"_properties = {ev.get_annotated(names.annotations.properties)!r}"
                 )
-            if names.predicates.has_extra_properties in ev.predicates:
+            if names.roles.has_extra_properties in ev.roles:
                 m.stmt(
                     "_extra_properties = {}",
                     json.loads(
                         json.dumps(ev.get_annotated(names.annotations.extra_properties))
                     ),
                 )
-            if names.predicates.has_links in ev.predicates:
+            if names.roles.has_links in ev.roles:
                 m.stmt(f"_links = {[name for name, ref in self._iterate_links(ev)]!r}")
             m.sep()
 
@@ -133,7 +133,7 @@ class Generator:
                     m.return_("[self._visit(ctx, x) for x in d]")
                 elif ev.name == names.types.oneOf:
                     pass
-                elif names.predicates.primitive_type in ev.predicates:
+                elif names.roles.primitive_type in ev.roles:
                     # drop schema definitions?
                     m.return_("self._visit(ctx, d)  # todo: simplify")
                 else:
@@ -226,14 +226,14 @@ def main():
 
     stream: t.Iterable[Event] = main(create_visitor=ToplevelVisitor)
     for ev in stream:
-        if names.predicates.has_expanded in ev.predicates:
+        if names.roles.has_expanded in ev.roles:
             definitions.update(
                 ev.get_annotated(names.annotations.expanded)["definitions"]
             )
-        if names.predicates.toplevel_properties in ev.predicates:
+        if names.roles.toplevel_properties in ev.roles:
             toplevels.append(ev)
             continue
-        if names.predicates.has_name in ev.predicates:
+        if names.roles.has_name in ev.roles:
             g.gen_visitor(ev)
 
     for ev in toplevels:

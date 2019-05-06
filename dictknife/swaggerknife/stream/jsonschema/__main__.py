@@ -5,6 +5,6 @@ from dictknife.swaggerknife.stream.jsonschema import ToplevelVisitor
 
 if __name__ == "__main__":
     for ev in main(create_visitor=ToplevelVisitor):
-        if "primitive" in ev.predicates:
+        if "primitive" in ev.roles:
             continue
         print(ev)

@@ -18,7 +18,7 @@ class types:
     unknown = "unknown"
 
 
-class predicates:  # todo: rename to roles?
+class roles:  # todo: rename to roles?
     new_type = "new_type"
     primitive_type = "primitive_type"
     combine_type = "combine_type"  # oneOf,allOf,anyOf

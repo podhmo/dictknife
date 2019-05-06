@@ -162,7 +162,7 @@ class SchemaNode(Node):
 
     def __call__(self, ctx: Context, d: dict, visitor: Visitor, *, retry=False):
         typename = _guess_event_name(d)
-        predicates = []
+        roles = []
         annotations = {}
 
         extra_properties = {}
@@ -171,13 +171,13 @@ class SchemaNode(Node):
         # has name
         # <file>#/definitions/<name>
         if len(ctx.path) > 2 and ctx.path[-2] == "definitions":
-            predicates.append(names.predicates.has_name)
+            roles.append(names.roles.has_name)
             annotations[names.annotations.name] = ctx.path[-1]
         elif "definitions" not in ctx.path:
-            predicates.append(names.predicates.toplevel_properties)  # ???
+            roles.append(names.roles.toplevel_properties)  # ???
         elif len(ctx.path) > 2:
             if ctx.path[-2] in _object_attributes or ctx.path[-1] in _object_attributes:
-                predicates.append(names.predicates.field_of_something)
+                roles.append(names.roles.field_of_something)
 
         if typename == names.types.array:
             seen = False
@@ -186,7 +186,7 @@ class SchemaNode(Node):
                     continue
                 if not seen:
                     seen = True
-                    predicates.append(names.predicates.has_extra_properties)
+                    roles.append(names.roles.has_extra_properties)
                 extra_properties[x] = d[x]
         elif typename == names.types.object:
             seen = False
@@ -195,10 +195,10 @@ class SchemaNode(Node):
                     continue
                 if not seen:
                     seen = True
-                    predicates.append(names.predicates.has_extra_properties)
+                    roles.append(names.roles.has_extra_properties)
                 extra_properties[x] = d[x]
         elif typename in _combine_types:
-            predicates.append(names.predicates.combine_type)
+            roles.append(names.roles.combine_type)
             # todo: lazy evaluation
             expanded = self.expander.expand(ctx, d)
 
@@ -208,18 +208,18 @@ class SchemaNode(Node):
             keys.pop("title", None)  # xxx
             keys.pop("default", None)
             if len(keys) == 0:
-                predicates.append(names.predicates.primitive_type)
+                roles.append(names.roles.primitive_type)
             else:
-                predicates.append(names.predicates.new_type)
+                roles.append(names.roles.new_type)
 
         if "enum" in d:
-            predicates.append(names.predicates.has_enum)
+            roles.append(names.roles.has_enum)
         if "format" in d:
-            predicates.append(names.predicates.has_format)
+            roles.append(names.roles.has_format)
 
         # refs (neighbour refs)
         if "properties" in d:
-            predicates.append(names.predicates.has_properties)
+            roles.append(names.roles.has_properties)
             annotations[names.annotations.properties] = set(d["properties"].keys())
 
             links = []
@@ -228,7 +228,7 @@ class SchemaNode(Node):
                 if _has_ref(prop):
                     links.append((name, ctx.get_uid(prop["$ref"])))
             if links:
-                predicates.append(names.predicates.has_links)
+                roles.append(names.roles.has_links)
                 annotations[names.annotations.links] = links
 
         if extra_properties:
@@ -245,6 +245,6 @@ class SchemaNode(Node):
                 annotations[names.annotations.pattern_properties_links] = links
 
         if expanded:
-            predicates.append(names.predicates.has_expanded)
+            roles.append(names.roles.has_expanded)
             annotations[names.annotations.expanded] = MiniReprDict(expanded)
-        ctx.emit(d, name=typename, predicates=predicates, annotations=annotations)
+        ctx.emit(d, name=typename, roles=roles, annotations=annotations)

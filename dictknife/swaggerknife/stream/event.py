@@ -10,7 +10,7 @@ def _serialize_default(ev: "Event", *, verbose=VERBOSE) -> str:
     try:
         d = {"event": ev.name}
         d["uid"] = ev.uid
-        d["predicates"] = sorted(ev.predicates)
+        d["roles"] = sorted(ev.roles)
         if verbose:
             d["history"] = ev.history
         return json.dumps(d)
@@ -30,7 +30,7 @@ class Event:
         "root_file",
         "file",
         "history",
-        "predicates",
+        "roles",
         "annotated",
     )
     serializer: t.Callable[["Event"], str] = staticmethod(_serialize_default)
@@ -43,14 +43,14 @@ class Event:
         data: dict,
         file: str,
         root_file: str,
-        predicates: t.List[str],
+        roles: t.List[str],
         history: t.List[t.List[str]] = None,
         annotations: dict = None,  # predicate -> any
     ) -> None:
         self.name = name
         self.path = path
         self.data = data
-        self.predicates = set(predicates or [])
+        self.roles = set(roles or [])
 
         self.file = file
         self.root_file = root_file
