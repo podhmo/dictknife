@@ -74,10 +74,14 @@ class _Expander:
         return DictWalker([And(["$ref", _is_string])])
 
     @reify
+    def description_walker(self):
+        return DictWalker(["description"])
+
+    @reify
     def accessor(self):
         return Accessor()
 
-    def expand(self, ctx: Context, data: dict) -> dict:
+    def expand(self, ctx: Context, data: dict, *, minimize=True) -> dict:
         pool = self.pool
         seen = self.seen
         genid = self.genid
@@ -136,6 +140,9 @@ class _Expander:
                     continue
                 sresolver, sd = stack[-1]
                 new_sd = copy.deepcopy(sd)
+                if minimize:
+                    for _, prop in list(self.description_walker.walk(new_sd)):
+                        prop.pop("description")
                 pool[kid] = new_sd
                 assigned.add(kid)
                 accessor.assign(r, path, f"#/definitions/{kid}")
@@ -238,5 +245,6 @@ class SchemaNode(Node):
                 annotations[names.annotations.pattern_properties_links] = links
 
         if expanded:
+            predicates.append(names.predicates.has_expanded)
             annotations[names.annotations.expanded] = MiniReprDict(expanded)
         ctx.emit(d, name=typename, predicates=predicates, annotations=annotations)

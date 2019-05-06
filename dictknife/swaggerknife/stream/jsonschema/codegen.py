@@ -28,6 +28,7 @@ class Generator:
     def __init__(self, m=None, logging_enable=True):
         self.logging_enable = logging_enable
         self.m = m or Module(import_unique=True)
+
         self.visitors = {}
 
         # xxx:
@@ -100,7 +101,7 @@ class Generator:
                 )
             if names.predicates.has_extra_properties in ev.predicates:
                 m.stmt(
-                    "_extra_properties = {!r}",
+                    "_extra_properties = {}",
                     json.loads(
                         json.dumps(ev.get_annotated(names.annotations.extra_properties))
                     ),
@@ -220,10 +221,15 @@ def main():
     from dictknife.swaggerknife.stream import main
 
     g = Generator()
+    definitions = {}
     toplevels: t.List[Event] = []
 
     stream: t.Iterable[Event] = main(create_visitor=ToplevelVisitor)
     for ev in stream:
+        if names.predicates.has_expanded in ev.predicates:
+            definitions.update(
+                ev.get_annotated(names.annotations.expanded)["definitions"]
+            )
         if names.predicates.toplevel_properties in ev.predicates:
             toplevels.append(ev)
             continue
@@ -233,6 +239,10 @@ def main():
     for ev in toplevels:
         if ev.uid.endswith("#/"):
             g.gen_visitor(ev, clsname="toplevel")
+
+    g.m.stmt("# fmt: off")
+    g.m.stmt("_definitions = {}", json.loads(json.dumps(definitions)))
+    g.m.stmt("# fmt: on")
     print(g.m)
 
 
