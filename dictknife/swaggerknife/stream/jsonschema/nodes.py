@@ -95,6 +95,7 @@ class _Expander:
             resolver, d = q.pop()
 
             for path, sd in ref_walker.walk(d):
+                history = []
                 kid = genid()
 
                 k = (resolver, "/".join(map(str, path)).lstrip("#/"))
@@ -105,8 +106,8 @@ class _Expander:
                     continue
 
                 seen[k] = kid
-                ref = sd["$ref"]
-                stack = [(resolver, ref)]
+                history.append(k)
+                stack = [(resolver, sd["$ref"])]
 
                 found = False
                 while True:
@@ -116,9 +117,12 @@ class _Expander:
                         assigned_kid = seen[k]
                         assigned.add(assigned_kid)
                         sd["$ref"] = f"#/definitions/{assigned_kid}"
+                        for k in history:
+                            seen[k] = assigned_kid
                         break
 
                     seen[k] = kid
+                    history.append(k)
                     sresolver, sref = resolver.resolve(ref)
 
                     sd = sresolver.access_by_json_pointer(sref)
