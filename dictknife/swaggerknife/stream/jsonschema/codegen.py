@@ -45,6 +45,9 @@ class Helper:
             return []
         return ev.get_annotated(names.annotations.links)
 
+    def iterate_xxx_of_links(self, ev: Event) -> t.Iterable[t.Tuple[str, str]]:
+        return ev.get_annotated(names.annotations.xxx_of_links)
+
 
 class NameManager:  # todo: rename
     def __init__(self):
@@ -115,7 +118,10 @@ class Generator:
             self._gen_visit_method(ev, m=m)
             self._gen_visit_private_method(ev, clsname=clsname, m=m)
 
-            self._gen_sub_visitor_properties(ev, m=m)
+            # reify properties
+            self._gen_properties_visitors(ev, m=m)
+            if ev.name in (names.types.oneOf, names.types.allOf, names.types.anyOf):
+                self._gen_xxx_of_visitors(ev, m=m)
 
     def _gen_headers(self, ev: Event, *, m) -> None:
         m.stmt(f"schema_type = {ev.name!r}")
@@ -148,7 +154,7 @@ class Generator:
             m.return_("r")
 
     def _gen_node_property(self, ev: Event, *, clsname, m) -> None:
-        m.stmt("@reify")
+        m.stmt("@reify  # todo: use Importer")
         with m.def_("node", "self"):
             with m.try_():
                 self.logging.log(
@@ -166,20 +172,56 @@ class Generator:
         with m.def_("__call__", "self", "ctx: Context", "d: dict"):
             if ev.name == names.types.array:
                 m.return_("[self._visit(ctx, x) for x in d]")
-                # elif names.roles.combine_type in ev.roles:
-            elif ev.name == names.types.oneOf:
+            elif names.roles.primitive_type in ev.roles:
+                # drop schema definitions?
+                m.return_("self._visit(ctx, d)  # todo: simplify")
+            elif names.roles.combine_type in ev.roles:
                 expanded = ev.get_annotated(names.annotations.expanded)
-                links = list(ev.get_annotated(names.annotations.xxx_of_links))
+                links = list(self.helper.iterate_xxx_of_links(ev))
                 bodies = {k: v for k, v in expanded.items() if k != "definitions"}
                 m.stmt("# for {} (xxx: _case is module global)", ev.name)
-                for i, prop in enumerate(bodies["oneOf"]):
-                    with m.if_(f"_case.when(d, {prop['$ref']!r})"):
+
+                if ev.name == names.types.oneOf:
+                    for i, prop in enumerate(bodies["oneOf"]):
+                        with m.if_(f"_case.when(d, {prop['$ref']!r})"):
+                            ref = links[i]
+                            if ref is None:
+                                m.stmt("return  # not supported yet")
+                                continue  # xxx
+                            else:
+                                m.stmt(
+                                    f"return ctx.run(None, self.{ev.name}{i!r}.visit, d)"
+                                )
+                    m.stmt("raise ValueError('unexpected value')  # todo gentle message")
+                elif ev.name == names.types.anyOf:
+                    m.stmt("matched = False")
+                    for i, prop in enumerate(bodies["anyOf"]):
+                        with m.if_(f"_case.when(d, {prop['$ref']!r})"):
+                            ref = links[i]
+                            if ref is None:
+                                m.stmt("pass  # not supported yet")
+                                continue  # xxx
+                            else:
+                                m.stmt("matched = True")
+                                m.stmt(
+                                    f"ctx.run(None, self.{ev.name}{i!r}.visit, d)"
+                                )
+                    with m.if_("not matched"):
+                        m.stmt("raise ValueError('unexpected value')  # todo gentle message")
+                elif ev.name == names.types.allOf:
+                    for i, prop in enumerate(bodies["anyOf"]):
+                        with m.if_(f"not _case.when(d, {prop['$ref']!r})"):
+                            m.stmt("raise ValueError('unexpected value')  # todo gentle message")
                         ref = links[i]
                         if ref is None:
                             m.stmt("pass  # not supported yet")
                             continue  # xxx
                         else:
-                            m.stmt(f"ctx.run({i!r}, self.)")
+                            m.stmt(
+                                f"ctx.run(None, self.{ev.name}{i!r}.visit, d)"
+                            )
+            else:
+                m.return_("self._visit(ctx, d)  # todo: remove this code")
 
     def _gen_visit_private_method(self, ev: Event, *, clsname: str, m) -> None:
         with m.def_("_visit", "self", "ctx: Context", "d: dict"):
@@ -238,7 +280,7 @@ class Generator:
                     else:
                         m.stmt("ctx.run(k, self.additional_properties.visit, v)")
 
-    def _gen_sub_visitor_properties(self, ev: Event, *, m) -> None:
+    def _gen_properties_visitors(self, ev: Event, *, m) -> None:
         for name, ref in self.helper.iterate_links(ev):
             m.stmt("@reify  # visitor")
             with m.def_(name, "self"):
@@ -246,6 +288,24 @@ class Generator:
                 self.logging.log(
                     m,
                     """logger.debug("resolve node: %s", {cls!r})""",
+                    cls=lazy_link_name,
+                )
+                m.stmt("return {cls}()", cls=lazy_link_name)
+
+    def _gen_xxx_of_visitors(self, ev: Event, *, m) -> None:
+        for i, ref in self.helper.iterate_xxx_of_links(ev):
+            name = f"{ev.name}{i}"
+            m.stmt(f"@reify  # visitor")
+            with m.def_(name, "self"):
+                if ref is None:
+                    m.return_("None")
+                    continue
+
+                lazy_link_name = self.name_manager.create_lazy_visitor_name(ref)
+                self.logging.log(
+                    m,
+                    """logger.debug("resolve {name} node: %s", {cls!r})""",
+                    name=name,
                     cls=lazy_link_name,
                 )
                 m.stmt("return {cls}()", cls=lazy_link_name)

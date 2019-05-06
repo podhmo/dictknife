@@ -64,6 +64,9 @@ class Context:
         return self.path.pop()
 
     def run(self, name, fn, *args, **kwargs):
+        if name is None:
+            return fn(self, *args, **kwargs)
+
         teardown = None
         try:
             teardown = self.push_name(name)
