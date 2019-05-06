@@ -39,8 +39,11 @@ class roles:  # todo: rename to roles?
 
 class annotations:
     name = "name"
-    links = "links"
-    pattern_properties_links = "pattern_properties_links"
     properties = "properties"
     extra_properties = "extra_properties"
     expanded = "expanded"
+
+    links = "links"
+    pattern_properties_links = "pattern_properties_links"
+    xxx_of_links = "xxx_of_links"
+    # additionalPropeties link?

@@ -199,8 +199,17 @@ class SchemaNode(Node):
                 extra_properties[x] = d[x]
         elif typename in _combine_types:
             roles.append(names.roles.combine_type)
-            # todo: lazy evaluation
             expanded = self.expander.expand(ctx, d)
+            links = []
+            for k in ["oneOf", "allOf", "anyOf"]:
+                if k in d:
+                    for i, prop in enumerate(d[k]):
+                        if _has_ref(prop):
+                            links.append((i, ctx.get_uid(prop["$ref"])))
+                        else:
+                            links.append((i, None))
+            if links:
+                annotations[names.annotations.xxx_of_links] = links
 
         elif typename in _primitive_types:
             keys = {k: True for k in d.keys()}
@@ -228,7 +237,6 @@ class SchemaNode(Node):
                 if _has_ref(prop):
                     links.append((name, ctx.get_uid(prop["$ref"])))
             if links:
-                roles.append(names.roles.has_links)
                 annotations[names.annotations.links] = links
 
         if extra_properties:
