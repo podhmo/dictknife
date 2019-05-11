@@ -1,0 +1,166 @@
+# generated from examples/05patternProperties.yaml
+from logging import getLogger
+from dictknife.swaggerknife.stream import (
+    Visitor,
+    runtime
+)
+from dictknife.langhelpers import reify
+from dictknife.swaggerknife.stream.context import Context
+
+
+logger = getLogger(__name__)  # noqa
+
+
+class Schema(Visitor):
+    _schema_type = 'object'
+    _roles = {'has_extra_properties', 'has_properties', 'has_name'}
+    _uid = '/examples/05patternProperties.yaml#/definitions/Schema'
+    _properties = {'type', 'description'}
+    _extra_properties = {'additionalProperties': False, 'patternProperties': {'^x-': {}}}
+
+    @reify  # visitor
+    def _pattern_properties_regexes(self):
+        import re
+        r = []
+        r.append((re.compile('^x-'), None))
+        return r
+
+    @reify  # todo: use Importer
+    def node(self):
+        try:
+            logger.debug("resolve node: %s", 'Schema')
+            from .nodes import Schema
+            return Schema()
+        except ImportError:
+            logger.info("resolve node: %s is not found", 'Schema')
+            return None
+
+    def __call__(self, ctx: Context, d: dict):
+        return self._visit(ctx, d)  # todo: remove this code
+
+    def _visit(self, ctx: Context, d: dict):
+        logger.debug("visit: %s", 'Schema')
+        if self.node is not None:
+            self.node.attach(ctx, d, self)
+
+        # patternProperties
+        for rx, visitor in self._pattern_properties_regexes:
+            for k, v in d.items():
+                m = rx.search(rx)
+                if m is not None and visitor is not None:
+                    ctx.run(k, visitor.visit, v)
+
+        # additionalProperties
+        for k, v in d.items():
+            if if k in self._properties:
+                continue
+            for rx, visitor in self._pattern_properties_regexes:
+                m = rx.search(rx)
+                if m is not None:
+                    continue
+            logger.warning('unexpected property is found: %r, where=%s', k, self.__class__.__name__)
+
+
+
+class Point(Visitor):
+    _schema_type = 'integer'
+    _roles = {'primitive_type', 'has_name'}
+    _uid = '/examples/05patternProperties.yaml#/definitions/Point'
+
+    @reify  # todo: use Importer
+    def node(self):
+        try:
+            logger.debug("resolve node: %s", 'Point')
+            from .nodes import Point
+            return Point()
+        except ImportError:
+            logger.info("resolve node: %s is not found", 'Point')
+            return None
+
+    def __call__(self, ctx: Context, d: dict):
+        return self._visit(ctx, d)  # todo: simplify
+
+    def _visit(self, ctx: Context, d: dict):
+        logger.debug("visit: %s", 'Point')
+        if self.node is not None:
+            self.node.attach(ctx, d, self)
+
+
+
+class Points(Visitor):
+    _schema_type = 'object'
+    _roles = {'has_extra_properties', 'has_name'}
+    _uid = '/examples/05patternProperties.yaml#/definitions/Points'
+    _extra_properties = {'patternProperties': {'^point[0-9]+': {'$ref': '#/definitions/Point'}}}
+
+    @reify  # visitor
+    def _pattern_properties_regexes(self):
+        r = []
+        r.append((re.compile('^point[0-9]+'), Point()))
+        return r
+
+    @reify  # todo: use Importer
+    def node(self):
+        try:
+            logger.debug("resolve node: %s", 'Points')
+            from .nodes import Points
+            return Points()
+        except ImportError:
+            logger.info("resolve node: %s is not found", 'Points')
+            return None
+
+    def __call__(self, ctx: Context, d: dict):
+        return self._visit(ctx, d)  # todo: remove this code
+
+    def _visit(self, ctx: Context, d: dict):
+        logger.debug("visit: %s", 'Points')
+        if self.node is not None:
+            self.node.attach(ctx, d, self)
+
+        # patternProperties
+        for rx, visitor in self._pattern_properties_regexes:
+            for k, v in d.items():
+                m = rx.search(rx)
+                if m is not None and visitor is not None:
+                    ctx.run(k, visitor.visit, v)
+
+
+
+class toplevel(Visitor):
+    _schema_type = 'object'
+    _roles = {'has_properties', 'toplevel_properties'}
+    _uid = '/examples/05patternProperties.yaml#/'
+    _properties = {'schema', 'points'}
+    _links = ['schema', 'points']
+
+    @reify  # todo: use Importer
+    def node(self):
+        try:
+            logger.debug("resolve node: %s", 'toplevel')
+            from .nodes import toplevel
+            return toplevel()
+        except ImportError:
+            logger.info("resolve node: %s is not found", 'toplevel')
+            return None
+
+    def __call__(self, ctx: Context, d: dict):
+        return self._visit(ctx, d)  # todo: remove this code
+
+    def _visit(self, ctx: Context, d: dict):
+        logger.debug("visit: %s", 'toplevel')
+        if self.node is not None:
+            self.node.attach(ctx, d, self)
+        if 'schema' in d:
+            ctx.run('schema', self.schema.visit, d['schema'])
+        if 'points' in d:
+            ctx.run('points', self.points.visit, d['points'])
+
+    @reify  # visitor
+    def schema(self):
+        logger.debug("resolve %r node: %s", 'schema', 'Schema')
+        return Schema()
+
+    @reify  # visitor
+    def points(self):
+        logger.debug("resolve %r node: %s", 'points', 'Points')
+        return Points()

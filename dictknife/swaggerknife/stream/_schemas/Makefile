@@ -6,25 +6,27 @@ CMD ?= python -m dictknife.swaggerknife.stream.jsonschema.codegen
 default:
 	@$(CMD) separated/main.yaml ${OPTS}
 
-00:
-	@$(CMD) examples/00*.yaml ${OPTS}
-01:
-	@$(CMD) examples/01*.yaml ${OPTS}
-02:
-	@$(CMD) examples/02*.yaml ${OPTS}
-03:
-	@$(CMD) examples/03*.yaml ${OPTS}
-04:
-	@$(CMD) examples/04*.yaml ${OPTS}
-05:
-	@$(CMD) examples/05*.yaml ${OPTS}
-06:
-	@$(CMD) examples/06*.yaml ${OPTS}
-07:
-	@$(CMD) examples/07*.yaml ${OPTS}
+dst:
+	mkdir -p dst
+00: dst
+	@$(CMD) examples/00*.yaml ${OPTS} | tee dst/00.py
+01: dst
+	@$(CMD) examples/01*.yaml ${OPTS} | tee dst/01.py
+02: dst
+	@$(CMD) examples/02*.yaml ${OPTS} | tee dst/02.py
+03: dst
+	@$(CMD) examples/03*.yaml ${OPTS} | tee dst/03.py
+04: dst
+	@$(CMD) examples/04*.yaml ${OPTS} | tee dst/04.py
+05: dst
+	@$(CMD) examples/05*.yaml ${OPTS} | tee dst/05.py
+06: dst
+	@$(CMD) examples/06*.yaml ${OPTS} | tee dst/06.py
+07: dst
+	@$(CMD) examples/07*.yaml ${OPTS} | tee dst/07.py
 
-xxx: CMD := python -m dictknife.swaggerknife.stream.jsonschema
-xxx:
-	$(MAKE) default CMD="${CMD}"
+# xxx: CMD := python -m dictknife.swaggerknife.stream.jsonschema
+# xxx:
+# 	$(MAKE) default CMD="${CMD}"
 
-.DEFAULT_GOAL := xxx
+# .DEFAULT_GOAL := xxx
