@@ -18,3 +18,13 @@ default:
 	@$(CMD) examples/04*.yaml ${OPTS}
 05:
 	@$(CMD) examples/05*.yaml ${OPTS}
+06:
+	@$(CMD) examples/06*.yaml ${OPTS}
+07:
+	@$(CMD) examples/07*.yaml ${OPTS}
+
+xxx: CMD := python -m dictknife.swaggerknife.stream.jsonschema
+xxx:
+	$(MAKE) default CMD="${CMD}"
+
+.DEFAULT_GOAL := xxx

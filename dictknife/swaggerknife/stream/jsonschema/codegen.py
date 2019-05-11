@@ -18,15 +18,21 @@ class _LazyName:
         return self.callable()
 
 
-# todo: oneOf,anyof,allOf
+# todo: toplevel $ref
+# todo: drop link of primitive types
 # todo: additionalProperties (schema)
 # todo: anonymous definition(nested definition)
 # todo: anonymous definition(oneOf, anyof, allOf)
 
 
 class Helper:
-    def classname(self, ev: Event, *, clsname: str = None) -> str:
-        return pascalcase(clsname or ev.get_annotated(names.annotations.name))
+    def classname(self, ev: Event, *, name: str = None) -> str:
+        return pascalcase(name or ev.get_annotated(names.annotations.name))
+
+    def create_submodule(self, m) -> Module:
+        sm = m.submodule()
+        sm.import_area = m.import_area
+        return sm
 
     def has_pattern_properties(self, ev: Event) -> bool:
         return (
@@ -41,12 +47,10 @@ class Helper:
         )
 
     def iterate_links(self, ev: Event) -> t.Iterable[t.Tuple[str, str]]:
-        if names.roles.has_links not in ev.roles:
-            return []
-        return ev.get_annotated(names.annotations.links)
+        return ev.get_annotated(names.annotations.links) or []
 
     def iterate_xxx_of_links(self, ev: Event) -> t.Iterable[t.Tuple[str, str]]:
-        return ev.get_annotated(names.annotations.xxx_of_links)
+        return ev.get_annotated(names.annotations.xxx_of_links) or []
 
 
 class NameManager:  # todo: rename
@@ -56,11 +60,11 @@ class NameManager:  # todo: rename
     def register_visitor_name(self, ev: Event, clsname):
         self.visitors[ev.uid] = clsname
 
-    def create_lazy_visitor_name(self, ref: str) -> _LazyName:
-        def to_str(ref: str = ref):
-            name = self.visitors[ref]
-            # name = self.visitors.get(ref) or "<missing>"
-            logger.debug("resolve clasname: %s -> %s", ref, name)
+    def create_lazy_visitor_name(self, uid: str) -> _LazyName:
+        def to_str(uid: str = uid):
+            # name = self.visitors[uid]
+            name = self.visitors.get(uid) or "<missing>"
+            logger.debug("resolve clasname: %s -> %s", uid, name)
             return name
 
         return _LazyName(to_str)
@@ -102,9 +106,15 @@ class Generator:
         self.helper = Helper()
         self.name_manager = NameManager()
 
+        # xxx:
+        self._registered = {}  # uid -> classname
+        self._end_of_private_visit_method_conts = {}  # classname -> m.submodule()
+        self._end_of_class_definition_conts = {}  # classname -> m.submodule()
+
     def generate_class(self, ev: Event, *, m=None, clsname: str = None) -> None:
-        m = self.m
-        clsname = self.helper.classname(ev, clsname=clsname)
+        m = m or self.m
+        clsname = clsname or self.helper.classname(ev)
+        self._registered[ev.uid] = clsname
         self.name_manager.register_visitor_name(ev, clsname)
 
         m.import_area.from_("dictknife.swaggerknife.stream", "Visitor")
@@ -123,9 +133,14 @@ class Generator:
             if ev.name in (names.types.oneOf, names.types.allOf, names.types.anyOf):
                 self._gen_xxx_of_visitors(ev, m=m)
 
+            # xxx:
+            self._end_of_class_definition_conts[clsname] = self.helper.create_submodule(
+                m
+            )
+
     def _gen_headers(self, ev: Event, *, m) -> None:
-        m.stmt(f"schema_type = {ev.name!r}")
-        m.stmt(f"roles = {ev.roles!r}")
+        m.stmt(f"_schema_type = {ev.name!r}")
+        m.stmt(f"_roles = {ev.roles!r}")
 
         m.stmt(f"_uid = {ev.uid!r}")
         if names.roles.has_properties in ev.roles:
@@ -133,7 +148,9 @@ class Generator:
         if names.roles.has_extra_properties in ev.roles:
             data = ev.get_annotated(names.annotations.extra_properties)
             self.emitter.emit_data(m, "_extra_properties = {}", data)
-        if names.roles.has_links in ev.roles:
+
+        links = list(self.helper.iterate_links(ev))
+        if links:
             m.stmt(
                 f"_links = {[name for name, ref in self.helper.iterate_links(ev)]!r}"
             )
@@ -192,7 +209,9 @@ class Generator:
                                 m.stmt(
                                     f"return ctx.run(None, self.{ev.name}{i!r}.visit, d)"
                                 )
-                    m.stmt("raise ValueError('unexpected value')  # todo gentle message")
+                    m.stmt(
+                        "raise ValueError('unexpected value')  # todo gentle message"
+                    )
                 elif ev.name == names.types.anyOf:
                     m.stmt("matched = False")
                     for i, prop in enumerate(bodies["anyOf"]):
@@ -203,23 +222,23 @@ class Generator:
                                 continue  # xxx
                             else:
                                 m.stmt("matched = True")
-                                m.stmt(
-                                    f"ctx.run(None, self.{ev.name}{i!r}.visit, d)"
-                                )
+                                m.stmt(f"ctx.run(None, self.{ev.name}{i!r}.visit, d)")
                     with m.if_("not matched"):
-                        m.stmt("raise ValueError('unexpected value')  # todo gentle message")
+                        m.stmt(
+                            "raise ValueError('unexpected value')  # todo gentle message"
+                        )
                 elif ev.name == names.types.allOf:
                     for i, prop in enumerate(bodies["anyOf"]):
                         with m.if_(f"not _case.when(d, {prop['$ref']!r})"):
-                            m.stmt("raise ValueError('unexpected value')  # todo gentle message")
+                            m.stmt(
+                                "raise ValueError('unexpected value')  # todo gentle message"
+                            )
                         ref = links[i]
                         if ref is None:
                             m.stmt("pass  # not supported yet")
                             continue  # xxx
                         else:
-                            m.stmt(
-                                f"ctx.run(None, self.{ev.name}{i!r}.visit, d)"
-                            )
+                            m.stmt(f"ctx.run(None, self.{ev.name}{i!r}.visit, d)")
             else:
                 m.return_("self._visit(ctx, d)  # todo: remove this code")
 
@@ -280,41 +299,42 @@ class Generator:
                     else:
                         m.stmt("ctx.run(k, self.additional_properties.visit, v)")
 
+            # add code, after visited
+            self._end_of_private_visit_method_conts[
+                clsname
+            ] = self.helper.create_submodule(m)
+
+    def _gen_visitor_property(
+        self, ev: Event, *, name: str, uid: str, m, prefix: str = ""
+    ) -> None:
+        m.stmt("@reify  # visitor")
+        with m.def_(name, "self"):
+            lazy_link_name = self.name_manager.create_lazy_visitor_name(uid)
+            self.logging.log(
+                m,
+                """logger.debug("resolve {name} node: %s", {cls!r})""",
+                name=name,
+                cls=lazy_link_name,
+            )
+            m.stmt("return {prefix}{cls}()", prefix=prefix, cls=lazy_link_name)
+
     def _gen_properties_visitors(self, ev: Event, *, m) -> None:
-        for name, ref in self.helper.iterate_links(ev):
-            m.stmt("@reify  # visitor")
-            with m.def_(name, "self"):
-                lazy_link_name = self.name_manager.create_lazy_visitor_name(ref)
-                self.logging.log(
-                    m,
-                    """logger.debug("resolve node: %s", {cls!r})""",
-                    cls=lazy_link_name,
-                )
-                m.stmt("return {cls}()", cls=lazy_link_name)
+        for name, uid in self.helper.iterate_links(ev):
+            if uid is None:
+                uid = f"{ev.uid}/{name}"
+            self._gen_visitor_property(ev, name=name, uid=uid, m=m)
 
     def _gen_xxx_of_visitors(self, ev: Event, *, m) -> None:
-        for i, ref in self.helper.iterate_xxx_of_links(ev):
+        for i, uid in self.helper.iterate_xxx_of_links(ev):
             name = f"{ev.name}{i}"
-            m.stmt(f"@reify  # visitor")
-            with m.def_(name, "self"):
-                if ref is None:
-                    m.return_("None")
-                    continue
-
-                lazy_link_name = self.name_manager.create_lazy_visitor_name(ref)
-                self.logging.log(
-                    m,
-                    """logger.debug("resolve {name} node: %s", {cls!r})""",
-                    name=name,
-                    cls=lazy_link_name,
-                )
-                m.stmt("return {cls}()", cls=lazy_link_name)
+            self._gen_visitor_property(ev, name=name, uid=uid, m=m)
 
 
 def main():
     from dictknife.swaggerknife.stream import main
 
     m = Module(import_unique=True)
+    m.header_area = m.submodule()
     m.import_area = m.submodule()
     m.sep()
 
@@ -323,23 +343,74 @@ def main():
     toplevels: t.List[Event] = []
 
     stream: t.Iterable[Event] = main(create_visitor=ToplevelVisitor)
-    for ev in stream:
-        if names.roles.has_expanded in ev.roles:
-            definitions.update(
-                ev.get_annotated(names.annotations.expanded)["definitions"]
-            )
-        if names.roles.toplevel_properties in ev.roles:
-            toplevels.append(ev)
-            continue
-        if names.roles.has_name in ev.roles:
-            g.generate_class(ev)
+
+    def consume_stream(stream: t.Iterable[Event], *, is_delayed=False) -> t.List[Event]:
+        delayed_stream: t.List[Event] = []
+        for ev in stream:
+            if names.roles.has_expanded in ev.roles:
+                definitions.update(
+                    ev.get_annotated(names.annotations.expanded)["definitions"]
+                )
+            if names.roles.toplevel_properties in ev.roles:
+                toplevels.append(ev)
+                continue
+            if names.roles.has_name in ev.roles:
+                g.generate_class(ev)
+                continue
+
+            if not is_delayed:
+                delayed_stream.append(ev)
+                continue
+
+            if ev.name == names.types.object or ev.name == names.types.array:
+                uid_and_clsname_pairs = sorted(
+                    g._registered.items(), key=lambda pair: len(pair[0]), reverse=True
+                )
+                for parent_uid, parent_clsname in uid_and_clsname_pairs:
+                    uid = ev.uid
+                    if uid.startswith(parent_uid):
+                        classdef_sm = g._end_of_class_definition_conts[parent_clsname]
+                        fieldname = uid.replace(parent_uid, "").lstrip("/")
+                        clsname = f"_{g.helper.classname(ev, name=fieldname)}"
+
+                        classdef_sm.stmt(
+                            f"# anonymous definition for {fieldname!r} (TODO: nodename)"
+                        )
+                        g.generate_class(ev, clsname=clsname, m=classdef_sm)
+
+                        # todo: properties, additionalProperties, patternProperties
+                        # todo:  oneOf, anyof, allof
+
+                        assert "/" not in fieldname
+                        name = fieldname
+                        g._gen_visitor_property(
+                            ev,
+                            name=name,
+                            uid=uid,
+                            prefix=f"{parent_clsname}.",
+                            m=classdef_sm,
+                        )
+                        break
+        return delayed_stream
+
+    delayed_stream = consume_stream(stream, is_delayed=False)
 
     for ev in toplevels:
         if ev.uid.endswith("#/"):
             g.generate_class(ev, clsname="toplevel")
 
+    import os.path
+
+    m.header_area.stmt(
+        f"# generated from {os.path.relpath(ev.root_file, start=os.getcwd())}"
+    )
+    m.import_area.from_("dictknife.langhelpers", "reify")
+    m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
+    m.import_area.from_("dictknife.swaggerknife.stream.context", "Context")
+
+    consume_stream(sorted(delayed_stream, key=lambda ev: len(ev.uid)), is_delayed=True)
+
     if definitions:
-        m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
         data = {"definitions": definitions}
         g.emitter.emit_data(m, "_case = runtime.Case({})", data, nofmt=True)
 

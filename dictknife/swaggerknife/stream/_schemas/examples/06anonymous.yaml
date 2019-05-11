@@ -1,0 +1,18 @@
+definitions:
+  ComplexStructure:
+    type: object
+    properties:
+      person:
+        type: object
+        properties:
+          name:
+            type: string
+          age:
+            type: integer
+        required:
+          - name
+      value:
+        type: integer
+properties:
+  structure:
+    $ref: "#/definitions/ComplexStructure"

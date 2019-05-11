@@ -30,8 +30,6 @@ class roles:  # todo: rename to roles?
     has_enum = "has_enum"
     has_format = "has_format"
 
-    has_links = "has_links"  # has $ref in fields
-
     has_properties = "has_properties"
     has_extra_properties = "has_extra_properties"
     has_expanded = "has_expanded"
