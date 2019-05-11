@@ -1,0 +1,56 @@
+[
+  {
+    "category": "3.6",
+    "percent": "38.86%",
+    "downloads": "1,078,975"
+  },
+  {
+    "category": "2.7",
+    "percent": "27.45%",
+    "downloads": "762,206"
+  },
+  {
+    "category": "3.7",
+    "percent": "21.43%",
+    "downloads": "595,086"
+  },
+  {
+    "category": "3.5",
+    "percent": "9.01%",
+    "downloads": "250,227"
+  },
+  {
+    "category": "3.4",
+    "percent": "2.03%",
+    "downloads": "56,461"
+  },
+  {
+    "category": null,
+    "percent": "1.09%",
+    "downloads": "30,137"
+  },
+  {
+    "category": "3.8",
+    "percent": "0.06%",
+    "downloads": "1,764"
+  },
+  {
+    "category": "2.6",
+    "percent": "0.05%",
+    "downloads": "1,320"
+  },
+  {
+    "category": "3.3",
+    "percent": "0.01%",
+    "downloads": 381
+  },
+  {
+    "category": "3.2",
+    "percent": "0.00%",
+    "downloads": 24
+  },
+  {
+    "category": "Total",
+    "downloads": "2,776,581"
+  }
+]
