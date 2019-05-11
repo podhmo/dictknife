@@ -32,10 +32,13 @@ def load(
             elif val == null_value:
                 row[name] = None
             elif maybe_num:
-                if "." in val:
-                    row[name] = float(val)
-                else:
-                    row[name] = int(val)
+                try:
+                    if "." in val:
+                        row[name] = float(val)
+                    else:
+                        row[name] = int(val)
+                except ValueError:
+                    row[name] = val
             else:
                 row[name] = val
         yield row
