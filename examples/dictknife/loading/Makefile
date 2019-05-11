@@ -1,4 +1,4 @@
-default: 00 01 02 03 06 07 08 09
+default: 00 01 02 03 06 07 08 09 10
 
 dst:
 	mkdir -p dst
@@ -67,3 +67,7 @@ dst:
 	dictknife cat $< --dst dst/08output.yaml
 09: src/09yaml-string.yaml dst
 	dictknife cat $< --dst dst/09output.yaml
+
+# markdown
+10: src/10data.md
+	dictknife cat $< -o json --dst dst/10output.json
