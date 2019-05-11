@@ -1,6 +1,6 @@
 import logging
 import copy
-from dictknife import DictWalker, And, Accessor, deepmerge
+from dictknife import DictWalker, And, Or, Accessor, deepmerge
 from dictknife.langhelpers import reify
 from ..interfaces import Visitor, Node
 from ..context import Context, MiniReprDict
@@ -16,8 +16,12 @@ _object_extra_attributes = set(["additionalProperties", "patternProperties"])
 _array_attributes = set(["items"])
 
 
-def _is_string(k, d) -> bool:
-    return hasattr(d, "startswith")
+def _is_string(k, v) -> bool:
+    return hasattr(v, "startswith")
+
+
+def _is_array(k, v) -> bool:
+    return isinstance(v, list)
 
 
 def _has_ref(d) -> bool:
@@ -74,6 +78,10 @@ class _Expander:
         return DictWalker([And(["$ref", _is_string])])
 
     @reify
+    def xxx_of_walker(self):
+        return DictWalker([And([Or(_combine_types), _is_array])])
+
+    @reify
     def description_walker(self):
         return DictWalker(["description"])
 
@@ -87,6 +95,21 @@ class _Expander:
         genid = self.genid
         accessor = self.accessor
         ref_walker = self.ref_walker
+        xxx_of_walker = self.xxx_of_walker
+
+        def _on_newdata(resolver, data):
+            for path, sd in xxx_of_walker.walk(data):
+                cases = sd[path[-1]]
+                for i, case in enumerate(cases):
+                    if "$ref" in case:
+                        continue
+                    # todo: optimization
+                    kid = genid()
+                    assigned.add(kid)
+                    pool[kid] = case
+                    cases[i] = {"$ref": f"#/definitions/{kid}"}
+                    seen[(resolver, f'definitions/{kid}')] = kid  # xxx
+            return data
 
         r = copy.deepcopy(data)
         # todo: merge code with ..context:Context.get_uid()
@@ -130,6 +153,7 @@ class _Expander:
                     sresolver, sref = resolver.resolve(ref)
 
                     sd = sresolver.access_by_json_pointer(sref)
+
                     if not hasattr(sd, "get") or "$ref" not in sd:
                         found = True
                         stack.append((sresolver, sd))
@@ -143,13 +167,15 @@ class _Expander:
                 if minimize:
                     for _, prop in list(self.description_walker.walk(new_sd)):
                         prop.pop("description")
-                pool[kid] = new_sd
+                pool[kid] = _on_newdata(sresolver, new_sd)
                 assigned.add(kid)
                 accessor.assign(r, path, f"#/definitions/{kid}")
                 q.append((sresolver, new_sd))
 
+        r = _on_newdata(ctx.resolver, r)
         if not assigned:
             return r
+
         return deepmerge(
             r, {"definitions": {str(kid): pool[kid] for kid in sorted(assigned)}}
         )

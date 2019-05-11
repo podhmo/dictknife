@@ -20,6 +20,8 @@ class _LazyName:
 
 # todo: toplevel $ref
 # todo: drop link of primitive types
+# todo: required support
+# todo: enum support(?)
 # todo: additionalProperties (schema)
 # todo: anonymous definition(nested definition)
 # todo: anonymous definition(oneOf, anyof, allOf)
@@ -161,12 +163,12 @@ class Generator:
         with m.def_("_pattern_properties_regexes", "self"):
             m.import_("re")
             m.stmt("r = []")
-            for k, ref in ev.get_annotated(names.annotations.pattern_properties_links):
-                if ref is None:
+            for k, uid in ev.get_annotated(names.annotations.pattern_properties_links):
+                if uid is None:
                     m.stmt("""r.append((re.compile({k!r}), None))""", k=k)
                     continue
 
-                lazy_name = self.name_manager.create_lazy_visitor_name(ref)
+                lazy_name = self.name_manager.create_lazy_visitor_name(uid)
                 m.stmt("""r.append((re.compile({k!r}), {cls}()))""", k=k, cls=lazy_name)
             m.return_("r")
 
@@ -312,7 +314,7 @@ class Generator:
             lazy_link_name = self.name_manager.create_lazy_visitor_name(uid)
             self.logging.log(
                 m,
-                """logger.debug("resolve {name} node: %s", {cls!r})""",
+                """logger.debug("resolve %r node: %s", {name!r}, {cls!r})""",
                 name=name,
                 cls=lazy_link_name,
             )
@@ -362,7 +364,12 @@ def main():
                 delayed_stream.append(ev)
                 continue
 
-            if ev.name == names.types.object or ev.name == names.types.array:
+            # xxx:
+            if (
+                ev.name == names.types.object
+                or ev.name == names.types.array
+                or names.roles.combine_type in ev.roles
+            ):
                 uid_and_clsname_pairs = sorted(
                     g._registered.items(), key=lambda pair: len(pair[0]), reverse=True
                 )
@@ -381,7 +388,7 @@ def main():
                         # todo: properties, additionalProperties, patternProperties
                         # todo:  oneOf, anyof, allof
 
-                        assert "/" not in fieldname
+                        # assert "/" not in fieldname
                         name = fieldname
                         g._gen_visitor_property(
                             ev,
@@ -391,6 +398,8 @@ def main():
                             m=classdef_sm,
                         )
                         break
+                else:
+                    raise RuntimeError(f"unexpected type: {ev.name}")
         return delayed_stream
 
     delayed_stream = consume_stream(stream, is_delayed=False)

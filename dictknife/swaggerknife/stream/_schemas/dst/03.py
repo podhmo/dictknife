@@ -41,8 +41,8 @@ class Schema(Visitor):
     _schema_type = 'object'
     _roles = {'has_properties', 'has_name'}
     _uid = '/examples/03one-of.yaml#/definitions/Schema'
-    _properties = {'patternProperties', 'properties', 'type'}
-    _links = ['patternProperties', 'properties']
+    _properties = {'patternProperties', 'additionalProperties', 'type', 'properties'}
+    _links = ['patternProperties', 'properties', 'additionalProperties']
 
     @reify  # todo: use Importer
     def node(self):
@@ -65,6 +65,8 @@ class Schema(Visitor):
             ctx.run('patternProperties', self.patternProperties.visit, d['patternProperties'])
         if 'properties' in d:
             ctx.run('properties', self.properties.visit, d['properties'])
+        if 'additionalProperties' in d:
+            ctx.run('additionalProperties', self.additionalProperties.visit, d['additionalProperties'])
 
     @reify  # visitor
     def patternProperties(self):
@@ -75,6 +77,11 @@ class Schema(Visitor):
     def properties(self):
         logger.debug("resolve %r node: %s", 'properties', '_Properties')
         return _Properties()
+
+    @reify  # visitor
+    def additionalProperties(self):
+        logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
+        return _AdditionalProperties()
 
     # anonymous definition for 'properties' (TODO: nodename)
     class _Properties(Visitor):
@@ -115,6 +122,51 @@ class Schema(Visitor):
                     if m is not None and visitor is not None:
                         ctx.run(k, visitor.visit, v)
 
+        # anonymous definition for 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$' (TODO: nodename)
+        class _PatternProperties/^[aZAZ09\.\]+$(Visitor):
+            _schema_type = 'oneOf'
+            _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+            _uid = '/examples/03one-of.yaml#/definitions/Schema/properties/patternProperties/^[a-zA-Z0-9\\.\\-_]+$'
+
+            @reify  # todo: use Importer
+            def node(self):
+                try:
+                    logger.debug("resolve node: %s", '_PatternProperties/^[aZAZ09\\.\\]+$')
+                    from .nodes import _PatternProperties/^[aZAZ09\.\]+$
+                    return _PatternProperties/^[aZAZ09\.\]+$()
+                except ImportError:
+                    logger.info("resolve node: %s is not found", '_PatternProperties/^[aZAZ09\\.\\]+$')
+                    return None
+
+            def __call__(self, ctx: Context, d: dict):
+                # for oneOf (xxx: _case is module global)
+                if _case.when(d, '#/definitions/1'):
+                    return ctx.run(None, self.oneOf0.visit, d)
+                if _case.when(d, '#/definitions/3'):
+                    return ctx.run(None, self.oneOf1.visit, d)
+                raise ValueError('unexpected value')  # todo gentle message
+
+            def _visit(self, ctx: Context, d: dict):
+                logger.debug("visit: %s", '_PatternProperties/^[aZAZ09\\.\\]+$')
+                if self.node is not None:
+                    self.node.attach(ctx, d, self)
+
+            @reify  # visitor
+            def oneOf0(self):
+                logger.debug("resolve %r node: %s", 'oneOf0', 'Schema')
+                return Schema()
+
+            @reify  # visitor
+            def oneOf1(self):
+                logger.debug("resolve %r node: %s", 'oneOf1', 'Reference')
+                return Reference()
+
+
+        @reify  # visitor
+        def patternProperties/^[a-zA-Z0-9\.\-_]+$(self):
+            logger.debug("resolve %r node: %s", 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$', '_PatternProperties/^[aZAZ09\\.\\]+$')
+            return _Properties._PatternProperties/^[aZAZ09\.\]+$()
+
 
     @reify  # visitor
     def properties(self):
@@ -152,19 +204,116 @@ class Schema(Visitor):
                     continue
                 ctx.run(k, self.additional_properties.visit, v)
 
+        # anonymous definition for 'additionalProperties' (TODO: nodename)
+        class _AdditionalProperties(Visitor):
+            _schema_type = 'oneOf'
+            _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+            _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties/additionalProperties'
+
+            @reify  # todo: use Importer
+            def node(self):
+                try:
+                    logger.debug("resolve node: %s", '_AdditionalProperties')
+                    from .nodes import _AdditionalProperties
+                    return _AdditionalProperties()
+                except ImportError:
+                    logger.info("resolve node: %s is not found", '_AdditionalProperties')
+                    return None
+
+            def __call__(self, ctx: Context, d: dict):
+                # for oneOf (xxx: _case is module global)
+                if _case.when(d, '#/definitions/1'):
+                    return ctx.run(None, self.oneOf0.visit, d)
+                if _case.when(d, '#/definitions/3'):
+                    return ctx.run(None, self.oneOf1.visit, d)
+                raise ValueError('unexpected value')  # todo gentle message
+
+            def _visit(self, ctx: Context, d: dict):
+                logger.debug("visit: %s", '_AdditionalProperties')
+                if self.node is not None:
+                    self.node.attach(ctx, d, self)
+
+            @reify  # visitor
+            def oneOf0(self):
+                logger.debug("resolve %r node: %s", 'oneOf0', 'Schema')
+                return Schema()
+
+            @reify  # visitor
+            def oneOf1(self):
+                logger.debug("resolve %r node: %s", 'oneOf1', 'Reference')
+                return Reference()
+
+
+        @reify  # visitor
+        def additionalProperties(self):
+            logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
+            return _PatternProperties._AdditionalProperties()
+
 
     @reify  # visitor
     def patternProperties(self):
         logger.debug("resolve %r node: %s", 'patternProperties', '_PatternProperties')
         return Schema._PatternProperties()
 
+    # anonymous definition for 'additionalProperties' (TODO: nodename)
+    class _AdditionalProperties(Visitor):
+        _schema_type = 'oneOf'
+        _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+        _uid = '/examples/03one-of.yaml#/definitions/Schema/additionalProperties'
+
+        @reify  # todo: use Importer
+        def node(self):
+            try:
+                logger.debug("resolve node: %s", '_AdditionalProperties')
+                from .nodes import _AdditionalProperties
+                return _AdditionalProperties()
+            except ImportError:
+                logger.info("resolve node: %s is not found", '_AdditionalProperties')
+                return None
+
+        def __call__(self, ctx: Context, d: dict):
+            # for oneOf (xxx: _case is module global)
+            if _case.when(d, '#/definitions/15'):
+                return ctx.run(None, self.oneOf0.visit, d)
+            if _case.when(d, '#/definitions/3'):
+                return ctx.run(None, self.oneOf1.visit, d)
+            if _case.when(d, '#/definitions/3'):
+                return ctx.run(None, self.oneOf2.visit, d)
+            raise ValueError('unexpected value')  # todo gentle message
+
+        def _visit(self, ctx: Context, d: dict):
+            logger.debug("visit: %s", '_AdditionalProperties')
+            if self.node is not None:
+                self.node.attach(ctx, d, self)
+
+        @reify  # visitor
+        def oneOf0(self):
+            logger.debug("resolve %r node: %s", 'oneOf0', '<missing>')
+            return <missing>()
+
+        @reify  # visitor
+        def oneOf1(self):
+            logger.debug("resolve %r node: %s", 'oneOf1', 'Schema')
+            return Schema()
+
+        @reify  # visitor
+        def oneOf2(self):
+            logger.debug("resolve %r node: %s", 'oneOf2', 'Reference')
+            return Reference()
+
+
+    @reify  # visitor
+    def additionalProperties(self):
+        logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
+        return Schema._AdditionalProperties()
+
 
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = {'toplevel_properties', 'has_properties'}
     _uid = '/examples/03one-of.yaml#/'
-    _properties = {'definitions', 'properties', 'type'}
+    _properties = {'definitions', 'type', 'properties'}
     _links = ['definitions', 'properties']
 
     @reify  # todo: use Importer
@@ -247,5 +396,52 @@ class toplevel(Visitor):
 
 
 # fmt: off
-_case = runtime.Case({'definitions': {'1': {'type': 'object', 'properties': {'type': {'type': 'string'}, 'patternProperties': {'type': 'object', 'additionalProperties': {'oneOf': [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/2'}]}}, 'properties': {'type': 'object', 'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'oneOf': [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/2'}]}}}}, 'required': ['type']}, '2': {'type': 'object', 'properties': {'$ref': {'type': 'string', 'format': 'uniref'}}, 'required': ['$ref']}}})
+_case = runtime.Case(
+    {
+        "definitions": {
+            "1": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string"},
+                    "patternProperties": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "oneOf": [
+                                {"$ref": "#/definitions/1"},
+                                {"$ref": "#/definitions/3"},
+                            ]
+                        },
+                    },
+                    "properties": {
+                        "type": "object",
+                        "patternProperties": {
+                            "^[a-zA-Z0-9\\.\\-_]+$": {
+                                "oneOf": [
+                                    {"$ref": "#/definitions/1"},
+                                    {"$ref": "#/definitions/3"},
+                                ]
+                            }
+                        },
+                    },
+                    "additionalProperties": {
+                        "oneOf": [
+                            {"$ref": "#/definitions/2"},
+                            {"$ref": "#/definitions/1"},
+                            {"$ref": "#/definitions/3"},
+                        ]
+                    },
+                },
+                "required": ["type"],
+            },
+            "2": {"type": "boolean"},
+            "3": {
+                "type": "object",
+                "properties": {"$ref": {"type": "string", "format": "uniref"}},
+                "required": ["$ref"],
+            },
+            "15": {"type": "boolean"},
+        }
+    }
+)
+
 # fmt: on

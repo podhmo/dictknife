@@ -17,6 +17,11 @@ definitions:
             oneOf:
               - { $ref: "#/definitions/Schema" }
               - { $ref: "#/definitions/Reference" }
+      additionalProperties:
+        oneOf:
+          - { type: boolean }
+          - { $ref: "#/definitions/Schema" }
+          - { $ref: "#/definitions/Reference" }
     required:
       - type
   Reference:
