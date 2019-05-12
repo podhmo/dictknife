@@ -18,31 +18,31 @@ class ToplevelVisitor(Visitor):
     def schema(self):
         return SchemaVisitor()
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         teardown = ctx.push_name(ctx.resolver.name)
         self.schema.visit(ctx, d)
         teardown()
 
 
 class SchemaVisitor(Visitor):
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         if hasattr(d, "get") and "$ref" in d:
-            return ctx.resolve_ref(d["$ref"], cont=self)
+            return ctx.resolve_ref(d["$ref"], cont=self.visit)
 
         if not hasattr(d, "get"):
             return
 
         if "properties" in d:
             for name, prop in d["properties"].items():
-                ctx.run(name, self, prop)
+                ctx.run(name, self.visit, prop)
         for k in ["additionalProperties", "items"]:
             if k in d:
-                ctx.run(k, self, d[k])
+                ctx.run(k, self.visit, d[k])
         if "patternProperties" in d:
             teardown = ctx.push_name("patternProperties")
             try:
                 for k, v in d["patternProperties"].items():
-                    ctx.run(k, self, v)
+                    ctx.run(k, self.visit, v)
             finally:
                 teardown()
         for k in ["oneOf", "allOf", "anyOf"]:
@@ -50,10 +50,10 @@ class SchemaVisitor(Visitor):
                 teardown = ctx.push_name(k)
                 try:
                     for i, x in enumerate(d[k]):
-                        ctx.run(i, self, x)
+                        ctx.run(i, self.visit, x)
                 finally:
                     teardown()
-        return self.node(ctx, d, self)
+        return self.node.accept(ctx, d, self)
 
     @reify
     def node(self):

@@ -108,7 +108,7 @@ class _Expander:
                     assigned.add(kid)
                     pool[kid] = case
                     cases[i] = {"$ref": f"#/definitions/{kid}"}
-                    seen[(resolver, f'definitions/{kid}')] = kid  # xxx
+                    seen[(resolver, f"definitions/{kid}")] = kid  # xxx
             return data
 
         r = copy.deepcopy(data)
@@ -186,7 +186,7 @@ class SchemaNode(Node):
     def expander(self):
         return _Expander()
 
-    def __call__(self, ctx: Context, d: dict, visitor: Visitor, *, retry=False):
+    def accept(self, ctx: Context, d: dict, visitor: Visitor, *, retry=False):
         typename = _guess_event_name(d)
         roles = []
         annotations = {}

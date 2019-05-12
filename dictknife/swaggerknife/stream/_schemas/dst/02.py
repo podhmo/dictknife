@@ -1,7 +1,9 @@
 # generated from examples/02one-of.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -13,7 +15,7 @@ logger = getLogger(__name__)  # noqa
 
 class One(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/02one-of.yaml#/definitions/one'
     _properties = {'one'}
 
@@ -21,7 +23,7 @@ class One(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.One', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -33,7 +35,7 @@ class One(Visitor):
 
 class Twotwo(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/02one-of.yaml#/definitions/twotwo'
     _properties = {'two'}
 
@@ -41,7 +43,7 @@ class Twotwo(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Twotwo', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -53,14 +55,14 @@ class Twotwo(Visitor):
 
 class Value(Visitor):
     _schema_type = 'oneOf'
-    _roles = {'has_name', 'combine_type', 'has_expanded'}
+    _roles = {'has_expanded', 'has_name', 'combine_type'}
     _uid = '/examples/02one-of.yaml#/definitions/value'
 
     @reify
     def node(self):
         return runtime.resolve_node('.nodes.Value', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         # for oneOf (xxx: _case is module global)
         if _case.when(d, '#/definitions/1'):
             return ctx.run(None, self.oneOf0.visit, d)
@@ -87,7 +89,7 @@ class Value(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = {'toplevel_properties', 'has_properties'}
     _uid = '/examples/02one-of.yaml#/'
     _properties = {'value'}
     _links = ['value']
@@ -96,7 +98,7 @@ class toplevel(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):

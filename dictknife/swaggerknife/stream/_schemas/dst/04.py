@@ -1,7 +1,9 @@
 # generated from examples/04array.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -20,7 +22,7 @@ class Name(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Name', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: simplify
 
     def _visit(self, ctx: Context, d: dict):
@@ -32,7 +34,7 @@ class Name(Visitor):
 
 class People(Visitor):
     _schema_type = 'array'
-    _roles = {'has_extra_properties', 'has_name'}
+    _roles = {'has_name', 'has_extra_properties'}
     _uid = '/examples/04array.yaml#/definitions/people'
     _extra_properties = {'items': {'$ref': '#/definitions/person'}}
 
@@ -40,7 +42,7 @@ class People(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.People', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return [self._visit(ctx, x) for x in d]
 
     def _visit(self, ctx: Context, d: dict):
@@ -52,16 +54,16 @@ class People(Visitor):
 
 class Person(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/04array.yaml#/definitions/person'
-    _properties = {'name', 'age', 'parents'}
+    _properties = {'parents', 'name', 'age'}
     _links = ['name', 'parents']
 
     @reify
     def node(self):
         return runtime.resolve_node('.nodes.Person', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -96,7 +98,7 @@ class toplevel(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):

@@ -119,7 +119,7 @@ class Generator:
         self._registered[ev.uid] = clsname
         self.name_manager.register_visitor_name(ev, clsname)
 
-        m.import_area.from_("dictknife.swaggerknife.stream", "Visitor")
+        m.import_area.from_("dictknife.swaggerknife.stream.interfaces", "Visitor")
         with m.class_(clsname, "Visitor"):
             self._gen_headers(ev, m=m)
 
@@ -182,7 +182,7 @@ class Generator:
             )
 
     def _gen_visit_method(self, ev: Event, *, m) -> None:
-        with m.def_("__call__", "self", "ctx: Context", "d: dict"):
+        with m.def_("visit", "self", "ctx: Context", "d: dict"):
             if ev.name == names.types.array:
                 m.return_("[self._visit(ctx, x) for x in d]")
             elif names.roles.primitive_type in ev.roles:

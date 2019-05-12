@@ -1,7 +1,9 @@
 # generated from examples/05patternProperties.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -29,7 +31,7 @@ class Schema(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Schema', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -65,7 +67,7 @@ class Point(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Point', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: simplify
 
     def _visit(self, ctx: Context, d: dict):
@@ -91,7 +93,7 @@ class Points(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Points', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -119,7 +121,7 @@ class toplevel(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):

@@ -1,7 +1,9 @@
 # generated from examples/03one-of.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -13,7 +15,7 @@ logger = getLogger(__name__)  # noqa
 
 class Reference(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/03one-of.yaml#/definitions/Reference'
     _properties = {'$ref'}
 
@@ -21,7 +23,7 @@ class Reference(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.Reference', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -33,16 +35,16 @@ class Reference(Visitor):
 
 class Schema(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/03one-of.yaml#/definitions/Schema'
-    _properties = {'patternProperties', 'properties', 'type', 'additionalProperties'}
+    _properties = {'properties', 'patternProperties', 'type', 'additionalProperties'}
     _links = ['patternProperties', 'properties', 'additionalProperties']
 
     @reify
     def node(self):
         return runtime.resolve_node('.nodes.Schema', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -89,7 +91,7 @@ class Schema(Visitor):
         def node(self):
             return runtime.resolve_node('.nodes._Properties', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
 
         def _visit(self, ctx: Context, d: dict):
@@ -107,14 +109,14 @@ class Schema(Visitor):
         # anonymous definition for 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$' (TODO: nodename)
         class _PatternProperties/^[aZAZ09\.\]+$(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'has_expanded', 'field_of_something', 'combine_type'}
+            _roles = {'field_of_something', 'combine_type', 'has_expanded'}
             _uid = '/examples/03one-of.yaml#/definitions/Schema/properties/patternProperties/^[a-zA-Z0-9\\.\\-_]+$'
 
             @reify
             def node(self):
                 return runtime.resolve_node('.nodes._PatternProperties/^[aZAZ09\\.\\]+$', here=__name__, logger=logger)
 
-            def __call__(self, ctx: Context, d: dict):
+            def visit(self, ctx: Context, d: dict):
                 # for oneOf (xxx: _case is module global)
                 if _case.when(d, '#/definitions/1'):
                     return ctx.run(None, self.oneOf0.visit, d)
@@ -160,7 +162,7 @@ class Schema(Visitor):
         def node(self):
             return runtime.resolve_node('.nodes._PatternProperties', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
 
         def _visit(self, ctx: Context, d: dict):
@@ -177,14 +179,14 @@ class Schema(Visitor):
         # anonymous definition for 'additionalProperties' (TODO: nodename)
         class _AdditionalProperties(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'has_expanded', 'field_of_something', 'combine_type'}
+            _roles = {'field_of_something', 'combine_type', 'has_expanded'}
             _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties/additionalProperties'
 
             @reify
             def node(self):
                 return runtime.resolve_node('.nodes._AdditionalProperties', here=__name__, logger=logger)
 
-            def __call__(self, ctx: Context, d: dict):
+            def visit(self, ctx: Context, d: dict):
                 # for oneOf (xxx: _case is module global)
                 if _case.when(d, '#/definitions/1'):
                     return ctx.run(None, self.oneOf0.visit, d)
@@ -222,14 +224,14 @@ class Schema(Visitor):
     # anonymous definition for 'additionalProperties' (TODO: nodename)
     class _AdditionalProperties(Visitor):
         _schema_type = 'oneOf'
-        _roles = {'has_expanded', 'field_of_something', 'combine_type'}
+        _roles = {'field_of_something', 'combine_type', 'has_expanded'}
         _uid = '/examples/03one-of.yaml#/definitions/Schema/additionalProperties'
 
         @reify
         def node(self):
             return runtime.resolve_node('.nodes._AdditionalProperties', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             # for oneOf (xxx: _case is module global)
             if _case.when(d, '#/definitions/15'):
                 return ctx.run(None, self.oneOf0.visit, d)
@@ -269,16 +271,16 @@ class Schema(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = {'toplevel_properties', 'has_properties'}
     _uid = '/examples/03one-of.yaml#/'
-    _properties = {'definitions', 'properties', 'type'}
+    _properties = {'properties', 'definitions', 'type'}
     _links = ['definitions', 'properties']
 
     @reify
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -318,7 +320,7 @@ class toplevel(Visitor):
         def node(self):
             return runtime.resolve_node('.nodes._Definitions', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
 
         def _visit(self, ctx: Context, d: dict):

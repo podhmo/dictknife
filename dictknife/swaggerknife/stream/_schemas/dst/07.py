@@ -1,7 +1,9 @@
 # generated from examples/07anonymous_nested.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -13,16 +15,16 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = {'has_properties', 'has_name'}
     _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure'
-    _properties = {'value', 'people'}
+    _properties = {'people', 'value'}
     _links = ['people']
 
     @reify
     def node(self):
         return runtime.resolve_node('.nodes.ComplexStructure', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -48,7 +50,7 @@ class ComplexStructure(Visitor):
         def node(self):
             return runtime.resolve_node('.nodes._People', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             return [self._visit(ctx, x) for x in d]
 
         def _visit(self, ctx: Context, d: dict):
@@ -67,7 +69,7 @@ class ComplexStructure(Visitor):
             def node(self):
                 return runtime.resolve_node('.nodes._Items', here=__name__, logger=logger)
 
-            def __call__(self, ctx: Context, d: dict):
+            def visit(self, ctx: Context, d: dict):
                 return self._visit(ctx, d)  # todo: remove this code
 
             def _visit(self, ctx: Context, d: dict):
@@ -100,7 +102,7 @@ class toplevel(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):

@@ -1,7 +1,9 @@
 # generated from examples/06anonymous.yaml
 from logging import getLogger
+from dictknife.swaggerknife.stream.interfaces import (
+    Visitor
+)
 from dictknife.swaggerknife.stream import (
-    Visitor,
     runtime
 )
 from dictknife.langhelpers import reify
@@ -13,7 +15,7 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = {'has_properties', 'has_name'}
     _uid = '/examples/06anonymous.yaml#/definitions/ComplexStructure'
     _properties = {'person', 'value'}
     _links = ['person']
@@ -22,7 +24,7 @@ class ComplexStructure(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.ComplexStructure', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
@@ -48,7 +50,7 @@ class ComplexStructure(Visitor):
         def node(self):
             return runtime.resolve_node('.nodes._Person', here=__name__, logger=logger)
 
-        def __call__(self, ctx: Context, d: dict):
+        def visit(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
 
         def _visit(self, ctx: Context, d: dict):
@@ -66,7 +68,7 @@ class ComplexStructure(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = {'toplevel_properties', 'has_properties'}
     _uid = '/examples/06anonymous.yaml#/'
     _properties = {'structure'}
     _links = ['structure']
@@ -75,7 +77,7 @@ class toplevel(Visitor):
     def node(self):
         return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
-    def __call__(self, ctx: Context, d: dict):
+    def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
