@@ -1,7 +1,18 @@
-class Importer:
-    # todo: use this in generated code
-    def __init__(self, logger):
-        self.logger = logger
+import sys
+from importlib import import_module
+
+
+def resolve_node(name, *, logger, here=None):
+    here = here or sys._getframe(1).f_globals["__name__"]
+    try:
+        logger.debug("resolve node: %s", name)
+        module_path, symbol = name.rsplit(".", 1)
+        module = import_module(module_path, here)
+        cls = getattr(module, symbol)
+        return cls()
+    except ImportError:
+        logger.info("resolve node: %s is not found", name)
+        return None
 
 
 class Case:

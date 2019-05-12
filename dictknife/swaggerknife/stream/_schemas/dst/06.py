@@ -13,20 +13,14 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/06anonymous.yaml#/definitions/ComplexStructure'
     _properties = {'person', 'value'}
     _links = ['person']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'ComplexStructure')
-            from .nodes import ComplexStructure
-            return ComplexStructure()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'ComplexStructure')
-            return None
+        return runtime.resolve_node('.nodes.ComplexStructure', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -50,15 +44,9 @@ class ComplexStructure(Visitor):
         _uid = '/examples/06anonymous.yaml#/definitions/ComplexStructure/person'
         _properties = {'name', 'age'}
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_Person')
-                from .nodes import _Person
-                return _Person()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_Person')
-                return None
+            return runtime.resolve_node('.nodes._Person', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
@@ -83,15 +71,9 @@ class toplevel(Visitor):
     _properties = {'structure'}
     _links = ['structure']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code

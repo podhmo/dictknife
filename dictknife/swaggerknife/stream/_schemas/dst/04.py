@@ -16,15 +16,9 @@ class Name(Visitor):
     _roles = {'has_name', 'primitive_type'}
     _uid = '/examples/04array.yaml#/definitions/name'
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Name')
-            from .nodes import Name
-            return Name()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Name')
-            return None
+        return runtime.resolve_node('.nodes.Name', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: simplify
@@ -38,19 +32,13 @@ class Name(Visitor):
 
 class People(Visitor):
     _schema_type = 'array'
-    _roles = {'has_name', 'has_extra_properties'}
+    _roles = {'has_extra_properties', 'has_name'}
     _uid = '/examples/04array.yaml#/definitions/people'
     _extra_properties = {'items': {'$ref': '#/definitions/person'}}
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'People')
-            from .nodes import People
-            return People()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'People')
-            return None
+        return runtime.resolve_node('.nodes.People', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return [self._visit(ctx, x) for x in d]
@@ -64,20 +52,14 @@ class People(Visitor):
 
 class Person(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = {'has_properties', 'has_name'}
     _uid = '/examples/04array.yaml#/definitions/person'
-    _properties = {'age', 'parents', 'name'}
+    _properties = {'name', 'age', 'parents'}
     _links = ['name', 'parents']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Person')
-            from .nodes import Person
-            return Person()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Person')
-            return None
+        return runtime.resolve_node('.nodes.Person', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -110,15 +92,9 @@ class toplevel(Visitor):
     _properties = {'mother', 'father'}
     _links = ['father', 'mother']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code

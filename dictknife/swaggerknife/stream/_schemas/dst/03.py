@@ -17,15 +17,9 @@ class Reference(Visitor):
     _uid = '/examples/03one-of.yaml#/definitions/Reference'
     _properties = {'$ref'}
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Reference')
-            from .nodes import Reference
-            return Reference()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Reference')
-            return None
+        return runtime.resolve_node('.nodes.Reference', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -41,18 +35,12 @@ class Schema(Visitor):
     _schema_type = 'object'
     _roles = {'has_properties', 'has_name'}
     _uid = '/examples/03one-of.yaml#/definitions/Schema'
-    _properties = {'patternProperties', 'additionalProperties', 'type', 'properties'}
+    _properties = {'patternProperties', 'properties', 'type', 'additionalProperties'}
     _links = ['patternProperties', 'properties', 'additionalProperties']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Schema')
-            from .nodes import Schema
-            return Schema()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Schema')
-            return None
+        return runtime.resolve_node('.nodes.Schema', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -97,15 +85,9 @@ class Schema(Visitor):
             r.append((re.compile('^[a-zA-Z0-9\\.\\-_]+$'), None))
             return r
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_Properties')
-                from .nodes import _Properties
-                return _Properties()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_Properties')
-                return None
+            return runtime.resolve_node('.nodes._Properties', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
@@ -125,18 +107,12 @@ class Schema(Visitor):
         # anonymous definition for 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$' (TODO: nodename)
         class _PatternProperties/^[aZAZ09\.\]+$(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+            _roles = {'has_expanded', 'field_of_something', 'combine_type'}
             _uid = '/examples/03one-of.yaml#/definitions/Schema/properties/patternProperties/^[a-zA-Z0-9\\.\\-_]+$'
 
-            @reify  # todo: use Importer
+            @reify
             def node(self):
-                try:
-                    logger.debug("resolve node: %s", '_PatternProperties/^[aZAZ09\\.\\]+$')
-                    from .nodes import _PatternProperties/^[aZAZ09\.\]+$
-                    return _PatternProperties/^[aZAZ09\.\]+$()
-                except ImportError:
-                    logger.info("resolve node: %s is not found", '_PatternProperties/^[aZAZ09\\.\\]+$')
-                    return None
+                return runtime.resolve_node('.nodes._PatternProperties/^[aZAZ09\\.\\]+$', here=__name__, logger=logger)
 
             def __call__(self, ctx: Context, d: dict):
                 # for oneOf (xxx: _case is module global)
@@ -180,15 +156,9 @@ class Schema(Visitor):
         _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties'
         _extra_properties = {'additionalProperties': {'oneOf': [{'$ref': '#/definitions/Schema'}, {'$ref': '#/definitions/Reference'}]}}
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_PatternProperties')
-                from .nodes import _PatternProperties
-                return _PatternProperties()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_PatternProperties')
-                return None
+            return runtime.resolve_node('.nodes._PatternProperties', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
@@ -207,18 +177,12 @@ class Schema(Visitor):
         # anonymous definition for 'additionalProperties' (TODO: nodename)
         class _AdditionalProperties(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+            _roles = {'has_expanded', 'field_of_something', 'combine_type'}
             _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties/additionalProperties'
 
-            @reify  # todo: use Importer
+            @reify
             def node(self):
-                try:
-                    logger.debug("resolve node: %s", '_AdditionalProperties')
-                    from .nodes import _AdditionalProperties
-                    return _AdditionalProperties()
-                except ImportError:
-                    logger.info("resolve node: %s is not found", '_AdditionalProperties')
-                    return None
+                return runtime.resolve_node('.nodes._AdditionalProperties', here=__name__, logger=logger)
 
             def __call__(self, ctx: Context, d: dict):
                 # for oneOf (xxx: _case is module global)
@@ -258,18 +222,12 @@ class Schema(Visitor):
     # anonymous definition for 'additionalProperties' (TODO: nodename)
     class _AdditionalProperties(Visitor):
         _schema_type = 'oneOf'
-        _roles = {'field_of_something', 'has_expanded', 'combine_type'}
+        _roles = {'has_expanded', 'field_of_something', 'combine_type'}
         _uid = '/examples/03one-of.yaml#/definitions/Schema/additionalProperties'
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_AdditionalProperties')
-                from .nodes import _AdditionalProperties
-                return _AdditionalProperties()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_AdditionalProperties')
-                return None
+            return runtime.resolve_node('.nodes._AdditionalProperties', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             # for oneOf (xxx: _case is module global)
@@ -311,20 +269,14 @@ class Schema(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = {'has_properties', 'toplevel_properties'}
     _uid = '/examples/03one-of.yaml#/'
-    _properties = {'definitions', 'type', 'properties'}
+    _properties = {'definitions', 'properties', 'type'}
     _links = ['definitions', 'properties']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -362,15 +314,9 @@ class toplevel(Visitor):
             r.append((re.compile('^[a-zA-Z0-9\\.\\-_]+$'), Schema()))
             return r
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_Definitions')
-                from .nodes import _Definitions
-                return _Definitions()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_Definitions')
-                return None
+            return runtime.resolve_node('.nodes._Definitions', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             return self._visit(ctx, d)  # todo: remove this code
@@ -396,52 +342,5 @@ class toplevel(Visitor):
 
 
 # fmt: off
-_case = runtime.Case(
-    {
-        "definitions": {
-            "1": {
-                "type": "object",
-                "properties": {
-                    "type": {"type": "string"},
-                    "patternProperties": {
-                        "type": "object",
-                        "additionalProperties": {
-                            "oneOf": [
-                                {"$ref": "#/definitions/1"},
-                                {"$ref": "#/definitions/3"},
-                            ]
-                        },
-                    },
-                    "properties": {
-                        "type": "object",
-                        "patternProperties": {
-                            "^[a-zA-Z0-9\\.\\-_]+$": {
-                                "oneOf": [
-                                    {"$ref": "#/definitions/1"},
-                                    {"$ref": "#/definitions/3"},
-                                ]
-                            }
-                        },
-                    },
-                    "additionalProperties": {
-                        "oneOf": [
-                            {"$ref": "#/definitions/2"},
-                            {"$ref": "#/definitions/1"},
-                            {"$ref": "#/definitions/3"},
-                        ]
-                    },
-                },
-                "required": ["type"],
-            },
-            "2": {"type": "boolean"},
-            "3": {
-                "type": "object",
-                "properties": {"$ref": {"type": "string", "format": "uniref"}},
-                "required": ["$ref"],
-            },
-            "15": {"type": "boolean"},
-        }
-    }
-)
-
+_case = runtime.Case({'definitions': {'1': {'type': 'object', 'properties': {'type': {'type': 'string'}, 'patternProperties': {'type': 'object', 'additionalProperties': {'oneOf': [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/3'}]}}, 'properties': {'type': 'object', 'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'oneOf': [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/3'}]}}}, 'additionalProperties': {'oneOf': [{'$ref': '#/definitions/2'}, {'$ref': '#/definitions/1'}, {'$ref': '#/definitions/3'}]}}, 'required': ['type']}, '2': {'type': 'boolean'}, '3': {'type': 'object', 'properties': {'$ref': {'type': 'string', 'format': 'uniref'}}, 'required': ['$ref']}, '15': {'type': 'boolean'}}})
 # fmt: on

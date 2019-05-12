@@ -13,20 +13,14 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure'
     _properties = {'value', 'people'}
     _links = ['people']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'ComplexStructure')
-            from .nodes import ComplexStructure
-            return ComplexStructure()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'ComplexStructure')
-            return None
+        return runtime.resolve_node('.nodes.ComplexStructure', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -50,15 +44,9 @@ class ComplexStructure(Visitor):
         _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure/people'
         _extra_properties = {'items': {'type': 'object', 'properties': {'name': {'type': 'string'}, 'age': {'type': 'integer'}}, 'required': ['name']}}
 
-        @reify  # todo: use Importer
+        @reify
         def node(self):
-            try:
-                logger.debug("resolve node: %s", '_People')
-                from .nodes import _People
-                return _People()
-            except ImportError:
-                logger.info("resolve node: %s is not found", '_People')
-                return None
+            return runtime.resolve_node('.nodes._People', here=__name__, logger=logger)
 
         def __call__(self, ctx: Context, d: dict):
             return [self._visit(ctx, x) for x in d]
@@ -75,15 +63,9 @@ class ComplexStructure(Visitor):
             _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure/people/items'
             _properties = {'name', 'age'}
 
-            @reify  # todo: use Importer
+            @reify
             def node(self):
-                try:
-                    logger.debug("resolve node: %s", '_Items')
-                    from .nodes import _Items
-                    return _Items()
-                except ImportError:
-                    logger.info("resolve node: %s is not found", '_Items')
-                    return None
+                return runtime.resolve_node('.nodes._Items', here=__name__, logger=logger)
 
             def __call__(self, ctx: Context, d: dict):
                 return self._visit(ctx, d)  # todo: remove this code
@@ -109,20 +91,14 @@ class ComplexStructure(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = {'has_properties', 'toplevel_properties'}
     _uid = '/examples/07anonymous_nested.yaml#/'
     _properties = {'structure'}
     _links = ['structure']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code

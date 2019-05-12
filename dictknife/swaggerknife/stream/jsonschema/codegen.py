@@ -173,19 +173,13 @@ class Generator:
             m.return_("r")
 
     def _gen_node_property(self, ev: Event, *, clsname, m) -> None:
-        m.stmt("@reify  # todo: use Importer")
+        m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
+        m.stmt("@reify")
         with m.def_("node", "self"):
-            with m.try_():
-                self.logging.log(
-                    m, f"""logger.debug("resolve node: %s", {clsname!r})"""
-                )
-                m.submodule().from_(".nodes", clsname)
-                m.return_("{}()", clsname)
-            with m.except_("ImportError"):
-                self.logging.log(
-                    m, f"""logger.info("resolve node: %s is not found", {clsname!r})"""
-                )
-                m.return_("None")
+            m.stmt(
+                "return runtime.resolve_node({path!r}, here=__name__, logger=logger)",
+                path=f".nodes.{clsname}",
+            )
 
     def _gen_visit_method(self, ev: Event, *, m) -> None:
         with m.def_("__call__", "self", "ctx: Context", "d: dict"):

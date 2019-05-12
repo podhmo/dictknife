@@ -13,19 +13,13 @@ logger = getLogger(__name__)  # noqa
 
 class One(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = {'has_properties', 'has_name'}
     _uid = '/examples/02one-of.yaml#/definitions/one'
     _properties = {'one'}
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'One')
-            from .nodes import One
-            return One()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'One')
-            return None
+        return runtime.resolve_node('.nodes.One', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -39,19 +33,13 @@ class One(Visitor):
 
 class Twotwo(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = {'has_properties', 'has_name'}
     _uid = '/examples/02one-of.yaml#/definitions/twotwo'
     _properties = {'two'}
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Twotwo')
-            from .nodes import Twotwo
-            return Twotwo()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Twotwo')
-            return None
+        return runtime.resolve_node('.nodes.Twotwo', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -65,18 +53,12 @@ class Twotwo(Visitor):
 
 class Value(Visitor):
     _schema_type = 'oneOf'
-    _roles = {'has_expanded', 'has_name', 'combine_type'}
+    _roles = {'has_name', 'combine_type', 'has_expanded'}
     _uid = '/examples/02one-of.yaml#/definitions/value'
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Value')
-            from .nodes import Value
-            return Value()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Value')
-            return None
+        return runtime.resolve_node('.nodes.Value', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         # for oneOf (xxx: _case is module global)
@@ -110,15 +92,9 @@ class toplevel(Visitor):
     _properties = {'value'}
     _links = ['value']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code

@@ -25,15 +25,9 @@ class Schema(Visitor):
         r.append((re.compile('^x-'), None))
         return r
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Schema')
-            from .nodes import Schema
-            return Schema()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Schema')
-            return None
+        return runtime.resolve_node('.nodes.Schema', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -67,15 +61,9 @@ class Point(Visitor):
     _roles = {'primitive_type', 'has_name'}
     _uid = '/examples/05patternProperties.yaml#/definitions/Point'
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Point')
-            from .nodes import Point
-            return Point()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Point')
-            return None
+        return runtime.resolve_node('.nodes.Point', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: simplify
@@ -99,15 +87,9 @@ class Points(Visitor):
         r.append((re.compile('^point[0-9]+'), Point()))
         return r
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Points')
-            from .nodes import Points
-            return Points()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Points')
-            return None
+        return runtime.resolve_node('.nodes.Points', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -128,20 +110,14 @@ class Points(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = {'toplevel_properties', 'has_properties'}
     _uid = '/examples/05patternProperties.yaml#/'
     _properties = {'schema', 'points'}
     _links = ['schema', 'points']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code

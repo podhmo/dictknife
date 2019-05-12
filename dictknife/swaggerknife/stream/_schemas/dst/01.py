@@ -16,15 +16,9 @@ class Name(Visitor):
     _roles = {'has_name', 'primitive_type'}
     _uid = '/examples/01ref.yaml#/definitions/name'
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Name')
-            from .nodes import Name
-            return Name()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Name')
-            return None
+        return runtime.resolve_node('.nodes.Name', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: simplify
@@ -38,20 +32,14 @@ class Name(Visitor):
 
 class Person(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = {'has_name', 'has_properties'}
     _uid = '/examples/01ref.yaml#/definitions/person'
-    _properties = {'name', 'age'}
+    _properties = {'age', 'name'}
     _links = ['name']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'Person')
-            from .nodes import Person
-            return Person()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'Person')
-            return None
+        return runtime.resolve_node('.nodes.Person', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
@@ -77,15 +65,9 @@ class toplevel(Visitor):
     _properties = {'father'}
     _links = ['father']
 
-    @reify  # todo: use Importer
+    @reify
     def node(self):
-        try:
-            logger.debug("resolve node: %s", 'toplevel')
-            from .nodes import toplevel
-            return toplevel()
-        except ImportError:
-            logger.info("resolve node: %s is not found", 'toplevel')
-            return None
+        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
 
     def __call__(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
