@@ -53,10 +53,9 @@ class Person(Visitor):
         if 'name' in d:
             ctx.run('name', self.name.visit, d['name'])
 
-    @reify  # visitor
+    @reify
     def name(self):
-        logger.debug("resolve %r node: %s", 'name', 'Name')
-        return Name()
+        return runtime.resolve_visitor('name', cls=Name, logger=logger)
 
 
 
@@ -81,7 +80,6 @@ class toplevel(Visitor):
         if 'father' in d:
             ctx.run('father', self.father.visit, d['father'])
 
-    @reify  # visitor
+    @reify
     def father(self):
-        logger.debug("resolve %r node: %s", 'father', 'Person')
-        return Person()
+        return runtime.resolve_visitor('father', cls=Person, logger=logger)

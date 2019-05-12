@@ -58,20 +58,17 @@ class Schema(Visitor):
         if 'additionalProperties' in d:
             ctx.run('additionalProperties', self.additionalProperties.visit, d['additionalProperties'])
 
-    @reify  # visitor
+    @reify
     def patternProperties(self):
-        logger.debug("resolve %r node: %s", 'patternProperties', '_PatternProperties')
-        return _PatternProperties()
+        return runtime.resolve_visitor('patternProperties', cls=_PatternProperties, logger=logger)
 
-    @reify  # visitor
+    @reify
     def properties(self):
-        logger.debug("resolve %r node: %s", 'properties', '_Properties')
-        return _Properties()
+        return runtime.resolve_visitor('properties', cls=_Properties, logger=logger)
 
-    @reify  # visitor
+    @reify
     def additionalProperties(self):
-        logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
-        return _AdditionalProperties()
+        return runtime.resolve_visitor('additionalProperties', cls=_AdditionalProperties, logger=logger)
 
     # anonymous definition for 'properties' (TODO: nodename)
     class _Properties(Visitor):
@@ -129,27 +126,23 @@ class Schema(Visitor):
                 if self.node is not None:
                     self.node.attach(ctx, d, self)
 
-            @reify  # visitor
+            @reify
             def oneOf0(self):
-                logger.debug("resolve %r node: %s", 'oneOf0', 'Schema')
-                return Schema()
+                return runtime.resolve_visitor('oneOf0', cls=Schema, logger=logger)
 
-            @reify  # visitor
+            @reify
             def oneOf1(self):
-                logger.debug("resolve %r node: %s", 'oneOf1', 'Reference')
-                return Reference()
+                return runtime.resolve_visitor('oneOf1', cls=Reference, logger=logger)
 
 
-        @reify  # visitor
+        @reify
         def patternProperties/^[a-zA-Z0-9\.\-_]+$(self):
-            logger.debug("resolve %r node: %s", 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$', '_PatternProperties/^[aZAZ09\\.\\]+$')
-            return _Properties._PatternProperties/^[aZAZ09\.\]+$()
+            return runtime.resolve_visitor('patternProperties/^[a-zA-Z0-9\\.\\-_]+$', cls=_Properties._PatternProperties/^[aZAZ09\.\]+$, logger=logger)
 
 
-    @reify  # visitor
+    @reify
     def properties(self):
-        logger.debug("resolve %r node: %s", 'properties', '_Properties')
-        return Schema._Properties()
+        return runtime.resolve_visitor('properties', cls=Schema._Properties, logger=logger)
 
     # anonymous definition for 'patternProperties' (TODO: nodename)
     class _PatternProperties(Visitor):
@@ -199,27 +192,23 @@ class Schema(Visitor):
                 if self.node is not None:
                     self.node.attach(ctx, d, self)
 
-            @reify  # visitor
+            @reify
             def oneOf0(self):
-                logger.debug("resolve %r node: %s", 'oneOf0', 'Schema')
-                return Schema()
+                return runtime.resolve_visitor('oneOf0', cls=Schema, logger=logger)
 
-            @reify  # visitor
+            @reify
             def oneOf1(self):
-                logger.debug("resolve %r node: %s", 'oneOf1', 'Reference')
-                return Reference()
+                return runtime.resolve_visitor('oneOf1', cls=Reference, logger=logger)
 
 
-        @reify  # visitor
+        @reify
         def additionalProperties(self):
-            logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
-            return _PatternProperties._AdditionalProperties()
+            return runtime.resolve_visitor('additionalProperties', cls=_PatternProperties._AdditionalProperties, logger=logger)
 
 
-    @reify  # visitor
+    @reify
     def patternProperties(self):
-        logger.debug("resolve %r node: %s", 'patternProperties', '_PatternProperties')
-        return Schema._PatternProperties()
+        return runtime.resolve_visitor('patternProperties', cls=Schema._PatternProperties, logger=logger)
 
     # anonymous definition for 'additionalProperties' (TODO: nodename)
     class _AdditionalProperties(Visitor):
@@ -246,26 +235,22 @@ class Schema(Visitor):
             if self.node is not None:
                 self.node.attach(ctx, d, self)
 
-        @reify  # visitor
+        @reify
         def oneOf0(self):
-            logger.debug("resolve %r node: %s", 'oneOf0', '<missing>')
-            return <missing>()
+            return runtime.resolve_visitor('oneOf0', cls=<missing>, logger=logger)
 
-        @reify  # visitor
+        @reify
         def oneOf1(self):
-            logger.debug("resolve %r node: %s", 'oneOf1', 'Schema')
-            return Schema()
+            return runtime.resolve_visitor('oneOf1', cls=Schema, logger=logger)
 
-        @reify  # visitor
+        @reify
         def oneOf2(self):
-            logger.debug("resolve %r node: %s", 'oneOf2', 'Reference')
-            return Reference()
+            return runtime.resolve_visitor('oneOf2', cls=Reference, logger=logger)
 
 
-    @reify  # visitor
+    @reify
     def additionalProperties(self):
-        logger.debug("resolve %r node: %s", 'additionalProperties', '_AdditionalProperties')
-        return Schema._AdditionalProperties()
+        return runtime.resolve_visitor('additionalProperties', cls=Schema._AdditionalProperties, logger=logger)
 
 
 
@@ -292,15 +277,13 @@ class toplevel(Visitor):
         if 'properties' in d:
             ctx.run('properties', self.properties.visit, d['properties'])
 
-    @reify  # visitor
+    @reify
     def definitions(self):
-        logger.debug("resolve %r node: %s", 'definitions', '<missing>')
-        return <missing>()
+        return runtime.resolve_visitor('definitions', cls=<missing>, logger=logger)
 
-    @reify  # visitor
+    @reify
     def properties(self):
-        logger.debug("resolve %r node: %s", 'properties', '<missing>')
-        return <missing>()
+        return runtime.resolve_visitor('properties', cls=<missing>, logger=logger)
 
     # anonymous definition for 'definitions' (TODO: nodename)
     class _Definitions(Visitor):
@@ -336,10 +319,9 @@ class toplevel(Visitor):
                         ctx.run(k, visitor.visit, v)
 
 
-    @reify  # visitor
+    @reify
     def definitions(self):
-        logger.debug("resolve %r node: %s", 'definitions', '_Definitions')
-        return toplevel._Definitions()
+        return runtime.resolve_visitor('definitions', cls=toplevel._Definitions, logger=logger)
 
 
 

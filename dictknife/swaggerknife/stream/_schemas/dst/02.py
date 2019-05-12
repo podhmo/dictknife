@@ -75,15 +75,13 @@ class Value(Visitor):
         if self.node is not None:
             self.node.attach(ctx, d, self)
 
-    @reify  # visitor
+    @reify
     def oneOf0(self):
-        logger.debug("resolve %r node: %s", 'oneOf0', 'One')
-        return One()
+        return runtime.resolve_visitor('oneOf0', cls=One, logger=logger)
 
-    @reify  # visitor
+    @reify
     def oneOf1(self):
-        logger.debug("resolve %r node: %s", 'oneOf1', 'Twotwo')
-        return Twotwo()
+        return runtime.resolve_visitor('oneOf1', cls=Twotwo, logger=logger)
 
 
 
@@ -108,10 +106,9 @@ class toplevel(Visitor):
         if 'value' in d:
             ctx.run('value', self.value.visit, d['value'])
 
-    @reify  # visitor
+    @reify
     def value(self):
-        logger.debug("resolve %r node: %s", 'value', 'Value')
-        return Value()
+        return runtime.resolve_visitor('value', cls=Value, logger=logger)
 
 
 

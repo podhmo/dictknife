@@ -34,10 +34,9 @@ class ComplexStructure(Visitor):
         if 'person' in d:
             ctx.run('person', self.person.visit, d['person'])
 
-    @reify  # visitor
+    @reify
     def person(self):
-        logger.debug("resolve %r node: %s", 'person', '_Person')
-        return _Person()
+        return runtime.resolve_visitor('person', cls=_Person, logger=logger)
 
     # anonymous definition for 'person' (TODO: nodename)
     class _Person(Visitor):
@@ -59,10 +58,9 @@ class ComplexStructure(Visitor):
                 self.node.attach(ctx, d, self)
 
 
-    @reify  # visitor
+    @reify
     def person(self):
-        logger.debug("resolve %r node: %s", 'person', '_Person')
-        return ComplexStructure._Person()
+        return runtime.resolve_visitor('person', cls=ComplexStructure._Person, logger=logger)
 
 
 
@@ -87,7 +85,6 @@ class toplevel(Visitor):
         if 'structure' in d:
             ctx.run('structure', self.structure.visit, d['structure'])
 
-    @reify  # visitor
+    @reify
     def structure(self):
-        logger.debug("resolve %r node: %s", 'structure', 'ComplexStructure')
-        return ComplexStructure()
+        return runtime.resolve_visitor('structure', cls=ComplexStructure, logger=logger)

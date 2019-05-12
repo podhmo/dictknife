@@ -25,6 +25,7 @@ class _LazyName:
 # todo: additionalProperties (schema)
 # todo: anonymous definition(nested definition)
 # todo: anonymous definition(oneOf, anyof, allOf)
+# todo: rename python reserved word
 
 
 class Helper:
@@ -305,16 +306,16 @@ class Generator:
     def _gen_visitor_property(
         self, ev: Event, *, name: str, uid: str, m, prefix: str = ""
     ) -> None:
-        m.stmt("@reify  # visitor")
+        m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
+        m.stmt("@reify")
         with m.def_(name, "self"):
             lazy_link_name = self.name_manager.create_lazy_visitor_name(uid)
-            self.logging.log(
-                m,
-                """logger.debug("resolve %r node: %s", {name!r}, {cls!r})""",
+            m.stmt(
+                "return runtime.resolve_visitor({name!r}, cls={prefix}{cls}, logger=logger)",
                 name=name,
                 cls=lazy_link_name,
+                prefix=prefix,
             )
-            m.stmt("return {prefix}{cls}()", prefix=prefix, cls=lazy_link_name)
 
     def _gen_properties_visitors(self, ev: Event, *, m) -> None:
         for name, uid in self.helper.iterate_links(ev):

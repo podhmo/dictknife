@@ -18,7 +18,7 @@ class Schema(Visitor):
     _roles = ['has_extra_properties', 'has_name', 'has_properties']
     _uid = '/examples/05patternProperties.yaml#/definitions/Schema'
     _properties = ['description', 'type']
-    _extra_properties = {'additionalProperties': False, 'patternProperties': {'^x-': {}}}
+    _extra_properties = {'patternProperties': {'^x-': {}}, 'additionalProperties': False}
 
     @reify  # visitor
     def _pattern_properties_regexes(self):
@@ -133,12 +133,10 @@ class toplevel(Visitor):
         if 'points' in d:
             ctx.run('points', self.points.visit, d['points'])
 
-    @reify  # visitor
+    @reify
     def schema(self):
-        logger.debug("resolve %r node: %s", 'schema', 'Schema')
-        return Schema()
+        return runtime.resolve_visitor('schema', cls=Schema, logger=logger)
 
-    @reify  # visitor
+    @reify
     def points(self):
-        logger.debug("resolve %r node: %s", 'points', 'Points')
-        return Points()
+        return runtime.resolve_visitor('points', cls=Points, logger=logger)

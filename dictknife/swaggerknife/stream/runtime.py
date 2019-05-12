@@ -2,6 +2,11 @@ import sys
 from importlib import import_module
 
 
+def resolve_visitor(name, *, cls, logger):
+    logger.debug("resolve %r visitor: %s", name, cls.__name__)
+    return cls()
+
+
 def resolve_node(name, *, logger, here=None):
     here = here or sys._getframe(1).f_globals["__name__"]
     try:
