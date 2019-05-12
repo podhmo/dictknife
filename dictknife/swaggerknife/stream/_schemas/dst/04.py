@@ -85,7 +85,7 @@ class Person(Visitor):
 
 
 
-class toplevel(Visitor):
+class Toplevel(Visitor):
     _schema_type = 'object'
     _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/04array.yaml#/'
@@ -94,13 +94,13 @@ class toplevel(Visitor):
 
     @reify
     def node(self):
-        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
+        return runtime.resolve_node('.nodes.Toplevel', here=__name__, logger=logger)
 
     def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
-        logger.debug("visit: %s", 'toplevel')
+        logger.debug("visit: %s", 'Toplevel')
         if self.node is not None:
             self.node.attach(ctx, d, self)
         if 'father' in d:

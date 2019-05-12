@@ -58,18 +58,6 @@ class Schema(Visitor):
         if 'additionalProperties' in d:
             ctx.run('additionalProperties', self.additionalProperties.visit, d['additionalProperties'])
 
-    @reify
-    def patternProperties(self):
-        return runtime.resolve_visitor('patternProperties', cls=_PatternProperties, logger=logger)
-
-    @reify
-    def properties(self):
-        return runtime.resolve_visitor('properties', cls=_Properties, logger=logger)
-
-    @reify
-    def additionalProperties(self):
-        return runtime.resolve_visitor('additionalProperties', cls=_AdditionalProperties, logger=logger)
-
     # anonymous definition for 'properties' (TODO: nodename)
     class _Properties(Visitor):
         _schema_type = 'object'
@@ -257,7 +245,7 @@ class Schema(Visitor):
 
 
 
-class toplevel(Visitor):
+class Toplevel(Visitor):
     _schema_type = 'object'
     _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/03one-of.yaml#/'
@@ -266,27 +254,19 @@ class toplevel(Visitor):
 
     @reify
     def node(self):
-        return runtime.resolve_node('.nodes.toplevel', here=__name__, logger=logger)
+        return runtime.resolve_node('.nodes.Toplevel', here=__name__, logger=logger)
 
     def visit(self, ctx: Context, d: dict):
         return self._visit(ctx, d)  # todo: remove this code
 
     def _visit(self, ctx: Context, d: dict):
-        logger.debug("visit: %s", 'toplevel')
+        logger.debug("visit: %s", 'Toplevel')
         if self.node is not None:
             self.node.attach(ctx, d, self)
         if 'definitions' in d:
             ctx.run('definitions', self.definitions.visit, d['definitions'])
         if 'properties' in d:
             ctx.run('properties', self.properties.visit, d['properties'])
-
-    @reify
-    def definitions(self):
-        return runtime.resolve_visitor('definitions', cls=<missing>, logger=logger)
-
-    @reify
-    def properties(self):
-        return runtime.resolve_visitor('properties', cls=<missing>, logger=logger)
 
     # anonymous definition for 'definitions' (TODO: nodename)
     class _Definitions(Visitor):
@@ -324,7 +304,7 @@ class toplevel(Visitor):
 
     @reify
     def definitions(self):
-        return runtime.resolve_visitor('definitions', cls=toplevel._Definitions, logger=logger)
+        return runtime.resolve_visitor('definitions', cls=Toplevel._Definitions, logger=logger)
 
 
 
