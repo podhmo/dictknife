@@ -80,9 +80,9 @@ class Schema(Visitor):
         @reify
         def _pattern_properties_regexes(self):
             import re
-            r = []
-            r.append((re.compile('^[a-zA-Z0-9\\.\\-_]+$'), None))
-            return r
+            return [
+                (re.compile('^[a-zA-Z0-9\\.\\-_]+$'), None),
+            ]
 
         @reify
         def node(self):
@@ -298,9 +298,9 @@ class toplevel(Visitor):
         @reify
         def _pattern_properties_regexes(self):
             import re
-            r = []
-            r.append((re.compile('^[a-zA-Z0-9\\.\\-_]+$'), Schema()))
-            return r
+            return [
+                (re.compile('^[a-zA-Z0-9\\.\\-_]+$'), resolve_visitor('^[a-zA-Z0-9\\.\\-_]+$', cls=Schema, logger=logger)),
+            ]
 
         @reify
         def node(self):

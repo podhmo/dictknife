@@ -23,9 +23,9 @@ class Schema(Visitor):
     @reify
     def _pattern_properties_regexes(self):
         import re
-        r = []
-        r.append((re.compile('^x-'), None))
-        return r
+        return [
+            (re.compile('^x-'), None),
+        ]
 
     @reify
     def node(self):
@@ -85,9 +85,9 @@ class Points(Visitor):
 
     @reify
     def _pattern_properties_regexes(self):
-        r = []
-        r.append((re.compile('^point[0-9]+'), Point()))
-        return r
+        return [
+            (re.compile('^point[0-9]+'), resolve_visitor('^point[0-9]+', cls=Point, logger=logger)),
+        ]
 
     @reify
     def node(self):

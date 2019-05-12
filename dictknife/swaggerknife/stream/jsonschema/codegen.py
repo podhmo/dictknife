@@ -172,15 +172,22 @@ class Generator:
         m.stmt("@reify")
         with m.def_("_pattern_properties_regexes", "self"):
             m.import_("re")
-            m.stmt("r = []")
-            for k, uid in ev.get_annotated(names.annotations.pattern_properties_links):
-                if uid is None:
-                    m.stmt("""r.append((re.compile({k!r}), None))""", k=k)
-                    continue
+            m.stmt("return [")
+            with m.scope():
+                for k, uid in ev.get_annotated(
+                    names.annotations.pattern_properties_links
+                ):
+                    if uid is None:
+                        m.stmt("""(re.compile({k!r}), None),""", k=k)
+                        continue
 
-                lazy_name = self.name_manager.create_lazy_visitor_name(uid)
-                m.stmt("""r.append((re.compile({k!r}), {cls}()))""", k=k, cls=lazy_name)
-            m.return_("r")
+                    lazy_name = self.name_manager.create_lazy_visitor_name(uid)
+                    m.stmt(
+                        """(re.compile({k!r}), resolve_visitor({k!r}, cls={cls}, logger=logger)),""",
+                        k=k,
+                        cls=lazy_name,
+                    )
+            m.stmt("]")
 
     def _gen_node_property(self, ev: Event, *, clsname, m) -> None:
         m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
