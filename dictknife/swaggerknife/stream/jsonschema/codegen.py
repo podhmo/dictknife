@@ -64,6 +64,9 @@ class NameManager:  # todo: rename
     def register_visitor_name(self, ev: Event, clsname):
         self.visitors[ev.uid] = clsname
 
+    def __contains__(self, uid: str) -> bool:
+        return uid in self.visitors
+
     def create_lazy_visitor_name(self, uid: str) -> _LazyName:
         def to_str(uid: str = uid):
             # name = self.visitors[uid]
@@ -111,14 +114,14 @@ class Generator:
         self.name_manager = NameManager()
 
         # xxx:
-        self.registered = {}  # uid -> classname
         self._end_of_private_visit_method_conts = {}  # classname -> m.submodule()
         self._end_of_class_definition_conts = {}  # classname -> m.submodule()
 
-    def generate_class(self, ev: Event, *, m=None, clsname: str = None) -> None:
+    def generate_class(
+        self, ev: Event, *, m=None, clsname: str = None, prefix: str = None
+    ) -> None:
         m = m or self.m
         clsname = clsname or self.helper.classname(ev)
-        self.registered[ev.uid] = clsname
         self.name_manager.register_visitor_name(ev, clsname)
 
         m.import_area.from_("dictknife.swaggerknife.stream.interfaces", "Visitor")
@@ -138,7 +141,7 @@ class Generator:
                 self._gen_xxx_of_visitors(ev, m=m)
 
             # xxx:
-            self._end_of_class_definition_conts[clsname] = self.helper.create_submodule(
+            self._end_of_class_definition_conts[ev.uid] = self.helper.create_submodule(
                 m
             )
 
@@ -179,7 +182,7 @@ class Generator:
                     names.annotations.pattern_properties_links
                 ):
                     if uid is None:
-                        uid = f"{ev.uid}/{k}"  # xxx
+                        uid = f"{ev.uid}/patternProperties/{k}"  # xxx
 
                     lazy_name = self.name_manager.create_lazy_visitor_name(uid)
                     m.stmt(
@@ -316,7 +319,7 @@ class Generator:
 
             # add code, after visited
             self._end_of_private_visit_method_conts[
-                clsname
+                ev.uid,
             ] = self.helper.create_submodule(m)
 
     def _gen_visitor_property(
@@ -362,7 +365,7 @@ def main():
     def consume_stream(stream: t.Iterable[Event], *, is_delayed=False) -> t.List[Event]:
         delayed_stream: t.List[Event] = []
         for ev in stream:
-            if ev.uid in g.registered:
+            if ev.uid in g.name_manager:
                 continue
 
             if names.roles.has_expanded in ev.roles:
@@ -385,20 +388,27 @@ def main():
                 or names.roles.combine_type in ev.roles
             ):
                 uid_and_clsname_pairs = sorted(
-                    g.registered.items(), key=lambda pair: len(pair[0]), reverse=True
+                    g.name_manager.visitors.items(),
+                    key=lambda pair: len(pair[0]),
+                    reverse=True,
                 )
 
+                uid = ev.uid
                 for parent_uid, parent_clsname in uid_and_clsname_pairs:
-                    uid = ev.uid
                     if uid.startswith(parent_uid):
-                        classdef_sm = g._end_of_class_definition_conts[parent_clsname]
+                        classdef_sm = g._end_of_class_definition_conts[parent_uid]
                         fieldname = uid.replace(parent_uid, "").lstrip("/")
                         clsname = f"_{g.helper.classname(ev, name=fieldname)}"
 
                         classdef_sm.stmt(
                             f"# anonymous definition for {fieldname!r} (TODO: nodename)"
                         )
-                        g.generate_class(ev, clsname=clsname, m=classdef_sm)
+                        g.generate_class(
+                            ev,
+                            clsname=clsname,
+                            m=classdef_sm,
+                            prefix=f"{parent_clsname}.",
+                        )
 
                         # ok: properties
                         # todo: additionalProperties, patternProperties
