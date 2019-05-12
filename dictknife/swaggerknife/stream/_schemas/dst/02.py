@@ -15,9 +15,9 @@ logger = getLogger(__name__)  # noqa
 
 class One(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/02one-of.yaml#/definitions/one'
-    _properties = {'one'}
+    _properties = ['one']
 
     @reify
     def node(self):
@@ -35,9 +35,9 @@ class One(Visitor):
 
 class Twotwo(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/02one-of.yaml#/definitions/twotwo'
-    _properties = {'two'}
+    _properties = ['two']
 
     @reify
     def node(self):
@@ -55,7 +55,7 @@ class Twotwo(Visitor):
 
 class Value(Visitor):
     _schema_type = 'oneOf'
-    _roles = {'has_expanded', 'has_name', 'combine_type'}
+    _roles = ['combine_type', 'has_expanded', 'has_name']
     _uid = '/examples/02one-of.yaml#/definitions/value'
 
     @reify
@@ -89,9 +89,9 @@ class Value(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/02one-of.yaml#/'
-    _properties = {'value'}
+    _properties = ['value']
     _links = ['value']
 
     @reify

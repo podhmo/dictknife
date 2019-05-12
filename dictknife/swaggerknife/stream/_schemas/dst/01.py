@@ -15,7 +15,7 @@ logger = getLogger(__name__)  # noqa
 
 class Name(Visitor):
     _schema_type = 'string'
-    _roles = {'has_name', 'primitive_type'}
+    _roles = ['has_name', 'primitive_type']
     _uid = '/examples/01ref.yaml#/definitions/name'
 
     @reify
@@ -34,9 +34,9 @@ class Name(Visitor):
 
 class Person(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/01ref.yaml#/definitions/person'
-    _properties = {'name', 'age'}
+    _properties = ['age', 'name']
     _links = ['name']
 
     @reify
@@ -62,9 +62,9 @@ class Person(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/01ref.yaml#/'
-    _properties = {'father'}
+    _properties = ['father']
     _links = ['father']
 
     @reify

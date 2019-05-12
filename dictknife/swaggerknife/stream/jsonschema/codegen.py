@@ -142,11 +142,13 @@ class Generator:
 
     def _gen_headers(self, ev: Event, *, m) -> None:
         m.stmt(f"_schema_type = {ev.name!r}")
-        m.stmt(f"_roles = {ev.roles!r}")
+        m.stmt(f"_roles = {sorted(ev.roles)!r}")
 
         m.stmt(f"_uid = {ev.uid!r}")
         if names.roles.has_properties in ev.roles:
-            m.stmt(f"_properties = {ev.get_annotated(names.annotations.properties)!r}")
+            m.stmt(
+                f"_properties = {sorted(ev.get_annotated(names.annotations.properties))!r}"
+            )
         if names.roles.has_extra_properties in ev.roles:
             data = ev.get_annotated(names.annotations.extra_properties)
             self.emitter.emit_data(m, "_extra_properties = {}", data)

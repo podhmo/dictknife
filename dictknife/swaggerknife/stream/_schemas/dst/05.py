@@ -15,9 +15,9 @@ logger = getLogger(__name__)  # noqa
 
 class Schema(Visitor):
     _schema_type = 'object'
-    _roles = {'has_extra_properties', 'has_properties', 'has_name'}
+    _roles = ['has_extra_properties', 'has_name', 'has_properties']
     _uid = '/examples/05patternProperties.yaml#/definitions/Schema'
-    _properties = {'type', 'description'}
+    _properties = ['description', 'type']
     _extra_properties = {'additionalProperties': False, 'patternProperties': {'^x-': {}}}
 
     @reify  # visitor
@@ -60,7 +60,7 @@ class Schema(Visitor):
 
 class Point(Visitor):
     _schema_type = 'integer'
-    _roles = {'primitive_type', 'has_name'}
+    _roles = ['has_name', 'primitive_type']
     _uid = '/examples/05patternProperties.yaml#/definitions/Point'
 
     @reify
@@ -79,7 +79,7 @@ class Point(Visitor):
 
 class Points(Visitor):
     _schema_type = 'object'
-    _roles = {'has_extra_properties', 'has_name'}
+    _roles = ['has_extra_properties', 'has_name']
     _uid = '/examples/05patternProperties.yaml#/definitions/Points'
     _extra_properties = {'patternProperties': {'^point[0-9]+': {'$ref': '#/definitions/Point'}}}
 
@@ -112,9 +112,9 @@ class Points(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/05patternProperties.yaml#/'
-    _properties = {'schema', 'points'}
+    _properties = ['points', 'schema']
     _links = ['schema', 'points']
 
     @reify

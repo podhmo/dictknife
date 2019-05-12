@@ -15,9 +15,9 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/06anonymous.yaml#/definitions/ComplexStructure'
-    _properties = {'person', 'value'}
+    _properties = ['person', 'value']
     _links = ['person']
 
     @reify
@@ -42,9 +42,9 @@ class ComplexStructure(Visitor):
     # anonymous definition for 'person' (TODO: nodename)
     class _Person(Visitor):
         _schema_type = 'object'
-        _roles = {'has_properties'}
+        _roles = ['has_properties']
         _uid = '/examples/06anonymous.yaml#/definitions/ComplexStructure/person'
-        _properties = {'name', 'age'}
+        _properties = ['age', 'name']
 
         @reify
         def node(self):
@@ -68,9 +68,9 @@ class ComplexStructure(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/06anonymous.yaml#/'
-    _properties = {'structure'}
+    _properties = ['structure']
     _links = ['structure']
 
     @reify

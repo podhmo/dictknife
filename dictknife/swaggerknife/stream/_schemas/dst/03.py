@@ -15,9 +15,9 @@ logger = getLogger(__name__)  # noqa
 
 class Reference(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/03one-of.yaml#/definitions/Reference'
-    _properties = {'$ref'}
+    _properties = ['$ref']
 
     @reify
     def node(self):
@@ -35,9 +35,9 @@ class Reference(Visitor):
 
 class Schema(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/03one-of.yaml#/definitions/Schema'
-    _properties = {'properties', 'patternProperties', 'type', 'additionalProperties'}
+    _properties = ['additionalProperties', 'patternProperties', 'properties', 'type']
     _links = ['patternProperties', 'properties', 'additionalProperties']
 
     @reify
@@ -76,7 +76,7 @@ class Schema(Visitor):
     # anonymous definition for 'properties' (TODO: nodename)
     class _Properties(Visitor):
         _schema_type = 'object'
-        _roles = {'field_of_something', 'has_extra_properties'}
+        _roles = ['field_of_something', 'has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/properties'
         _extra_properties = {'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'oneOf': [{'$ref': '#/definitions/Schema'}, {'$ref': '#/definitions/Reference'}]}}}
 
@@ -109,7 +109,7 @@ class Schema(Visitor):
         # anonymous definition for 'patternProperties/^[a-zA-Z0-9\\.\\-_]+$' (TODO: nodename)
         class _PatternProperties/^[aZAZ09\.\]+$(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'field_of_something', 'combine_type', 'has_expanded'}
+            _roles = ['combine_type', 'field_of_something', 'has_expanded']
             _uid = '/examples/03one-of.yaml#/definitions/Schema/properties/patternProperties/^[a-zA-Z0-9\\.\\-_]+$'
 
             @reify
@@ -154,7 +154,7 @@ class Schema(Visitor):
     # anonymous definition for 'patternProperties' (TODO: nodename)
     class _PatternProperties(Visitor):
         _schema_type = 'object'
-        _roles = {'field_of_something', 'has_extra_properties'}
+        _roles = ['field_of_something', 'has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties'
         _extra_properties = {'additionalProperties': {'oneOf': [{'$ref': '#/definitions/Schema'}, {'$ref': '#/definitions/Reference'}]}}
 
@@ -179,7 +179,7 @@ class Schema(Visitor):
         # anonymous definition for 'additionalProperties' (TODO: nodename)
         class _AdditionalProperties(Visitor):
             _schema_type = 'oneOf'
-            _roles = {'field_of_something', 'combine_type', 'has_expanded'}
+            _roles = ['combine_type', 'field_of_something', 'has_expanded']
             _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties/additionalProperties'
 
             @reify
@@ -224,7 +224,7 @@ class Schema(Visitor):
     # anonymous definition for 'additionalProperties' (TODO: nodename)
     class _AdditionalProperties(Visitor):
         _schema_type = 'oneOf'
-        _roles = {'field_of_something', 'combine_type', 'has_expanded'}
+        _roles = ['combine_type', 'field_of_something', 'has_expanded']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/additionalProperties'
 
         @reify
@@ -271,9 +271,9 @@ class Schema(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/03one-of.yaml#/'
-    _properties = {'properties', 'definitions', 'type'}
+    _properties = ['definitions', 'properties', 'type']
     _links = ['definitions', 'properties']
 
     @reify
@@ -305,7 +305,7 @@ class toplevel(Visitor):
     # anonymous definition for 'definitions' (TODO: nodename)
     class _Definitions(Visitor):
         _schema_type = 'object'
-        _roles = {'has_extra_properties'}
+        _roles = ['has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions'
         _extra_properties = {'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'$ref': '#/definitions/Schema'}}}
 

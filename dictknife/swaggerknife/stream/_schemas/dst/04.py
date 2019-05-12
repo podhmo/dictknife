@@ -15,7 +15,7 @@ logger = getLogger(__name__)  # noqa
 
 class Name(Visitor):
     _schema_type = 'string'
-    _roles = {'has_name', 'primitive_type'}
+    _roles = ['has_name', 'primitive_type']
     _uid = '/examples/04array.yaml#/definitions/name'
 
     @reify
@@ -34,7 +34,7 @@ class Name(Visitor):
 
 class People(Visitor):
     _schema_type = 'array'
-    _roles = {'has_name', 'has_extra_properties'}
+    _roles = ['has_extra_properties', 'has_name']
     _uid = '/examples/04array.yaml#/definitions/people'
     _extra_properties = {'items': {'$ref': '#/definitions/person'}}
 
@@ -54,9 +54,9 @@ class People(Visitor):
 
 class Person(Visitor):
     _schema_type = 'object'
-    _roles = {'has_name', 'has_properties'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/04array.yaml#/definitions/person'
-    _properties = {'parents', 'name', 'age'}
+    _properties = ['age', 'name', 'parents']
     _links = ['name', 'parents']
 
     @reify
@@ -89,9 +89,9 @@ class Person(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/04array.yaml#/'
-    _properties = {'mother', 'father'}
+    _properties = ['father', 'mother']
     _links = ['father', 'mother']
 
     @reify

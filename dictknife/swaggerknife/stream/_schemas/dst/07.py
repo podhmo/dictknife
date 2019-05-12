@@ -15,9 +15,9 @@ logger = getLogger(__name__)  # noqa
 
 class ComplexStructure(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'has_name'}
+    _roles = ['has_name', 'has_properties']
     _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure'
-    _properties = {'people', 'value'}
+    _properties = ['people', 'value']
     _links = ['people']
 
     @reify
@@ -42,7 +42,7 @@ class ComplexStructure(Visitor):
     # anonymous definition for 'people' (TODO: nodename)
     class _People(Visitor):
         _schema_type = 'array'
-        _roles = {'has_extra_properties'}
+        _roles = ['has_extra_properties']
         _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure/people'
         _extra_properties = {'items': {'type': 'object', 'properties': {'name': {'type': 'string'}, 'age': {'type': 'integer'}}, 'required': ['name']}}
 
@@ -61,9 +61,9 @@ class ComplexStructure(Visitor):
         # anonymous definition for 'items' (TODO: nodename)
         class _Items(Visitor):
             _schema_type = 'object'
-            _roles = {'has_properties'}
+            _roles = ['has_properties']
             _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure/people/items'
-            _properties = {'name', 'age'}
+            _properties = ['age', 'name']
 
             @reify
             def node(self):
@@ -93,9 +93,9 @@ class ComplexStructure(Visitor):
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'has_properties', 'toplevel_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/07anonymous_nested.yaml#/'
-    _properties = {'structure'}
+    _properties = ['structure']
     _links = ['structure']
 
     @reify

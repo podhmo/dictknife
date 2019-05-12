@@ -13,9 +13,9 @@ logger = getLogger(__name__)  # noqa
 
 class toplevel(Visitor):
     _schema_type = 'object'
-    _roles = {'toplevel_properties', 'has_properties'}
+    _roles = ['has_properties', 'toplevel_properties']
     _uid = '/examples/00simple.yaml#/'
-    _properties = {'name'}
+    _properties = ['name']
 
     @reify
     def node(self):
