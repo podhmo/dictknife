@@ -43,7 +43,7 @@ class ComplexStructure(Visitor):
         _schema_type = 'array'
         _roles = ['has_extra_properties']
         _uid = '/examples/07anonymous_nested.yaml#/definitions/ComplexStructure/people'
-        _extra_properties = {'items': {'type': 'object', 'properties': {'name': {'type': 'string'}, 'age': {'type': 'integer'}}, 'required': ['name']}}
+        _extra_properties = ['items']
 
         @reify
         def node(self):

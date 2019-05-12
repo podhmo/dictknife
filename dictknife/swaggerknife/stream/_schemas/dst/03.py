@@ -75,9 +75,9 @@ class Schema(Visitor):
         _schema_type = 'object'
         _roles = ['field_of_something', 'has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/properties'
-        _extra_properties = {'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'oneOf': [{'$ref': '#/definitions/Schema'}, {'$ref': '#/definitions/Reference'}]}}}
+        _extra_properties = ['patternProperties']
 
-        @reify  # visitor
+        @reify
         def _pattern_properties_regexes(self):
             import re
             r = []
@@ -108,6 +108,7 @@ class Schema(Visitor):
             _schema_type = 'oneOf'
             _roles = ['combine_type', 'field_of_something', 'has_expanded']
             _uid = '/examples/03one-of.yaml#/definitions/Schema/properties/patternProperties/^[a-zA-Z0-9\\.\\-_]+$'
+            _xxx_of_definitions = [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/3'}]
 
             @reify
             def node(self):
@@ -149,7 +150,7 @@ class Schema(Visitor):
         _schema_type = 'object'
         _roles = ['field_of_something', 'has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties'
-        _extra_properties = {'additionalProperties': {'oneOf': [{'$ref': '#/definitions/Schema'}, {'$ref': '#/definitions/Reference'}]}}
+        _extra_properties = ['additionalProperties']
 
         @reify
         def node(self):
@@ -174,6 +175,7 @@ class Schema(Visitor):
             _schema_type = 'oneOf'
             _roles = ['combine_type', 'field_of_something', 'has_expanded']
             _uid = '/examples/03one-of.yaml#/definitions/Schema/patternProperties/additionalProperties'
+            _xxx_of_definitions = [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/3'}]
 
             @reify
             def node(self):
@@ -215,6 +217,7 @@ class Schema(Visitor):
         _schema_type = 'oneOf'
         _roles = ['combine_type', 'field_of_something', 'has_expanded']
         _uid = '/examples/03one-of.yaml#/definitions/Schema/additionalProperties'
+        _xxx_of_definitions = [{'$ref': '#/definitions/15'}, {'$ref': '#/definitions/3'}, {'$ref': '#/definitions/3'}]
 
         @reify
         def node(self):
@@ -290,9 +293,9 @@ class toplevel(Visitor):
         _schema_type = 'object'
         _roles = ['has_extra_properties']
         _uid = '/examples/03one-of.yaml#/definitions'
-        _extra_properties = {'patternProperties': {'^[a-zA-Z0-9\\.\\-_]+$': {'$ref': '#/definitions/Schema'}}}
+        _extra_properties = ['patternProperties']
 
-        @reify  # visitor
+        @reify
         def _pattern_properties_regexes(self):
             import re
             r = []

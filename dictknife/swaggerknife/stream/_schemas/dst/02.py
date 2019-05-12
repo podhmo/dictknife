@@ -57,6 +57,7 @@ class Value(Visitor):
     _schema_type = 'oneOf'
     _roles = ['combine_type', 'has_expanded', 'has_name']
     _uid = '/examples/02one-of.yaml#/definitions/value'
+    _xxx_of_definitions = [{'$ref': '#/definitions/1'}, {'$ref': '#/definitions/2'}]
 
     @reify
     def node(self):

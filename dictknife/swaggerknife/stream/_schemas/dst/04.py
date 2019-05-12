@@ -36,7 +36,7 @@ class People(Visitor):
     _schema_type = 'array'
     _roles = ['has_extra_properties', 'has_name']
     _uid = '/examples/04array.yaml#/definitions/people'
-    _extra_properties = {'items': {'$ref': '#/definitions/person'}}
+    _extra_properties = ['items']
 
     @reify
     def node(self):

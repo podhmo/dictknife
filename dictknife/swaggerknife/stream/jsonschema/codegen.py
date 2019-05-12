@@ -152,17 +152,24 @@ class Generator:
             )
         if names.roles.has_extra_properties in ev.roles:
             data = ev.get_annotated(names.annotations.extra_properties)
-            self.emitter.emit_data(m, "_extra_properties = {}", data)
+            self.emitter.emit_data(m, "_extra_properties = {}", sorted(data))
 
         links = list(self.helper.iterate_links(ev))
         if links:
             m.stmt(
                 f"_links = {[name for name, ref in self.helper.iterate_links(ev)]!r}"
             )
+        if names.roles.combine_type in ev.roles:
+            self.emitter.emit_data(
+                m,
+                "_xxx_of_definitions = {}",
+                ev.get_annotated(names.annotations.expanded)[ev.name],
+                nofmt=False,
+            )
         m.sep()
 
     def _gen_pattern_properties_regexes(self, ev: Event, *, m) -> None:
-        m.stmt("@reify  # visitor")
+        m.stmt("@reify")
         with m.def_("_pattern_properties_regexes", "self"):
             m.import_("re")
             m.stmt("r = []")
@@ -198,7 +205,7 @@ class Generator:
                 m.stmt("# for {} (xxx: _case is module global)", ev.name)
 
                 if ev.name == names.types.oneOf:
-                    for i, prop in enumerate(bodies["oneOf"]):
+                    for i, prop in enumerate(bodies[ev.name]):
                         with m.if_(f"_case.when(d, {prop['$ref']!r})"):
                             ref = links[i]
                             if ref is None:
@@ -213,7 +220,7 @@ class Generator:
                     )
                 elif ev.name == names.types.anyOf:
                     m.stmt("matched = False")
-                    for i, prop in enumerate(bodies["anyOf"]):
+                    for i, prop in enumerate(bodies[ev.name]):
                         with m.if_(f"_case.when(d, {prop['$ref']!r})"):
                             ref = links[i]
                             if ref is None:
@@ -227,7 +234,7 @@ class Generator:
                             "raise ValueError('unexpected value')  # todo gentle message"
                         )
                 elif ev.name == names.types.allOf:
-                    for i, prop in enumerate(bodies["anyOf"]):
+                    for i, prop in enumerate(bodies[ev.name]):
                         with m.if_(f"not _case.when(d, {prop['$ref']!r})"):
                             m.stmt(
                                 "raise ValueError('unexpected value')  # todo gentle message"

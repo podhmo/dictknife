@@ -18,9 +18,9 @@ class Schema(Visitor):
     _roles = ['has_extra_properties', 'has_name', 'has_properties']
     _uid = '/examples/05patternProperties.yaml#/definitions/Schema'
     _properties = ['description', 'type']
-    _extra_properties = {'patternProperties': {'^x-': {}}, 'additionalProperties': False}
+    _extra_properties = ['additionalProperties', 'patternProperties']
 
-    @reify  # visitor
+    @reify
     def _pattern_properties_regexes(self):
         import re
         r = []
@@ -81,9 +81,9 @@ class Points(Visitor):
     _schema_type = 'object'
     _roles = ['has_extra_properties', 'has_name']
     _uid = '/examples/05patternProperties.yaml#/definitions/Points'
-    _extra_properties = {'patternProperties': {'^point[0-9]+': {'$ref': '#/definitions/Point'}}}
+    _extra_properties = ['patternProperties']
 
-    @reify  # visitor
+    @reify
     def _pattern_properties_regexes(self):
         r = []
         r.append((re.compile('^point[0-9]+'), Point()))

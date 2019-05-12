@@ -15,7 +15,7 @@ def resolve_node(name, *, logger, here=None):
         module = import_module(module_path, here)
         cls = getattr(module, symbol)
         return cls()
-    except ImportError:
+    except (ImportError, AttributeError):
         logger.info("resolve node: %s is not found", name)
         return None
 
