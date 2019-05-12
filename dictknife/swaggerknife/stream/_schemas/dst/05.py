@@ -24,7 +24,7 @@ class Schema(Visitor):
     def _pattern_properties_regexes(self):
         import re
         return [
-            (re.compile('^x-'), None),
+            (re.compile('^x-'), resolve_visitor('^x-', cls=<missing>, logger=logger)),
         ]
 
     @reify

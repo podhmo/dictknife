@@ -262,7 +262,7 @@ class SchemaNode(Node):
             for name, prop in d["properties"].items():
                 if _has_ref(prop):
                     links.append((name, ctx.get_uid(prop["$ref"])))
-                elif prop.get("type", "object") in ("array", "object"):
+                elif hasattr(prop, "get") and prop.get("type", "object") in ("array", "object"):
                     links.append((name, None))
             if links:
                 annotations[names.annotations.links] = links

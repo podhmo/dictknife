@@ -2,10 +2,12 @@
 CMD ?= python -m dictknife.swaggerknife.stream.jsonschema.codegen
 
 # OPTS ?= --log=DEBUG
-
+default: TARGET?=main
 default:
-	@$(CMD) separated/main.yaml ${OPTS}
+	$(MAKE) ${TARGET}
 
+main:
+	@$(CMD) separated/main.yaml ${OPTS}
 dst:
 	mkdir -p dst
 00: dst
@@ -25,8 +27,7 @@ dst:
 07: dst
 	@$(CMD) examples/07*.yaml ${OPTS} | tee dst/07.py
 
-# xxx: CMD := python -m dictknife.swaggerknife.stream.jsonschema
-# xxx:
-# 	$(MAKE) default CMD="${CMD}"
-
-# .DEFAULT_GOAL := xxx
+xxx: TARGET ?= default
+xxx: CMD := python -m dictknife.swaggerknife.stream.jsonschema
+xxx:
+	$(MAKE) CMD="${CMD}" ${TARGET}

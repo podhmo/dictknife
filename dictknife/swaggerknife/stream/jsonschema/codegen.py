@@ -111,14 +111,14 @@ class Generator:
         self.name_manager = NameManager()
 
         # xxx:
-        self._registered = {}  # uid -> classname
+        self.registered = {}  # uid -> classname
         self._end_of_private_visit_method_conts = {}  # classname -> m.submodule()
         self._end_of_class_definition_conts = {}  # classname -> m.submodule()
 
     def generate_class(self, ev: Event, *, m=None, clsname: str = None) -> None:
         m = m or self.m
         clsname = clsname or self.helper.classname(ev)
-        self._registered[ev.uid] = clsname
+        self.registered[ev.uid] = clsname
         self.name_manager.register_visitor_name(ev, clsname)
 
         m.import_area.from_("dictknife.swaggerknife.stream.interfaces", "Visitor")
@@ -179,8 +179,7 @@ class Generator:
                     names.annotations.pattern_properties_links
                 ):
                     if uid is None:
-                        m.stmt("""(re.compile({k!r}), None),""", k=k)
-                        continue
+                        uid = f"{ev.uid}/{k}"  # xxx
 
                     lazy_name = self.name_manager.create_lazy_visitor_name(uid)
                     m.stmt(
@@ -363,30 +362,32 @@ def main():
     def consume_stream(stream: t.Iterable[Event], *, is_delayed=False) -> t.List[Event]:
         delayed_stream: t.List[Event] = []
         for ev in stream:
+            if ev.uid in g.registered:
+                continue
+
             if names.roles.has_expanded in ev.roles:
                 definitions.update(
                     ev.get_annotated(names.annotations.expanded)["definitions"]
                 )
-            if names.roles.toplevel_properties in ev.roles:
-                toplevels.append(ev)
-                continue
             if names.roles.has_name in ev.roles:
                 g.generate_class(ev)
                 continue
 
             if not is_delayed:
+                if names.roles.toplevel_properties in ev.roles:
+                    toplevels.append(ev)  # xxx
                 delayed_stream.append(ev)
                 continue
 
             # xxx:
             if (
-                ev.name == names.types.object
-                or ev.name == names.types.array
+                ev.name in (names.types.object, names.types.array)
                 or names.roles.combine_type in ev.roles
             ):
                 uid_and_clsname_pairs = sorted(
-                    g._registered.items(), key=lambda pair: len(pair[0]), reverse=True
+                    g.registered.items(), key=lambda pair: len(pair[0]), reverse=True
                 )
+
                 for parent_uid, parent_clsname in uid_and_clsname_pairs:
                     uid = ev.uid
                     if uid.startswith(parent_uid):
@@ -399,9 +400,9 @@ def main():
                         )
                         g.generate_class(ev, clsname=clsname, m=classdef_sm)
 
-                        # todo: properties, additionalProperties, patternProperties
+                        # ok: properties
+                        # todo: additionalProperties, patternProperties
                         # todo:  oneOf, anyof, allof
-
                         # assert "/" not in fieldname
                         name = fieldname
                         g._gen_visitor_property(
@@ -431,7 +432,8 @@ def main():
     m.import_area.from_("dictknife.swaggerknife.stream", "runtime")
     m.import_area.from_("dictknife.swaggerknife.stream.context", "Context")
 
-    consume_stream(sorted(delayed_stream, key=lambda ev: len(ev.uid)), is_delayed=True)
+    delayed_stream = sorted(delayed_stream, key=lambda ev: len(ev.uid))
+    consume_stream(delayed_stream, is_delayed=True)
 
     if definitions:
         data = {"definitions": definitions}
