@@ -128,6 +128,109 @@ class JoinTests(unittest.TestCase):
                 self.assertTrue(data.x_packages == copied.x_packages, "not modified")
                 self.assertTrue(data.y_packages == copied.y_packages, "not modified")
 
+    def test_multi_keys(self):
+        class data:
+            classes = [
+                {"id": 1, "year": "1", "name": "A"},
+                {"id": 2, "year": "1", "name": "B"},
+                {"id": 3, "year": "1", "name": "C"},
+                {"id": 4, "year": "2", "name": "A"},
+                {"id": 5, "year": "2", "name": "B"},
+            ]
+            students = [
+                {"id": 1, "year": "1", "class": "A", "cid": 1, "name": "foo"},
+                {"id": 2, "year": "1", "class": "A", "cid": 1, "name": "bar"},
+                {"id": 3, "year": "1", "class": "B", "cid": 2, "name": "boo"},
+                {"id": 4, "year": "1", "class": "C", "cid": 3, "name": "yoo"},
+            ]
+
+        class copied:
+            classes = copy.deepcopy(data.classes)
+            students = copy.deepcopy(data.students)
+
+        C = namedtuple("C", "msg, args, kwargs, want")
+        cases = [
+            C(
+                msg="inner join",
+                args=[data.classes, data.students],
+                kwargs={"left_on": "id", "right_on": "cid"},
+                want=[
+                    (
+                        {"id": 1, "year": "1", "name": "A"},
+                        {"id": 1, "year": "1", "class": "A", "cid": 1, "name": "foo"},
+                    ),
+                    (
+                        {"id": 1, "year": "1", "name": "A"},
+                        {"id": 2, "year": "1", "class": "A", "cid": 1, "name": "bar"},
+                    ),
+                    (
+                        {"id": 2, "year": "1", "name": "B"},
+                        {"id": 3, "year": "1", "class": "B", "cid": 2, "name": "boo"},
+                    ),
+                    (
+                        {"id": 3, "year": "1", "name": "C"},
+                        {"id": 4, "year": "1", "class": "C", "cid": 3, "name": "yoo"},
+                    ),
+                ],
+            ),
+            C(
+                msg="inner join with multi keys",
+                args=[data.classes, data.students],
+                kwargs={"left_on": ("year", "name"), "right_on": ("year", "class")},
+                want=[
+                    (
+                        {"id": 1, "year": "1", "name": "A"},
+                        {"id": 1, "year": "1", "class": "A", "cid": 1, "name": "foo"},
+                    ),
+                    (
+                        {"id": 1, "year": "1", "name": "A"},
+                        {"id": 2, "year": "1", "class": "A", "cid": 1, "name": "bar"},
+                    ),
+                    (
+                        {"id": 2, "year": "1", "name": "B"},
+                        {"id": 3, "year": "1", "class": "B", "cid": 2, "name": "boo"},
+                    ),
+                    (
+                        {"id": 3, "year": "1", "name": "C"},
+                        {"id": 4, "year": "1", "class": "C", "cid": 3, "name": "yoo"},
+                    ),
+                ],
+            ),
+            C(
+                msg="inner join with multi keys2",
+                args=[data.students, data.classes],
+                kwargs={"left_on": ("year", "class"), "right_on": ("year", "name")},
+                want=[
+                    (
+                        {"id": 1, "year": "1", "class": "A", "cid": 1, "name": "foo"},
+                        {"id": 1, "year": "1", "name": "A"},
+                    ),
+                    (
+                        {"id": 2, "year": "1", "class": "A", "cid": 1, "name": "bar"},
+                        {"id": 1, "year": "1", "name": "A"},
+                    ),
+                    (
+                        {"id": 3, "year": "1", "class": "B", "cid": 2, "name": "boo"},
+                        {"id": 2, "year": "1", "name": "B"},
+                    ),
+                    (
+                        {"id": 4, "year": "1", "class": "C", "cid": 3, "name": "yoo"},
+                        {"id": 3, "year": "1", "name": "C"},
+                    ),
+                ],
+            ),
+        ]
+        for c in cases:
+            with self.subTest(msg=c.msg, kwargs=c.kwargs):
+                got = self._callFUT(*c.args, **c.kwargs)
+
+                self.assertTrue(
+                    got == c.want, msg=_DifferenceReportText(got=got, want=c.want)
+                )
+
+                self.assertTrue(data.students == copied.students, "not modified")
+                self.assertTrue(data.classes == copied.classes, "not modified")
+
 
 class _DifferenceReportText:
     def __init__(self, *, got, want):
