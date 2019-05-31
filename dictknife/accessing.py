@@ -49,6 +49,8 @@ class Accessor:
         return self.maybe_access_container(d, path) is not None
 
     def maybe_access(self, d, path, *, default=None):
+        if d is None:
+            return default
         d = self.maybe_access_container(d, path, default=default)
         if d is default:
             return default
@@ -61,6 +63,8 @@ class Accessor:
             except KeyError:
                 return default
             except TypeError:
+                if d is None:
+                    return None
                 if not isinstance(d, (list, tuple)):
                     raise
                 d = d[int(name)]
@@ -70,6 +74,8 @@ class Accessor:
         except KeyError:
             return default
         except TypeError:
+            if d is None:
+                return None
             if not isinstance(d, (list, tuple)):
                 raise
             return default
