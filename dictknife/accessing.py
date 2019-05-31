@@ -64,7 +64,7 @@ class Accessor:
                 return default
             except TypeError:
                 if d is None:
-                    return None
+                    return default
                 if not isinstance(d, (list, tuple)):
                     raise
                 d = d[int(name)]
@@ -75,7 +75,7 @@ class Accessor:
             return default
         except TypeError:
             if d is None:
-                return None
+                return default
             if not isinstance(d, (list, tuple)):
                 raise
             return default
