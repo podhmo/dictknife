@@ -96,5 +96,33 @@ class AssignTests(unittest.TestCase):
         self.assertDictEqual(d, expected)
 
 
+class MaybeAccessTests(unittest.TestCase):
+    def _callFUT(self, d, path):
+        from dictknife import Accessor
+
+        a = Accessor(make_dict=dict)
+        return a.maybe_access(d, path)
+
+    def test_maybe_access(self):
+        from collections import namedtuple
+
+        C = namedtuple("C", "d, path, expected")
+
+        cases = [
+            C(d=None, path=["k"], expected=None),
+            C(d={"k": "v"}, path=["k"], expected="v"),
+            C(d={"k": "v"}, path=["z"], expected=None),
+            C(d=[], path=["k"], expected=None),
+            C(d=[1], path=[0], expected=1),
+            C(d=[1], path=[1], expected=None),
+            C(d=[{"k": "v"}], path=[0, "k"], expected="v"),
+            C(d=[{"k": "v"}], path=[0, "z"], expected=None),
+        ]
+        for c in cases:
+            with self.subTest(d=c.d, path=c.path):
+                got = self._callFUT(c.d, c.path)
+                self.assertEqual(got, c.expected)
+
+
 if __name__ == "__main__":
     unittest.main()

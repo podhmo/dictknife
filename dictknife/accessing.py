@@ -71,7 +71,7 @@ class Accessor:
         try:
             d[path[-1]]
             return d
-        except KeyError:
+        except (KeyError, IndexError):
             return default
         except TypeError:
             if d is None:
