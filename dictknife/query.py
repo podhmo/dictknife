@@ -53,7 +53,8 @@ def how_left_outer_join(left, right, left_k, right_k, *, options=_default_option
 
 
 def how_right_outer_join(left, right, left_k, right_k, *, options=_default_options):
-    return how_left_outer_join(right, left, right_k, left_k, options=options)
+    for r, l in how_left_outer_join(right, left, right_k, left_k, options=options):
+        yield l, r
 
 
 def how_full_outer_join(left, right, left_k, right_k, *, options=_default_options):

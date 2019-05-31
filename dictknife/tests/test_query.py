@@ -14,6 +14,8 @@ class JoinTests(unittest.TestCase):
         return list(join(*args, **kwargs))
 
     def test_it(self):
+        from dictknife import query
+
         class data:
             x_packages = [
                 {"version": "2.7", "downloads": 1000},
@@ -45,14 +47,75 @@ class JoinTests(unittest.TestCase):
                     ),
                     (
                         {"version": "3.6", "downloads": 3000},
-                        {"version": "3.6", "downloads": 200},
+                        {"version": "3.6", "downloads": 2000},
                     ),
                     (
                         {"version": "3.7", "downloads": 3000},
                         {"version": "3.7", "downloads": 2000},
                     ),
                 ],
-            )
+            ),
+            C(
+                msg="left outer join",
+                args=["x_packages", "y_packages"],
+                kwargs={"on": "version", "how": query.how_left_outer_join},
+                want=[
+                    ({"version": "2.7", "downloads": 1000}, None),
+                    (
+                        {"version": "3.5", "downloads": 2000},
+                        {"version": "3.5", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.6", "downloads": 3000},
+                        {"version": "3.6", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.7", "downloads": 3000},
+                        {"version": "3.7", "downloads": 2000},
+                    ),
+                ],
+            ),
+            C(
+                msg="right outer join",
+                args=["x_packages", "y_packages"],
+                kwargs={"on": "version", "how": query.how_right_outer_join},
+                want=[
+                    (
+                        {"version": "3.5", "downloads": 2000},
+                        {"version": "3.5", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.6", "downloads": 3000},
+                        {"version": "3.6", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.7", "downloads": 3000},
+                        {"version": "3.7", "downloads": 2000},
+                    ),
+                    (None, {"version": "3.8", "downloads": 500}),
+                ],
+            ),
+            C(
+                msg="full outer join",
+                args=["x_packages", "y_packages"],
+                kwargs={"on": "version", "how": query.how_full_outer_join},
+                want=[
+                    ({"version": "2.7", "downloads": 1000}, None),
+                    (
+                        {"version": "3.5", "downloads": 2000},
+                        {"version": "3.5", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.6", "downloads": 3000},
+                        {"version": "3.6", "downloads": 2000},
+                    ),
+                    (
+                        {"version": "3.7", "downloads": 3000},
+                        {"version": "3.7", "downloads": 2000},
+                    ),
+                    (None, {"version": "3.8", "downloads": 500}),
+                ],
+            ),
         ]
         for c in cases:
             with self.subTest(msg=c.msg, args=c.args, kwargs=c.kwargs):
