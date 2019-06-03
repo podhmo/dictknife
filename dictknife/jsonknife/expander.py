@@ -28,6 +28,8 @@ class Expander(object):
         return DictWalker(["$ref"])
 
     def access(self, ref):
+        if not ref:
+            return self.resolver.doc
         return self.accessor.access(ref)
 
     def expand(self):

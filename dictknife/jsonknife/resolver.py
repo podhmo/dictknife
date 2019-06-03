@@ -71,8 +71,8 @@ class ExternalFileResolver(AccessingMixin):
                 self.rawfilename,
                 self.history[-1].filename,
             )
-            with open(self.filename) as rf:
-                self.doc = self.loader.load(rf, format=self.format)
+            self.doc = self.loader.loadfile(self.filename, format=self.format)
+
             if self.onload is not None:
                 self.onload(self.doc, self)
             return self.doc
