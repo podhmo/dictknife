@@ -40,7 +40,7 @@ def cat(
     size=None,
     slurp=False,
     extra=None,
-    merge_method="addtoset"
+    merge_method="addtoset",
 ):
     from dictknife import deepmerge
 
@@ -83,7 +83,7 @@ def transform(
     input_format: str,
     output_format: str,
     format: str,
-    sort_keys: str
+    sort_keys: str,
 ):
     """transform dict"""
     from magicalimport import import_symbol
@@ -125,7 +125,7 @@ def diff(
     n: int,
     input_format: str,
     output_format: str = "diff",
-    verbose: bool = False
+    verbose: bool = False,
 ):
     """diff dict"""
     from dictknife.diff import diff, diff_rows, make_jsonpatch
@@ -176,7 +176,7 @@ def shape(
     separator,
     with_type,
     with_example,
-    full
+    full,
 ):
     """shape"""
     from dictknife import shape
@@ -221,7 +221,7 @@ def mkdict(
     delimiter: str,
     sort_keys: bool,
     squash: bool,
-    extra
+    extra,
 ):
     from dictknife.mkdict import mkdict
 
@@ -255,6 +255,24 @@ def mkdict(
     else:
         loading.dumpfile(r, format=output_format, sort_keys=sort_keys)
         sys.stdout.write("\n")
+
+
+def describe(
+    *,
+    src: str,
+    dst: str,
+    output_format: str,
+    input_format: str,
+    format: str,
+    depth: int,
+):
+    from dictknife.describe import describe
+
+    input_format = input_format or format
+    output_format = output_format or format
+    data = loading.loadfile(src, input_format)
+    result = describe(data, max_depth=depth)
+    loading.dumpfile(result, dst, format=output_format)
 
 
 def main():
@@ -316,7 +334,9 @@ def main():
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
     sparser.add_argument(
-        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+        "--merge-method",
+        choices=["addtoset", "append", "merge", "replace"],
+        default="addtoset",
     )
 
     # concat (deprecated)
@@ -349,7 +369,9 @@ def main():
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
     sparser.add_argument(
-        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+        "--merge-method",
+        choices=["addtoset", "append", "merge", "replace"],
+        default="addtoset",
     )
 
     # transform
@@ -432,6 +454,17 @@ def main():
     sparser.add_argument("--separator", default="/")
     sparser.add_argument("--delimiter", default=";")
     sparser.add_argument("-S", "--sort-keys", action="store_true")
+
+    # describe
+    fn = describe
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("-d", "--depth", type=int, default=1)
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("src", default=None, nargs="?")
+    sparser.add_argument("--dst", default=None)
 
     args = parser.parse_args()
     params = vars(args)
