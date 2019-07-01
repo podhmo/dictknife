@@ -40,6 +40,15 @@ def on_last_default(d):
         return d  # xxx
 
 
+def on_last_minimize(d):
+    if isinstance(d, (list, tuple)):
+        return "list@depth:{}@length:{}".format(_depth(d), len(d))
+    elif hasattr(d, "keys"):
+        return "dict@depth:{}@length:{}".format(_depth(d), len(d))
+    else:
+        return d  # xxx
+
+
 def _depth(d) -> int:
     if isinstance(d, (list, tuple)):
         return max(_depth(x) for x in d) + 1 if d else 0

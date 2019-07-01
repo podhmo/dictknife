@@ -265,13 +265,16 @@ def describe(
     input_format: str,
     format: str,
     depth: int,
+    minimum: bool,
 ):
-    from dictknife.describe import describe
+    from dictknife.describe import Describer, on_last_minimize, on_last_default
 
     input_format = input_format or format
     output_format = output_format or format
     data = loading.loadfile(src, input_format)
-    result = describe(data, max_depth=depth)
+    on_last_function = on_last_minimize if minimum else on_last_default
+    describer = Describer(on_last=on_last_function)
+    result = describer.describe(data, max_depth=depth)
     loading.dumpfile(result, dst, format=output_format)
 
 
@@ -460,6 +463,7 @@ def main():
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("-d", "--depth", type=int, default=0)
+    sparser.add_argument("--minimum", action="store_true")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
