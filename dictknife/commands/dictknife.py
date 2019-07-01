@@ -459,7 +459,7 @@ def main():
     fn = describe
     sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("-d", "--depth", type=int, default=1)
+    sparser.add_argument("-d", "--depth", type=int, default=0)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
     sparser.add_argument("-f", "--format", default=None, choices=formats)
