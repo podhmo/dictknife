@@ -7,11 +7,11 @@ MAX_DEPTH = int(os.environ.get("DICTKNIFE_MAX_DEPTH") or "-1")
 
 def _depth(d) -> int:
     if isinstance(d, (list, tuple)):
-        return max(_depth(x) for x in d) if d else 1
+        return max(_depth(x) for x in d) + 1 if d else 0
     elif hasattr(d, "keys"):
-        return max(_depth(v) for v in d.values()) if d else 1
+        return max(_depth(v) for v in d.values()) + 1 if d else 0
     else:
-        return 1
+        return 0
 
 
 def _mini_dict(d) -> dict:
