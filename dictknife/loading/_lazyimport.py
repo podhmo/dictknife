@@ -11,8 +11,8 @@ class LoadingModule:
 
     @reify
     def toml(self):
-        import toml
-        return toml
+        import qtoml
+        return qtoml
 
     @reify
     def csv(self):
