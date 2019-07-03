@@ -35,7 +35,7 @@ setup(
         "testing": ["PyYAML", "jsonpatch"],
         "lint": ["flake8"],
         "docs": ["sphinx", "recommonmark", "sphinx_rtd_theme"],
-        "load": ["PyYAML", "toml"],
+        "load": ["PyYAML", "qtoml"],
         "command": ["PyYAML", "magicalimport", "prestring"],
         "spreadsheet": ["google-api-python-client", "oauth2client"],
     },
