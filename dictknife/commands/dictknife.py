@@ -299,7 +299,9 @@ def main():
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--encoding", default=None)
+    sparser.add_argument(
+        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None
+    )
     sparser.add_argument(
         "--errors",
         default=None,
@@ -316,7 +318,9 @@ def main():
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
     sparser.add_argument(
-        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+        "--merge-method",
+        choices=["addtoset", "append", "merge", "replace"],
+        default="addtoset",
     )
 
     # concat (deprecated)
@@ -332,7 +336,9 @@ def main():
     sparser.add_argument("-f", "--format", default=None, choices=formats)
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--encoding", default=None)
+    sparser.add_argument(
+        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None
+    )
     sparser.add_argument(
         "--errors",
         default=None,
@@ -349,7 +355,9 @@ def main():
     )
     sparser.add_argument("-S", "--sort-keys", action="store_true")
     sparser.add_argument(
-        "--merge-method", choices=["addtoset", "append", "merge", "replace"], default="addtoset"
+        "--merge-method",
+        choices=["addtoset", "append", "merge", "replace"],
+        default="addtoset",
     )
 
     # transform
