@@ -81,6 +81,7 @@ class ExternalFileResolver(AccessingMixin):
                 exc = e.__class__("{} (where={})".format(e, self.name)).with_traceback(
                     e.__traceback__
                 )
+                exc.__dict__.update(e.__dict__)  # sync
             except Exception:
                 raise e from None
             raise exc from None

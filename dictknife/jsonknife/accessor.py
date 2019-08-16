@@ -149,9 +149,11 @@ class StackedAccessor:
             where = None
             if len(self.stack) > 1:
                 where = self.stack[-2].name
-            raise e.__class__("{} (where={})".format(e, where)).with_traceback(
+            exc = e.__class__("{} (where={})".format(e, where)).with_traceback(
                 e.__traceback__
-            ) from None
+            )
+            exc.__dict__.update(e.__dict__)  # sync
+            raise exc from None
 
     def _access(self, subresolver, pointer):
         return access_by_json_pointer(subresolver.doc, pointer, accessor=self.accessor)
