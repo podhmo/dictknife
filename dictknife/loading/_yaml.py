@@ -15,11 +15,6 @@ class Dumper(yaml.Dumper):
         return True
 
 
-class SortedDumper(Dumper):
-    def _iterate_dict(self, d):
-        return sorted(d.items())
-
-
 class Loader(yaml.Loader):
     pass
 
