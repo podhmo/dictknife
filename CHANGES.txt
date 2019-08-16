@@ -1,3 +1,14 @@
+0.11.0
+
+- add dictknife.accessing.Scope (#108)
+- fix: fix accessing with list (#113)
+- fix: fix maybe access (#112)
+- add 2to3, but not complete implementation (#115)
+- add jsonknife bundle, --flavour option (#133)
+- add jsonknife separate (#137)
+- use qtoml instead of toml (#156)
+- fix: use pyyaml's sort_keys option, instead of custom implementation (#162)
+
 0.10.2
 
 - loading, adjustment yaml's output
