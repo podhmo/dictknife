@@ -134,6 +134,10 @@ class ExternalFileResolver(AccessingMixin):
         )
         return subresolver
 
+    def path_list(self, filename: str) -> list:
+        resolver = self.cache[filename]
+        return [*resolver.history[1:], resolver]
+
 
 class ROOT:
     filename = "*root*"
