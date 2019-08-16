@@ -32,23 +32,25 @@ class Expander(object):
             return self.resolver.doc
         return self.accessor.access(ref)
 
-    def expand(self):
-        return self.expand_subpart(self.resolver.doc)
+    def expand(self, *, _expect_stack_size=1):
+        doc = self.expand_subpart(self.resolver.doc)
+        assert len(self.accessor.stack) == _expect_stack_size
+        return doc
 
     def expand_subpart(self, subpart, resolver=None, ctx=None):
         resolver = resolver or self.resolver
 
         if "$ref" in subpart:
-            try:
-                original = self.accessor.access(subpart["$ref"])
-                ref = subpart.pop("$ref")
-                new_subpart = self.expand_subpart(original, resolver=self.accessor.resolver, ctx=ctx)
-                if detect_circur_reference(subpart, new_subpart):
-                    subpart["$ref"] = ref
-                else:
-                    subpart.update(new_subpart)
-            finally:
-                self.accessor.pop_stack()
+            original = self.accessor.access(subpart["$ref"])
+            ref = subpart.pop("$ref")
+            new_subpart = self.expand_subpart(
+                original, resolver=self.accessor.resolver, ctx=ctx
+            )
+            if detect_circur_reference(subpart, new_subpart):
+                subpart["$ref"] = ref
+            else:
+                subpart.update(new_subpart)
+            self.accessor.pop_stack()
             return subpart
         else:
             for path, sd in self.ref_walking.iterate(subpart):
