@@ -1,7 +1,8 @@
-import yaml
 import re
 from collections import defaultdict, ChainMap, OrderedDict
 from dictknife.langhelpers import make_dict
+import yaml
+from yaml.representer import SafeRepresenter
 
 load = yaml.load
 dump = yaml.dump
@@ -20,11 +21,6 @@ class Loader(yaml.Loader):
 
 
 def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
-    def _represent_odict(dumper, instance):
-        return dumper.represent_mapping(
-            "tag:yaml.org,2002:map", dumper._iterate_dict(instance)
-        )
-
     def _construct_odict(loader, node):
         return make_dict(loader.construct_pairs(node))
 
@@ -40,5 +36,5 @@ def setup(Loader, Dumper, dict_classes=[defaultdict, ChainMap, OrderedDict]):
 
     Loader.add_constructor("tag:yaml.org,2002:map", _construct_odict)
     for dict_class in dict_classes:
-        Dumper.add_representer(dict_class, _represent_odict)
+        Dumper.add_representer(dict_class, SafeRepresenter.represent_dict)
     Dumper.add_representer(str, _represent_str)
