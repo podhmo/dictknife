@@ -9,7 +9,7 @@ from dictknife.langhelpers import reify, pairrsplit
 
 from .accessor import AccessingMixin
 from .relpath import normpath
-
+from ._wrapped_exception import wrap_exception
 
 logger = logging.getLogger("jsonknife.resolver")
 
@@ -41,7 +41,8 @@ class ExternalFileResolver(AccessingMixin):
         doc=None,
         rawfilename=None,
         onload=None,
-        format=None
+        format=None,
+        wrap_exception=wrap_exception
     ):
         self.rawfilename = rawfilename or filename
         self.filename = os.path.normpath(os.path.abspath(str(filename)))
@@ -50,6 +51,7 @@ class ExternalFileResolver(AccessingMixin):
         self.history = history or [ROOT]
         self.onload = onload
         self.format = format
+        self.wrap_exception = wrap_exception
         if doc is not None:
             self.doc = doc
             if self.onload is not None:
@@ -77,13 +79,7 @@ class ExternalFileResolver(AccessingMixin):
                 self.onload(self.doc, self)
             return self.doc
         except Exception as e:
-            try:
-                exc = e.__class__("{} (where={})".format(e, self.name)).with_traceback(
-                    e.__traceback__
-                )
-                exc.__dict__.update(e.__dict__)  # sync
-            except Exception:
-                raise e from None
+            exc = self.wrap_exception(e, where=self.name)
             raise exc from None
 
     def new(self, filename, doc=None, rawfilename=None, format=None):
@@ -99,6 +95,7 @@ class ExternalFileResolver(AccessingMixin):
             rawfilename=rawfilename,
             onload=self.onload,
             format=format,
+            wrap_exception=self.wrap_exception,
         )
 
     def resolve_pathset(self, query):  # todo: refactoring

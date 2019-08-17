@@ -34,3 +34,6 @@ class WrappedMixin:
 
     def __str__(self):
         return f"{super().__str__()} (where={self.stack})"
+
+
+wrap_exception = WrappedExceptionFactory()
