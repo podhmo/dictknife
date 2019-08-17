@@ -2,13 +2,14 @@ import unittest
 
 
 class Tests(unittest.TestCase):
-    def _makeOne(self):
+    def _makeOne(self, *args, **kwargs):
         from dictknife.jsonknife._wrapped_exception import WrappedExceptionFactory
 
-        return WrappedExceptionFactory()
+        return WrappedExceptionFactory(*args, **kwargs)
 
     def test_it(self):
-        create_class = self._makeOne()
+        prefix = "Wrapped"
+        create_class = self._makeOne(prefix=prefix)
         try:
             raise KeyError("hmm")
         except KeyError as e:
@@ -16,6 +17,7 @@ class Tests(unittest.TestCase):
             self.assertIsInstance(e2, KeyError)
             self.assertEqual(e2.args, e.args)
 
+            self.assertEqual(e2.__class__.__name__, f"{prefix}KeyError")
             self.assertListEqual(e2.stack, ["<toplevel>"])
         else:
             self.fail("must be raised")
