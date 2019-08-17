@@ -4,6 +4,7 @@ from dictknife import Accessor
 from dictknife import operators
 from dictknife.langhelpers import as_jsonpointer, as_path_node
 
+from ._wrapped_exception import wrap_exception
 
 logger = logging.getLogger(__name__)
 
@@ -132,9 +133,10 @@ def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
 
 
 class StackedAccessor:
-    def __init__(self, resolver, accessor=Accessor()):
+    def __init__(self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception):
         self.stack = [resolver]
         self.accessor = accessor
+        self.wrap_exception = wrap_exception
 
     @property
     def resolver(self):
@@ -149,10 +151,7 @@ class StackedAccessor:
             where = None
             if len(self.stack) > 1:
                 where = self.stack[-2].name
-            exc = e.__class__("{} (where={})".format(e, where)).with_traceback(
-                e.__traceback__
-            )
-            exc.__dict__.update(e.__dict__)  # sync
+            exc = self.wrap_exception(e, where=where)
             raise exc from None
 
     def _access(self, subresolver, pointer):
