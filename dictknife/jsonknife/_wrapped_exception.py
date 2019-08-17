@@ -30,10 +30,11 @@ class WrappedExceptionFactory:
 class WrappedMixin:
     @reify
     def stack(self):
+        # This is just a list, but appended from inner to outer, on except-clause, usually.
         return []
 
     def __str__(self):
-        return f"{super().__str__()} (where={self.stack})"
+        return f"{super().__str__()} (where={tuple(reversed(self.stack))})"
 
 
 wrap_exception = WrappedExceptionFactory()
