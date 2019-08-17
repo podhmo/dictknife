@@ -46,7 +46,7 @@ class ExternalFileResolver(AccessingMixin):
     ):
         self.rawfilename = rawfilename or filename
         self.filename = os.path.normpath(os.path.abspath(str(filename)))
-        self.cache = cache or {}  # filename -> resolver
+        self.cache = {} if cache is None else cache  # filename -> resolver
         self.loader = loader or loading
         self.history = history or [ROOT]
         self.onload = onload
