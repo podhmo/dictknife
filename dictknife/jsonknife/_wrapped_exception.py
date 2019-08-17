@@ -15,7 +15,7 @@ class WrappedExceptionFactory:
         cls = self.classes.get(e.__class__)
         if cls is None:
             cls = type(
-                f"Wrapped{e.__class__.__name__}", (WrappedMixin, e.__class__), {}
+                f"{self.prefix}{e.__class__.__name__}", (WrappedMixin, e.__class__), {}
             )
             self.classes[e.__class__] = cls
 
@@ -37,4 +37,4 @@ class WrappedMixin:
         return f"{super().__str__()} (where={tuple(reversed(self.stack))})"
 
 
-wrap_exception = WrappedExceptionFactory()
+wrap_exception = WrappedExceptionFactory(prefix="Ex")
