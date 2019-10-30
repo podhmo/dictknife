@@ -1,29 +1,11 @@
-import re
-
 # if sys.version_info[:2] >= (3, 6):
 #     make_dict = dict
 # else:
 from collections import OrderedDict as make_dict  # noqa
 
-# for backword comaptibility
-from .cliutils import traceback_shortly  # noqa
-
-
-def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
-    return ignore_rx.sub("", name.replace("-", "_"))
-
-
-def titleize(name):
-    if not name:
-        return name
-    name = str(name)
-    return normalize("{}{}".format(name[0].upper(), name[1:]))
-
-
-def untitleize(name):
-    if not name:
-        return name
-    return "{}{}".format(name[0].lower(), name[1:])
+# for backword comaptibility (TODO: remove)
+from .cliutils import traceback_shortly  # noqa F401
+from .naming import normalize, titleize, untitleize  # noqa F401
 
 
 def pairsplit(s, sep):
