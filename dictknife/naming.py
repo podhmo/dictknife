@@ -10,9 +10,11 @@ def snakecase(
     rx0=re.compile(r"(.)([A-Z][a-z]+)"),
     rx1=re.compile(r"([a-z0-9])([A-Z])"),
     separator="_",
+    other="-",
 ):
     pattern = r"\1{}\2".format(separator)
-    return rx1.sub(pattern, rx0.sub(pattern, name)).lower()
+    replaced = rx1.sub(pattern, rx0.sub(pattern, name)).lower()
+    return replaced.replace(other, separator)
 
 
 def kebabcase(
@@ -20,9 +22,11 @@ def kebabcase(
     rx0=re.compile(r"(.)([A-Z][a-z]+)"),
     rx1=re.compile(r"([a-z0-9])([A-Z])"),
     separator="-",
+    other="_",
 ):
     pattern = r"\1{}\2".format(separator)
-    return rx1.sub(pattern, rx0.sub(pattern, name)).lower()
+    replaced = rx1.sub(pattern, rx0.sub(pattern, name)).lower()
+    return replaced.replace(other, separator)
 
 
 def camelcase(name):
