@@ -7,6 +7,7 @@ def normalize(name, ignore_rx=re.compile("[^0-9a-zA-Z_]+")):
 
 def snakecase(
     name,
+    *,
     rx0=re.compile(r"(.)([A-Z][a-z]+)"),
     rx1=re.compile(r"([a-z0-9])([A-Z])"),
     separator="_",
@@ -19,6 +20,7 @@ def snakecase(
 
 def kebabcase(
     name,
+    *,
     rx0=re.compile(r"(.)([A-Z][a-z]+)"),
     rx1=re.compile(r"([a-z0-9])([A-Z])"),
     separator="-",
@@ -29,8 +31,11 @@ def kebabcase(
     return replaced.replace(other, separator)
 
 
-def camelcase(name):
-    return untitleize(pascalcase(name))
+def camelcase(name, *, soft=True):
+    if soft and name[0].isupper():
+        return pascalcase(name)
+    else:
+        return untitleize(pascalcase(name))
 
 
 def pascalcase(name, rx=re.compile(r"[\-_ ]")):
