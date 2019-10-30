@@ -5,7 +5,7 @@ from functools import partial
 from dictknife import DictWalker
 from dictknife.accessing import Scope
 from dictknife.langhelpers import make_dict
-from dictknife.transform import normalize_dict
+from dictknife.transform import str_dict
 from dictknife.jsonknife import get_resolver
 from dictknife.swaggerknife.migration import Migration, is_empty_collection, is_empty
 
@@ -24,7 +24,7 @@ def transform(doc, *, sort_keys=False):
         if k in doc:
             r[k] = doc[k]
     if sort_keys:
-        r = normalize_dict(r)  # side effect
+        r = str_dict(r)  # side effect
     return r
 
 

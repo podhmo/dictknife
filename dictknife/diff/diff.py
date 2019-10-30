@@ -1,6 +1,6 @@
 import difflib
 from dictknife.deepequal import sort_flexibly
-from dictknife.transform import normalize_dict
+from dictknife.transform import str_dict
 
 
 def diff(
@@ -18,8 +18,8 @@ def diff(
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)
-        normalize_dict(d0)
-        normalize_dict(d1)
+        str_dict(d0)
+        str_dict(d1)
 
     # iterator?
     if hasattr(d0, "__next__"):

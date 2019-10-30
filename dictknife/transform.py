@@ -1,4 +1,6 @@
+from functools import partial
 from dictknife.langhelpers import as_jsonpointer as _as_jsonpointer
+from dictknife import naming
 
 
 def _make_key(k0, k1, *, sep="/"):
@@ -30,15 +32,23 @@ def rows(d, *, kname="name", vname="value"):
     return [{kname: k, vname: v} for k, v in d.items()]
 
 
-def normalize_dict(d):  # side effect!
+def update_keys(d, *, key, coerce=str):  # side effect!
     if hasattr(d, "keys"):
         for k, v in list(d.items()):
-            d[str(k)] = d.pop(k)
-            normalize_dict(v)
+            d[key(coerce(k))] = d.pop(k)
+            update_keys(v, key=key, coerce=coerce)
     elif isinstance(d, (list, tuple)):
         for x in d:
-            normalize_dict(x)
+            update_keys(x, key=key, coerce=coerce)
     return d
+
+
+str_dict = partial(update_keys, key=str)
+normalize_dict = partial(update_keys, key=naming.normalize)
+snakecase_dict = partial(update_keys, key=naming.snakecase)
+camelcase_dict = partial(update_keys, key=naming.camelcase)
+kebabcase_dict = partial(update_keys, key=naming.kebabcase)
+pascalcase_dict = partial(update_keys, key=naming.pascalcase)
 
 
 def only_num(d):

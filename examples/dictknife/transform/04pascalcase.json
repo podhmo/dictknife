@@ -1,0 +1,6 @@
+{
+  "PascalCase": "PascalCase",
+  "CamelCase": "camelCase",
+  "KebabCase": "kebab-case",
+  "SnakeCase": "snake_case"
+}
