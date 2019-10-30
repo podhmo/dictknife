@@ -14,7 +14,7 @@ except IOError:
 
 setup(
     name="dictknife",
-    version="0.11.1",
+    version=open(os.path.join(here, "VERSION")).read().strip(),
     description="utility set of handling dict",
     long_description=README + "\n\n" + CHANGES,
     classifiers=[

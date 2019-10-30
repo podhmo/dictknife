@@ -8,6 +8,22 @@ docs: runlib
 lint:
 	flake8 --show-source --ignore=E501,E121,W503 dictknife
 
+format:
+#	pip install -e .[dev]
+	black dictknife setup.py
+.PHONY: format
+
+build:
+#	pip install wheel
+	python setup.py bdist_wheel
+.PHONY: build
+
+upload:
+#	pip install twine
+	twine check dist/dictknife-$(shell cat VERSION)*
+	twine upload dist/dictknife-$(shell cat VERSION)*
+.PHONY: upload
+
 # integration tests (regression tests)
 WHERE ?= .
 run:
