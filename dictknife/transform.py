@@ -43,6 +43,7 @@ def update_keys(d, *, key, coerce=str):  # side effect!
     return d
 
 
+str_dict = partial(update_keys, key=str)
 normalize_dict = partial(update_keys, key=naming.normalize)
 snakecase_dict = partial(update_keys, key=naming.snakecase)
 camelcase_dict = partial(update_keys, key=naming.camelcase)
