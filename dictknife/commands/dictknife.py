@@ -283,7 +283,7 @@ def main():
         choices=["unicode", "url"],
     )
 
-    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
     subparsers.required = True
 
     # cat
