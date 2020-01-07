@@ -10,6 +10,7 @@ from oauth2client.clientsecrets import InvalidClientSecretsError
 from oauth2client.client import OAuth2Credentials
 from dictknife.langhelpers import reify
 from googleapiclient.discovery_cache.base import Cache
+
 # from googleapiclient.discovery_cache import LOGGER as noisy_logger
 # # supress stderr message of 'ImportError: file_cache is unavailable when using oauth2client >= 4.0.0 or google-auth' # noqa
 # noisy_logger.setLevel(logging.ERROR)  # noqa
@@ -26,8 +27,8 @@ DEFAULT_DISCOVERY_CACHE_PATH = "~/.config/dictknife/discovery.pickle"
 #     'https://www.googleapis.com/auth/drive.readonly'
 #     'https://www.googleapis.com/auth/spreadsheets'
 #     'https://www.googleapis.com/auth/spreadsheets.readonly'
-SCOPE = 'https://www.googleapis.com/auth/spreadsheets'
-SCOPE_READONLY = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+SCOPE = "https://www.googleapis.com/auth/spreadsheets"
+SCOPE_READONLY = "https://www.googleapis.com/auth/spreadsheets.readonly"
 
 
 def get_credentials(
@@ -52,7 +53,9 @@ def get_credentials(
         logger.info("credentials are invalid (or not found). %s", cache_path)
         logger.debug("see: %s", config_path)
         flow = client.flow_from_clientsecrets(config_path, scopes)
-        flags = tools.argparser.parse_args(["--logging_level=DEBUG", "--noauth_local_webserver"])
+        flags = tools.argparser.parse_args(
+            ["--logging_level=DEBUG", "--noauth_local_webserver"]
+        )
         credentials = tools.run_flow(flow, store, flags=flags)
     return credentials
 
@@ -66,21 +69,31 @@ def get_credentials_failback_webbrowser(
 ) -> OAuth2Credentials:
     if scopes is None:
         import webbrowser
+
         url = "https://developers.google.com/identity/protocols/googlescopes"
         print(
-            "please passing scopes: (e.g. 'https://www.googleapis.com/auth/spreadsheets.readonly')\nopening {}...".
-            format(url),
-            file=sys.stderr
+            "please passing scopes: (e.g. 'https://www.googleapis.com/auth/spreadsheets.readonly')\nopening {}...".format(
+                url
+            ),
+            file=sys.stderr,
         )
         webbrowser.open(url, new=1, autoraise=True)
         sys.exit(1)
     while True:
         try:
-            return get_credentials(config_path, scopes=scopes, cache_path=cache_path, logger=logger)
+            return get_credentials(
+                config_path, scopes=scopes, cache_path=cache_path, logger=logger
+            )
         except InvalidClientSecretsError:
             import webbrowser
+
             url = "https://console.cloud.google.com/apis/credentials"
-            print("please save credentials.json at {!r}.".format(config_path), file=sys.stderr)
+            print(
+                "please save credentials.json at {!r} (OAuth 2.0 client ID)".format(
+                    config_path
+                ),
+                file=sys.stderr,
+            )
             webbrowser.open(url, new=1, autoraise=True)
             input("saved? (if saved, please typing enter key)")
 
@@ -137,7 +150,7 @@ class Loader:
         need_save = self.cache.is_empty
         credentials = self.get_credentials(self.config_path, scopes=self.scopes)
         service = googleapiclient.discovery.build(
-            'sheets', 'v4', http=credentials.authorize(self.http), cache=self.cache
+            "sheets", "v4", http=credentials.authorize(self.http), cache=self.cache
         )
         if need_save:
             self._save_cache(self.cache)
@@ -157,13 +170,16 @@ class Loader:
                 return [
                     {
                         "title": sheet["properties"]["title"],
-                        **sheet["properties"]["gridProperties"]
-                    } for sheet in result.get("sheets") or []
+                        **sheet["properties"]["gridProperties"],
+                    }
+                    for sheet in result.get("sheets") or []
                 ]
 
-        result = resource.values().get(
-            spreadsheetId=guessed.spreadsheet_id, range=range_value
-        ).execute()
+        result = (
+            resource.values()
+            .get(spreadsheetId=guessed.spreadsheet_id, range=range_value)
+            .execute()
+        )
         values = result.get("values")
         if not with_header:
             return values
