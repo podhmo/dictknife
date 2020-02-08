@@ -148,7 +148,7 @@ def main():
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--debug", action="store_true")
 
-    subparsers = parser.add_subparsers(dest="subcommand")
+    subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
     subparsers.required = True
 
     # merge
