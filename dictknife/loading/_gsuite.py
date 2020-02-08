@@ -39,9 +39,7 @@ def get_credentials(
 ) -> Credentials:
     config_path = os.path.expanduser(config_path)
     if cache_path is None:
-        cache_path = os.path.join(
-            os.path.dirname(config_path), "google-token.json"
-        )
+        cache_path = os.path.join(os.path.dirname(config_path), "google-token.json")
     cache_path = os.path.expanduser(cache_path)
 
     os.makedirs(os.path.dirname(config_path), exist_ok=True)

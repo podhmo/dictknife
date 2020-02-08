@@ -18,6 +18,7 @@ def _curdir(here):
 class fixRelpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import fixpath
+
         return fixpath(*args, **kwargs)
 
     def test_it(self):
@@ -52,6 +53,7 @@ class fixRelpathTests(unittest.TestCase):
 class fixRefTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import fixref
+
         return fixref(*args, **kwargs)
 
     def test_it(self):
@@ -77,6 +79,7 @@ class fixRefTests(unittest.TestCase):
 class relRefTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import relref
+
         return relref(*args, **kwargs)
 
     def test_it(self):
@@ -100,6 +103,7 @@ class relRefTests(unittest.TestCase):
 class NormpathTests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.relpath import normpath
+
         return normpath(*args, **kwargs)
 
     def test_it(self):

@@ -4,10 +4,12 @@ import unittest
 class Tests(unittest.TestCase):
     def _callFUT(self, v, *args, **kwargs):
         from dictknife.guessing import guess
+
         return guess(v, *args, **kwargs)
 
     def test_nan(self):
         import math
+
         v = {"nan": "nan"}
         got = self._callFUT(v)
         self.assertTrue(math.isnan(got["nan"]))
@@ -15,31 +17,21 @@ class Tests(unittest.TestCase):
     def test_it(self):
         v = [
             {
-                "ints": [{
-                    "zero": "0",
-                    "nums": ["10", "-2000"]
-                }],
-                "floatnums": [{
-                    "full": "0.1",
-                    "mini": ".1",
-                    "epsilon": "5.551115123125783e-17"
-                }],
-                "infs": ["inf", "-inf"]
+                "ints": [{"zero": "0", "nums": ["10", "-2000"]}],
+                "floatnums": [
+                    {"full": "0.1", "mini": ".1", "epsilon": "5.551115123125783e-17"}
+                ],
+                "infs": ["inf", "-inf"],
             }
         ]
         got = self._callFUT(v)
         expected = [
             {
-                'floatnums': [{
-                    'full': 0.1,
-                    'mini': 0.1,
-                    'epsilon': 5.551115123125783e-17
-                }],
-                'ints': [{
-                    'nums': [10, -2000],
-                    'zero': 0
-                }],
-                'infs': [float('inf'), float('-inf')]
+                "floatnums": [
+                    {"full": 0.1, "mini": 0.1, "epsilon": 5.551115123125783e-17}
+                ],
+                "ints": [{"nums": [10, -2000], "zero": 0}],
+                "infs": [float("inf"), float("-inf")],
             }
         ]
 

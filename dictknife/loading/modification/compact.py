@@ -6,4 +6,6 @@ def setup(dispatcher):
     if is_used(dispatcher, __name__):
         return
     use(dispatcher, __name__)
-    dispatcher.dumper.fn_map["json"] = partial(dispatcher.dumper.fn_map["json"], indent=None)
+    dispatcher.dumper.fn_map["json"] = partial(
+        dispatcher.dumper.fn_map["json"], indent=None
+    )

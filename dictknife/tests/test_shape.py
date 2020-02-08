@@ -5,6 +5,7 @@ from collections import namedtuple
 class Tests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.shape import shape
+
         return shape(*args, **kwargs)
 
     def test_it(self):
@@ -13,182 +14,117 @@ class Tests(unittest.TestCase):
             C(input={}, output=[], squash=False, skiplist=False),
             C(input={"name": "foo"}, output=["name"], squash=False, skiplist=False),
             C(
-                input={"name": "foo",
-                       "skills": []},
+                input={"name": "foo", "skills": []},
                 output=["name", "skills"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input={"name": "foo",
-                       "skills": ["x"]},
+                input={"name": "foo", "skills": ["x"]},
                 output=["name", "skills", "skills/[]"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input={"name": "foo",
-                       "age": 10},
+                input={"name": "foo", "age": 10},
                 output=["age", "name"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input=[{
-                    "name": "foo",
-                    "age": 10
-                }, {
-                    "nickname": "BIGb",
-                    "name": "bar",
-                    "age": 10
-                }],
+                input=[
+                    {"name": "foo", "age": 10},
+                    {"nickname": "BIGb", "name": "bar", "age": 10},
+                ],
                 output=["[]", "[]/age", "[]/name", "?[]/nickname"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input=[[{
-                    "name": "foo",
-                    "age": 10
-                }, {
-                    "nickname": "BIGb",
-                    "name": "bar",
-                    "age": 10
-                }]],
+                input=[
+                    [
+                        {"name": "foo", "age": 10},
+                        {"nickname": "BIGb", "name": "bar", "age": 10},
+                    ]
+                ],
                 output=["[]", "[]/[]", "[]/[]/age", "[]/[]/name", "?[]/[]/nickname"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input={"person": {
-                    "name": "foo",
-                    "age": 10
-                }},
+                input={"person": {"name": "foo", "age": 10}},
                 output=["person", "person/age", "person/name"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
-                input=[{
-                    "person": {
-                        "name": "foo",
-                        "age": 10
-                    }
-                }],
+                input=[{"person": {"name": "foo", "age": 10}}],
                 output=["[]", "[]/person", "[]/person/age", "[]/person/name"],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
                 input=[
-                    {
-                        "person": {
-                            "name": "foo",
-                            "age": 10
-                        }
-                    }, {
-                        "person": {
-                            "nickname": "BIGb",
-                            "name": "bar",
-                            "age": 10
-                        }
-                    }
+                    {"person": {"name": "foo", "age": 10}},
+                    {"person": {"nickname": "BIGb", "name": "bar", "age": 10}},
                 ],
                 output=[
-                    "[]", "[]/person", "[]/person/age", "[]/person/name", "?[]/person/nickname"
+                    "[]",
+                    "[]/person",
+                    "[]/person/age",
+                    "[]/person/name",
+                    "?[]/person/nickname",
                 ],
                 squash=False,
-                skiplist=False
+                skiplist=False,
             ),
             C(
                 input=[
-                    {
-                        "person": {
-                            "name": "foo",
-                            "age": 10
-                        }
-                    }, {
-                        "person": {
-                            "nickname": "BIGb",
-                            "name": "bar",
-                            "age": 10
-                        }
-                    }
+                    {"person": {"name": "foo", "age": 10}},
+                    {"person": {"nickname": "BIGb", "name": "bar", "age": 10}},
                 ],
                 output=["person", "person/age", "person/name", "?person/nickname"],
                 squash=True,
-                skiplist=False
+                skiplist=False,
             ),
             C(
                 input=[
-                    {
-                        "person": {
-                            "name": "foo",
-                            "age": 10,
-                            "skills": [],
-                        }
-                    }, {
-                        "person": {
-                            "name": "bar",
-                            "age": 10,
-                            "skills": ["x"],
-                        }
-                    }
+                    {"person": {"name": "foo", "age": 10, "skills": [],}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
                 ],
                 output=[
-                    "person", "person/age", "person/name", "person/skills", "?person/skills/[]"
+                    "person",
+                    "person/age",
+                    "person/name",
+                    "person/skills",
+                    "?person/skills/[]",
                 ],
                 squash=True,
-                skiplist=False
+                skiplist=False,
             ),
             C(
                 input=[
-                    {
-                        "person": {
-                            "name": "foo",
-                            "age": 10,
-                        }
-                    }, {
-                        "person": {
-                            "name": "bar",
-                            "age": 10,
-                            "skills": ["x"],
-                        }
-                    }
+                    {"person": {"name": "foo", "age": 10,}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
                 ],
                 output=[
                     "person",
                     "person/age",
                     "person/name",
                     "?person/skills",
-                    "person/skills/[]"  # xxx
+                    "person/skills/[]",  # xxx
                 ],
                 squash=True,
-                skiplist=False
+                skiplist=False,
             ),
             C(
                 input=[
-                    {
-                        "person": {
-                            "name": "foo",
-                            "age": 10,
-                        }
-                    }, {
-                        "person": {
-                            "name": "bar",
-                            "age": 10,
-                            "skills": ["x"],
-                        }
-                    }
+                    {"person": {"name": "foo", "age": 10,}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
                 ],
-                output=[
-                    "person",
-                    "person/age",
-                    "person/name",
-                    "?person/skills",
-                ],
+                output=["person", "person/age", "person/name", "?person/skills",],
                 squash=True,
-                skiplist=True
+                skiplist=True,
             ),
         ]
         for c in candidates:

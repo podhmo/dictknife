@@ -5,6 +5,7 @@ from collections import namedtuple
 class OperatorsTests(unittest.TestCase):
     def _callFUT(self, op, value):
         from dictknife.operators import apply
+
         return apply(op, value)
 
     def test_it(self):
@@ -24,6 +25,7 @@ class OperatorsTests(unittest.TestCase):
 
     def test_and(self):
         from ..operators import And
+
         C = namedtuple("C", "value, expected")
 
         candidates = [
@@ -40,6 +42,7 @@ class OperatorsTests(unittest.TestCase):
 
     def test_or(self):
         from ..operators import Or
+
         C = namedtuple("C", "value, expected")
 
         candidates = [
@@ -56,6 +59,7 @@ class OperatorsTests(unittest.TestCase):
 
     def test_and2(self):
         from ..operators import And, Not
+
         C = namedtuple("C", "value, expected")
 
         candidates = [

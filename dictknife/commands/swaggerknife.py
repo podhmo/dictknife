@@ -117,7 +117,11 @@ def merge(
         wd["type"] = "object"
         wd["properties"] = make_dict()
         for name in r.get(wrap_section) or {}:
-            wd["properties"][name] = {"$ref": "#/{wrap_section}/{name}".format(wrap_section=wrap_section, name=name)}
+            wd["properties"][name] = {
+                "$ref": "#/{wrap_section}/{name}".format(
+                    wrap_section=wrap_section, name=name
+                )
+            }
         r[wrap_section][wrap] = wd
     loading.dumpfile(r, dst)
 

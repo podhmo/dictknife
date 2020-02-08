@@ -4,6 +4,7 @@ import unittest
 class Tests(unittest.TestCase):
     def _callFUT(self, *args, **kwargs):
         from dictknife.jsonknife.accessor import access_by_json_pointer
+
         return access_by_json_pointer(*args, **kwargs)
 
     def test_it(self):
@@ -16,9 +17,9 @@ class Tests(unittest.TestCase):
             "e^f": 3,
             "g|h": 4,
             "i\\j": 5,
-            "k\"l": 6,
+            'k"l': 6,
             " ": 7,
-            "m~n": 8
+            "m~n": 8,
         }
 
         candidates = [
@@ -31,7 +32,7 @@ class Tests(unittest.TestCase):
             ("/e^f", 3),
             ("/g|h", 4),
             ("/i\\j", 5),
-            ("/k\"l", 6),
+            ('/k"l', 6),
             ("/ ", 7),
             ("/m~0n", 8),
         ]

@@ -5,6 +5,7 @@ from io import StringIO
 
 def pp(d, out=None):
     import json
+
     out = out or sys.stdout
     try:
         json.dump(d, out, sort_keys=True, indent=2, ensure_ascii=False, default=str)

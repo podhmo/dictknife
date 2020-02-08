@@ -4,11 +4,13 @@ import unittest
 class Tests(unittest.TestCase):
     def _getTarget(self):
         from dictknife import loading
+
         return loading.dumpfile
 
     def _callFUT(self, d, *, format):
         from contextlib import redirect_stdout
         from io import StringIO
+
         o = StringIO()
         with redirect_stdout(o):
             self._getTarget()(d, format=format)

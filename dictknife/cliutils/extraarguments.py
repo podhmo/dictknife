@@ -3,7 +3,9 @@ import argparse
 
 
 class ExtraArgumentsParsers:
-    def __init__(self, parser, dest, *, prefix="extra", parser_factory=argparse.ArgumentParser):
+    def __init__(
+        self, parser, dest, *, prefix="extra", parser_factory=argparse.ArgumentParser
+    ):
         self.parser = parser
         self.dest = dest
 
@@ -22,7 +24,9 @@ class ExtraArgumentsParsers:
         return p
 
     def as_epilog(self):
-        r = ["{self.prefix} arguments: (with --{self.prefix}<option>)".format(self=self)]
+        r = [
+            "{self.prefix} arguments: (with --{self.prefix}<option>)".format(self=self)
+        ]
 
         formatter = argparse.HelpFormatter("")
         for name, parser in self.mapping.items():
@@ -74,5 +78,5 @@ class ExtraArgumentsParsers:
             "extra arguments: {rest!r} are ignored (option: {self.dest})".format(
                 rest=rest, self=self
             ),
-            file=sys.stderr
+            file=sys.stderr,
         )

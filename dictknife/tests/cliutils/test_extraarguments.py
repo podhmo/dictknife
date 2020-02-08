@@ -7,10 +7,12 @@ class Tests(unittest.TestCase):
 
     def _getTarget(self):
         from dictknife.cliutils.extraarguments import ExtraArgumentsParsers
+
         return ExtraArgumentsParsers
 
     def _makeOne(self):
         from argparse import ArgumentParser
+
         parser = ArgumentParser("cmd")
         target = self._getTarget()(parser, "--format", prefix="extra")
         sparser0 = target.add_parser("json")

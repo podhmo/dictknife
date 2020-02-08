@@ -10,7 +10,9 @@ _cls_registry = {}
 
 
 def setup_extra_parser(parser):
-    parser.add_argument("--fullscan", action="store_true", help="full scan for guessing headers")
+    parser.add_argument(
+        "--fullscan", action="store_true", help="full scan for guessing headers"
+    )
     return parser
 
 
@@ -27,7 +29,9 @@ def load(
     k = errors
     DictReader = _registry.get(k)
     if DictReader is None:
-        DictReader = _registry[k] = (create_reader_class or _create_reader_class)(m.csv, k)
+        DictReader = _registry[k] = (create_reader_class or _create_reader_class)(
+            m.csv, k
+        )
     reader = DictReader(fp, delimiter=delimiter)
     return reader
 
@@ -97,7 +101,9 @@ def _create_reader_class(csv, errors=None, retry=10):
                 d = original_next(self)
                 return guess(d, mutable=True)
             except csv.Error as e:
-                logger.info("line=%d errors is occured, skipping err=%r", self.line_num, e)
+                logger.info(
+                    "line=%d errors is occured, skipping err=%r", self.line_num, e
+                )
                 if retry <= 0:
                     raise
                 return self.__next__(retry=retry - 1)

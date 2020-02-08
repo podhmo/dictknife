@@ -7,6 +7,7 @@ class DiffRowsTests(unittest.TestCase):
 
     def _callFUT(self, d0, right):
         from dictknife.diff import diff_rows
+
         return diff_rows(d0, right)
 
     def test_primitives(self):
@@ -57,11 +58,9 @@ class DiffRowsTests(unittest.TestCase):
                             ("v1", 0),
                             ("v2", 1),
                             ("vs", [0, 1, 2, 3]),
-                            ("vs2", [{
-                                "z": "foo"
-                            }]),
+                            ("vs2", [{"z": "foo"}]),
                         ]
-                    )
+                    ),
                 ),
             ]
         )
@@ -76,11 +75,9 @@ class DiffRowsTests(unittest.TestCase):
                             ("v1", 10),
                             ("v2", -1),
                             ("vs", [0, 2, 2, 2]),
-                            ("vs2", [{
-                                "z": "bar"
-                            }]),
+                            ("vs2", [{"z": "bar"}]),
                         ]
-                    )
+                    ),
                 ),
             ]
         )

@@ -8,6 +8,7 @@ class GuessTests(unittest.TestCase):
 
     def _callFUT(self, *args, **kwargs):
         from dictknife.loading.spreadsheet import guess
+
         return guess(*args, **kwargs)
 
     def test_it(self):

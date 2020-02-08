@@ -14,8 +14,10 @@ def fixpath(relpath, *, where, to):
     'foo/a.html'
     """
     return os.path.relpath(
-        os.path.abspath(os.path.normpath(os.path.join(os.path.dirname(where), relpath))),
-        start=os.path.dirname(to)
+        os.path.abspath(
+            os.path.normpath(os.path.join(os.path.dirname(where), relpath))
+        ),
+        start=os.path.dirname(to),
     )
 
 

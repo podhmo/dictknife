@@ -13,54 +13,32 @@ class ref(object):
 class DeepEqualTests(unittest.TestCase):
     def _callFUT(self, left, right, normalize):
         from dictknife import deepequal
+
         return deepequal(left, right, normalize=normalize)
 
     def test_it(self):
         d0 = {
             "a": ref(1),
-            "b": {
-                "x": {
-                    "i": ref(2)
-                },
-                "y": {
-                    "j": ref(3)
-                }
-            },
+            "b": {"x": {"i": ref(2)}, "y": {"j": ref(3)}},
         }
         d1 = {
             "a": ref(1),
-            "b": {
-                "x": {
-                    "i": ref(2)
-                },
-                "y": {
-                    "j": ref(3)
-                }
-            },
+            "b": {"x": {"i": ref(2)}, "y": {"j": ref(3)}},
         }
         self.assertEqual(ref(1), ref(1), msg="prepare")
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it2(self):
-        d0 = {
-            "color": {
-                "type": "string",
-                "enum": ["C", "M", "Y", "K"],
-            }
-        }
-        d1 = {
-            "color": {
-                "type": "string",
-                "enum": ["K", "Y", "M", "C"],
-            }
-        }
+        d0 = {"color": {"type": "string", "enum": ["C", "M", "Y", "K"],}}
+        d1 = {"color": {"type": "string", "enum": ["K", "Y", "M", "C"],}}
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it3(self):
         from dictknife.langhelpers import make_dict
-        d0 = make_dict([('type', 'string'), ('enum', ['C', 'M', 'Y', 'K'])])
-        d1 = make_dict([('type', 'string'), ('enum', ['K', 'Y', 'M', 'C'])])
+
+        d0 = make_dict([("type", "string"), ("enum", ["C", "M", "Y", "K"])])
+        d1 = make_dict([("type", "string"), ("enum", ["K", "Y", "M", "C"])])
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
@@ -72,44 +50,12 @@ class DeepEqualTests(unittest.TestCase):
 
     def test_it5(self):
         d0 = [
-            {
-                "xs": [{
-                    "name": "i"
-                }, {
-                    "name": "j"
-                }, {
-                    "name": "k"
-                }]
-            },
-            {
-                "xs": [{
-                    "name": "x"
-                }, {
-                    "name": "y"
-                }, {
-                    "name": "z"
-                }]
-            },
+            {"xs": [{"name": "i"}, {"name": "j"}, {"name": "k"}]},
+            {"xs": [{"name": "x"}, {"name": "y"}, {"name": "z"}]},
         ]
         d1 = [
-            {
-                "xs": [{
-                    "name": "y"
-                }, {
-                    "name": "x"
-                }, {
-                    "name": "z"
-                }]
-            },
-            {
-                "xs": [{
-                    "name": "k"
-                }, {
-                    "name": "j"
-                }, {
-                    "name": "i"
-                }]
-            },
+            {"xs": [{"name": "y"}, {"name": "x"}, {"name": "z"}]},
+            {"xs": [{"name": "k"}, {"name": "j"}, {"name": "i"}]},
         ]
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
