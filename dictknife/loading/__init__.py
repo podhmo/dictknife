@@ -54,7 +54,11 @@ class Loader:
             opener = opener or self.opener_map.get(format) or open
             with opener(filename, encoding=encoding, errors=errors) as rf:
                 r = self.load(rf, format=format, errors=errors)
-                if not hasattr(r, "keys") and hasattr(r, "__iter__"):
+                if (
+                    not hasattr(r, "keys")
+                    and hasattr(r, "__iter__")
+                    and not isinstance(r, (str, bytes))
+                ):
                     r = list(r)
                 return r
 
