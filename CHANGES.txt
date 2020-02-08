@@ -1,3 +1,8 @@
+0.13.0
+
+- loading, see envvar (DICTKNIFE_LOAD_FORMAT, DICTKNIFE_DUMP_FORMAT)
+- omit oauth2client dependency, if spreadsheet's requires
+
 0.12.0
 
 - add dictknife.naming
