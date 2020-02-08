@@ -41,7 +41,7 @@ class Tests(unittest.TestCase):
         actual = self._callFUT(defs)
         expected = {
             "definitions": {
-                "foo": {"type": "string",},
+                "foo": {"type": "string"},
                 "my": {
                     "type": "object",
                     "properties": {

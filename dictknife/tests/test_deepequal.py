@@ -29,8 +29,8 @@ class DeepEqualTests(unittest.TestCase):
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
     def test_it2(self):
-        d0 = {"color": {"type": "string", "enum": ["C", "M", "Y", "K"],}}
-        d1 = {"color": {"type": "string", "enum": ["K", "Y", "M", "C"],}}
+        d0 = {"color": {"type": "string", "enum": ["C", "M", "Y", "K"]}}
+        d1 = {"color": {"type": "string", "enum": ["K", "Y", "M", "C"]}}
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 

@@ -21,19 +21,19 @@ class TestDeepMerge(unittest.TestCase):
     def test_it__override(self):
         d0 = {
             "name": "foo",
-            "object": {"x": 1, "z": 1,},
+            "object": {"x": 1, "z": 1},
             "children": [1],
         }
         d1 = {
             "name": "bar",
-            "object": {"y": 2, "z": 3,},
+            "object": {"y": 2, "z": 3},
             "children": [1, 2, 3],
             "a": {"b": {"c": "d"}},
         }
         actual = self._callFUT(d0, d1, override=True)
         expected = {
             "name": "bar",
-            "object": {"x": 1, "y": 2, "z": 3,},
+            "object": {"x": 1, "y": 2, "z": 3},
             "children": [1, 2, 3],
             "a": {"b": {"c": "d"}},
         }

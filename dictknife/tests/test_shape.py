@@ -89,8 +89,8 @@ class Tests(unittest.TestCase):
             ),
             C(
                 input=[
-                    {"person": {"name": "foo", "age": 10, "skills": [],}},
-                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
+                    {"person": {"name": "foo", "age": 10, "skills": []}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"]}},
                 ],
                 output=[
                     "person",
@@ -104,8 +104,8 @@ class Tests(unittest.TestCase):
             ),
             C(
                 input=[
-                    {"person": {"name": "foo", "age": 10,}},
-                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
+                    {"person": {"name": "foo", "age": 10}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"]}},
                 ],
                 output=[
                     "person",
@@ -119,10 +119,10 @@ class Tests(unittest.TestCase):
             ),
             C(
                 input=[
-                    {"person": {"name": "foo", "age": 10,}},
-                    {"person": {"name": "bar", "age": 10, "skills": ["x"],}},
+                    {"person": {"name": "foo", "age": 10}},
+                    {"person": {"name": "bar", "age": 10, "skills": ["x"]}},
                 ],
-                output=["person", "person/age", "person/name", "?person/skills",],
+                output=["person", "person/age", "person/name", "?person/skills"],
                 squash=True,
                 skiplist=True,
             ),
