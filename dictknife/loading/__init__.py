@@ -32,6 +32,8 @@ class Loader:
         return load(StringIO(s), *args, **kwargs)
 
     def load(self, fp, format=None, errors=None):
+        format = os.environ.get("DICTKNIFE_LOAD_FORMAT")
+
         if format is not None:
             load = self.fn_map[format]
         else:
@@ -66,6 +68,8 @@ class Dumper:
         return fp.getvalue()
 
     def dump(self, d, fp, *, format=None, sort_keys=False, extra=None):
+        format = os.environ.get("DICTKNIFE_DUMP_FORMAT")
+
         if format is not None:
             dumper = self.fn_map[format]
         else:
