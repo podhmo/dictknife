@@ -10,5 +10,9 @@ def traceback_shortly(debug):
         if debug:
             raise
         else:
-            print("\x1b[33m\x1b[1m{e.__class__.__name__}: {e}\x1b[0m".format(e=e, file=sys.stderr))
+            print(
+                "\x1b[33m\x1b[1m{e.__class__.__name__}: {e}\x1b[0m".format(
+                    e=e, file=sys.stderr
+                )
+            )
             sys.exit(1)

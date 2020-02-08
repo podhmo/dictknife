@@ -4,6 +4,7 @@ import unittest
 class Tests(unittest.TestCase):
     def _callFUT(self, d, q):
         from dictknife.jsonknife.merge import merge
+
         return merge(d, q)
 
     def test_empty(self):
@@ -19,31 +20,24 @@ class Tests(unittest.TestCase):
 
         d = {
             "title": "Goodbye!",
-            "author": {
-                "givenName": "John",
-                "familyName": "Doe"
-            },
+            "author": {"givenName": "John", "familyName": "Doe"},
             "tags": ["example", "sample"],
-            "content": "This will be unchanged"
+            "content": "This will be unchanged",
         }
 
         q = {
             "title": "Hello!",
             "phoneNumber": "+01-123-456-7890",
-            "author": {
-                "familyName": None
-            },
-            "tags": ["example"]
+            "author": {"familyName": None},
+            "tags": ["example"],
         }
 
         expected = {
             "title": "Hello!",
-            "author": {
-                "givenName": "John"
-            },
+            "author": {"givenName": "John"},
             "tags": ["example"],
             "content": "This will be unchanged",
-            "phoneNumber": "+01-123-456-7890"
+            "phoneNumber": "+01-123-456-7890",
         }
 
         actual = self._callFUT(d, q)

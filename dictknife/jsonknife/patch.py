@@ -1,4 +1,5 @@
 from collections import namedtuple
+
 diff = namedtuple("diff", "op, value, x_from, x_to")
 
 
@@ -46,7 +47,9 @@ def _merge(r):
         for k, v in r.items():
             prefix = str(k).replace("~", "~0").replace("/", "~1")
             for sv in _merge(v):
-                sv["path"] = "/{prefix}/{subpath}".format(prefix=prefix, subpath=sv['path'].lstrip('/')).rstrip("/")
+                sv["path"] = "/{prefix}/{subpath}".format(
+                    prefix=prefix, subpath=sv["path"].lstrip("/")
+                ).rstrip("/")
                 yield sv
 
 

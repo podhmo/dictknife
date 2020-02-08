@@ -4,6 +4,7 @@ import unittest
 class IteratorTests(unittest.TestCase):
     def _getTargetClass(self):
         from dictknife import DictWalker
+
         return DictWalker
 
     def _makeOne(self, *args, **kwargs):
@@ -11,6 +12,7 @@ class IteratorTests(unittest.TestCase):
 
     def test_rec(self):
         from ..operators import ANY
+
         s = []
 
         d = {"a": {"b": {"a": {"b": {"a": {"b": 10}}}}}}
@@ -23,9 +25,9 @@ class IteratorTests(unittest.TestCase):
                     s.append(value)
 
         expected = [
-            {'b': {'a': {'b': {'a': {'b': 10}}}}},
-            {'b': {'a': {'b': 10}}},
-            {'b': 10}
+            {"b": {"a": {"b": {"a": {"b": 10}}}}},
+            {"b": {"a": {"b": 10}}},
+            {"b": 10},
         ]
 
         self.assertEqual(s, expected)
