@@ -35,11 +35,18 @@ class Loader:
         if format is not None:
             load = self.fn_map[format]
         else:
-            fname = getattr(fp, "name", "(unknown)")
-            load = self.dispatcher.dispatch(fname, self.fn_map)
+            format = os.environ.get("DICTKNIFE_LOAD_FORMAT")
+            if format is not None:
+                load = self.fn_map[format]
+            else:
+                fname = getattr(fp, "name", "(unknown)")
+                load = self.dispatcher.dispatch(fname, self.fn_map)
+
         return load(fp, loader=self, errors=errors)
 
-    def loadfile(self, filename=None, format=None, opener=None, encoding=None, errors=None):
+    def loadfile(
+        self, filename=None, format=None, opener=None, encoding=None, errors=None
+    ):
         """load file or stdin"""
         if filename is None:
             return self.load(sys.stdin, format=format)
@@ -69,28 +76,50 @@ class Dumper:
         if format is not None:
             dumper = self.fn_map[format]
         else:
-            fname = getattr(fp, "name", "(unknown)")
-            dumper = self.dispatcher.dispatch(fname, self.fn_map)
+            format = os.environ.get("DICTKNIFE_DUMP_FORMAT")
+            if format is not None:
+                dumper = self.fn_map[format]
+            else:
+                fname = getattr(fp, "name", "(unknown)")
+                dumper = self.dispatcher.dispatch(fname, self.fn_map)
         extra = extra or {}
         return dumper(d, fp, sort_keys=sort_keys, **extra)
 
-    def dumpfile(self, d, filename=None, *, format=None, sort_keys=False, extra=None, _retry=False):
+    def dumpfile(
+        self,
+        d,
+        filename=None,
+        *,
+        format=None,
+        sort_keys=False,
+        extra=None,
+        _retry=False
+    ):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator
             d = list(d)
 
         if filename is None:
-            return self.dump(d, sys.stdout, format=format, sort_keys=sort_keys, extra=extra)
+            return self.dump(
+                d, sys.stdout, format=format, sort_keys=sort_keys, extra=extra
+            )
         else:
             try:
                 with open(filename, "w") as wf:
-                    return self.dump(d, wf, format=format, sort_keys=sort_keys, extra=extra)
+                    return self.dump(
+                        d, wf, format=format, sort_keys=sort_keys, extra=extra
+                    )
             except FileNotFoundError:
                 if _retry:
                     raise
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 return self.dumpfile(
-                    d, filename, format=format, sort_keys=sort_keys, extra=extra, _retry=True
+                    d,
+                    filename,
+                    format=format,
+                    sort_keys=sort_keys,
+                    extra=extra,
+                    _retry=True,
                 )
 
 
@@ -121,14 +150,16 @@ class Dispatcher:
 dispatcher = Dispatcher()
 dispatcher.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
 dispatcher.add_format("json", json.load, json.dump, exts=(".json", ".js"))
-dispatcher.add_format("toml", toml.load, toml.dump, exts=(".toml", ))
-dispatcher.add_format("csv", csv.load, csv.dump, exts=(".csv", ))
-dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv", ))
+dispatcher.add_format("toml", toml.load, toml.dump, exts=(".toml",))
+dispatcher.add_format("csv", csv.load, csv.dump, exts=(".csv",))
+dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv",))
 dispatcher.add_format("raw", raw.load, raw.dump, exts=[])
 dispatcher.add_format("env", env.load, None, exts=(".env", ".environ"))
 dispatcher.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
 dispatcher.add_format("markdown", md.load, md.dump, exts=[])
-dispatcher.add_format("spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open)
+dispatcher.add_format(
+    "spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open
+)
 dispatcher.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 # short cuts
