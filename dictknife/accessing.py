@@ -159,7 +159,7 @@ class MutableModifier:
 
 
 def dictmap(fn, x, *, mutable=False, with_key=False):
-    modifier = MutableModifier() if mutable else ImmutableModifier()
+    modifier = get_modifier(mutable=mutable)
     if with_key:
         modify_dict = modifier.modify_dict_with_keys
     else:
