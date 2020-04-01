@@ -137,6 +137,8 @@ class Dispatcher:
         self.exts_matching = {}
 
     def guess_format(self, filename, *, default=unknown):
+        if filename is None:
+            return default
         _, ext = os.path.splitext(filename)
         return self.exts_matching.get(ext) or default
 
