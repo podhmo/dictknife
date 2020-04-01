@@ -289,25 +289,37 @@ def main():
 
     formats = loading.get_formats()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=type(
+            "_HelpFormatter",
+            (argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter),
+            {},
+        )
+    )
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
         "--log",
         choices=list(logging._nameToLevel.keys()),
         default="INFO",
         dest="log_level",
+        help="-",
     )
-    parser.add_argument("-q", "--quiet", action="store_true")
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("-q", "--quiet", action="store_true", help="-")
+    parser.add_argument("--debug", action="store_true", help="-")
 
     # modification
-    parser.add_argument("--compact", action="store_true", dest="modification_compact")
-    parser.add_argument("--flatten", action="store_true", dest="modification_flatten")
+    parser.add_argument(
+        "--compact", action="store_true", dest="modification_compact", help="-"
+    )
+    parser.add_argument(
+        "--flatten", action="store_true", dest="modification_flatten", help="-"
+    )
     parser.add_argument(
         "--unescape",
         default=None,
         dest="modification_unescape",
         choices=["unicode", "url"],
+        help="-",
     )
 
     subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
@@ -315,19 +327,25 @@ def main():
 
     # cat
     fn = cat
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin])
-    sparser.add_argument("--slurp", action="store_true")
+    sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
+    sparser.add_argument("--slurp", action="store_true", help="-")
 
-    sparser.add_argument("--size", type=int, default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--size", type=int, default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
     sparser.add_argument(
-        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None,
     )
     sparser.add_argument(
         "--errors",
@@ -343,28 +361,35 @@ def main():
         ],
         help="see pydoc codecs.Codec",
     )
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
     sparser.add_argument(
         "--merge-method",
         choices=["addtoset", "append", "merge", "replace"],
         default="addtoset",
+        help="-",
     )
 
     # concat (deprecated)
     fn = concat
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin])
-    sparser.add_argument("--slurp", action="store_true")
+    sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
+    sparser.add_argument("--slurp", action="store_true", help="-")
 
-    sparser.add_argument("--size", type=int, default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--size", type=int, default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
     sparser.add_argument(
-        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None,
     )
     sparser.add_argument(
         "--errors",
@@ -380,16 +405,19 @@ def main():
         ],
         help="see pydoc codecs.Codec",
     )
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
     sparser.add_argument(
         "--merge-method",
         choices=["addtoset", "append", "merge", "replace"],
         default="addtoset",
+        help="-",
     )
 
     # transform
     fn = transform
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
 
     def print_help(*, file=None, self=sparser):
         if file is None:
@@ -411,74 +439,99 @@ def main():
 
     sparser.print_help = print_help
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--config", default="{}")
-    sparser.add_argument("--config-file", default=None)
-    sparser.add_argument("--code", default=None)
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--config", default="{}", help="-")
+    sparser.add_argument("--config-file", default=None, help="-")
+    sparser.add_argument("--code", default=None, help="-")
     sparser.add_argument(
-        "--fn", "--function", default=[], action="append", dest="functions"
+        "--fn", "--function", default=[], action="append", dest="functions", help="-"
     )
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
 
     # diff
     fn = diff
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--normalize", action="store_true")
-    sparser.add_argument("--verbose", action="store_true")
-    sparser.add_argument("left")
-    sparser.add_argument("right")
-    sparser.add_argument("--n", default=3, type=int)
-    sparser.add_argument("--skip-empty", action="store_true")
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("--normalize", action="store_true", help="-")
+    sparser.add_argument("--verbose", action="store_true", help="-")
+    sparser.add_argument("left", help="-")
+    sparser.add_argument("right", help="-")
+    sparser.add_argument("--n", default=3, type=int, help="-")
+    sparser.add_argument("--skip-empty", action="store_true", help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
     sparser.add_argument(
         "-o",
         "--output-format",
         choices=["diff", "dict", "md", "tsv", "jsonpatch"],
         default="diff",
+        help="-",
     )
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
 
     # shape
     fn = shape
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin])
-    sparser.add_argument("--squash", action="store_true")
-    sparser.add_argument("--skiplist", action="store_true")
-    sparser.add_argument("--full", action="store_true")
-    sparser.add_argument("--with-type", action="store_true")
-    sparser.add_argument("--with-example", action="store_true")
-    sparser.add_argument("--separator", default="/")
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
+    sparser.add_argument("--squash", action="store_true", help="-")
+    sparser.add_argument("--skiplist", action="store_true", help="-")
+    sparser.add_argument("--full", action="store_true", help="-")
+    sparser.add_argument("--with-type", action="store_true", help="-")
+    sparser.add_argument("--with-example", action="store_true", help="-")
+    sparser.add_argument("--separator", default="/", help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
 
     # shrink
     fn = shrink
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin])
-    sparser.add_argument("--max-length-of-string", type=int, default=100)
-    sparser.add_argument("--max-length-of-list", type=int, default=3)
-    sparser.add_argument("--cont-suffix", default="...")
-    sparser.add_argument("--with-tail", action="store_true")
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
+    sparser.add_argument("--max-length-of-string", type=int, default=100, help="-")
+    sparser.add_argument("--max-length-of-list", type=int, default=3, help="-")
+    sparser.add_argument("--cont-suffix", default="...", help="-")
+    sparser.add_argument("--with-tail", action="store_true", help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
 
     # mkdict
     fn = mkdict
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     apply_rest_arguments_as_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--squash", action="store_true")
-    sparser.add_argument("-o", "--output-format", default="json", choices=formats)
-    sparser.add_argument("--separator", default="/")
-    sparser.add_argument("--delimiter", default=";")
-    sparser.add_argument("-S", "--sort-keys", action="store_true")
+    sparser.add_argument("--squash", action="store_true", help="-")
+    sparser.add_argument(
+        "-o", "--output-format", default="json", choices=formats, help="-"
+    )
+    sparser.add_argument("--separator", default="/", help="-")
+    sparser.add_argument("--delimiter", default=";", help="-")
+    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
 
     args = parser.parse_args()
     params = vars(args)
