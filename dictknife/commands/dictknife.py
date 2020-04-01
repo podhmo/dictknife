@@ -439,7 +439,7 @@ def main():
 
     sparser.print_help = print_help
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("src", nargs="?", help="-")
     sparser.add_argument("--dst", default=None, help="-")
     sparser.add_argument("--config", default="{}", help="-")
     sparser.add_argument("--config-file", default=None, help="-")
