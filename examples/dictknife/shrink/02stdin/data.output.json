@@ -1,0 +1,15 @@
+{
+  "long_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ...",
+  "name": "foo",
+  "values": [
+    {
+      "v": 0
+    },
+    {
+      "v": 1
+    },
+    {
+      "v": 2
+    }
+  ]
+}

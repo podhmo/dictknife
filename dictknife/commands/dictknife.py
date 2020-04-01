@@ -230,7 +230,7 @@ def shrink(
     for f in files:
         with _open(f) as rf:
             d = loading.load(rf, format=input_format)
-            format = output_format or loading.guess_format(f)
+            format = output_format or input_format or loading.guess_format(f)
             r = shrink(
                 d,
                 max_length_of_list=max_length_of_list,
