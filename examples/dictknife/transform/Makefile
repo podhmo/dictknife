@@ -8,6 +8,7 @@ TEE ?= 2>&1 >
 	dictknife transform $(shell echo $@*/)$(TARGET) --fn flatten -o csv ${TEE} $(shell echo $@*/)person.flatten.csv
 	dictknife transform $(shell echo $@*/)$(TARGET) --fn flatten -o md ${TEE} $(shell echo $@*/)person.flatten.md
 
+
 # mixcase
 01: TARGET ?= input.json
 01:
@@ -22,7 +23,8 @@ TEE ?= 2>&1 >
 	dictknife transform $(shell echo $@*/)$(TARGET) --fn unflatten -o json ${TEE} $(shell echo $@*/)person.flatten.unflatten.json
 	dictknife diff $(shell echo 00*/)person.json  $(shell echo $@*/)person.flatten.unflatten.json ${TEE} $(shell echo $@*/)a.diff
 
-# stdin
+# stdin and eval
 03: TARGET ?= person.json
 03:
 	cat $(shell echo $@*/)$(TARGET) | dictknife transform -i json --code "lambda d: {k.upper():v for k,v in d.items()}" -o json ${TEE} $(shell echo $@*/)person.upcase.json
+	dictknife transform $(shell echo $@*/)$(TARGET) --fn flatten -o json | dictknife transform --fn rows -i json -o md ${TEE} $(shell echo $@*/)person.flatten.md
