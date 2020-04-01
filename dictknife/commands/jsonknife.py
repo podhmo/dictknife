@@ -143,90 +143,129 @@ def main():
 
     formats = loading.get_formats()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=type(
+            "_HelpFormatter",
+            (argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter),
+            {},
+        )
+    )
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
         "--log",
         choices=list(logging._nameToLevel.keys()),
         default="INFO",
         dest="log_level",
+        help="-",
     )
-    parser.add_argument("-q", "--quiet", action="store_true")
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("-q", "--quiet", action="store_true", help="-")
+    parser.add_argument("--debug", action="store_true", help="-")
 
     subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
     subparsers.required = True
 
     # cut
     fn = cut
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--ref", dest="refs", action="append")
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--ref", dest="refs", action="append", help="-")
 
     # deref
     fn = deref
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--ref", dest="refs", action="append")
-    sparser.add_argument("--unwrap", default=None)
-    sparser.add_argument("--wrap", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--ref", dest="refs", action="append", help="-")
+    sparser.add_argument("--unwrap", default=None, help="-")
+    sparser.add_argument("--wrap", default=None, help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
     # select
     fn = select
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--ref", dest="refs", action="append")
-    sparser.add_argument("--unwrap", default=None)
-    sparser.add_argument("--wrap", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--ref", dest="refs", action="append", help="-")
+    sparser.add_argument("--unwrap", default=None, help="-")
+    sparser.add_argument("--wrap", default=None, help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
 
     # bundle
     fn = bundle
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
-    sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--ref", default=None)
-    sparser.add_argument(
-        "--flavor", choices=["openapiv3", "openapiv2"], default="openapiv3"
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
     )
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--extra", default=None, nargs="+", dest="extras")
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--ref", default=None, help="-")
+    sparser.add_argument(
+        "--flavor", choices=["openapiv3", "openapiv2"], default="openapiv3", help="-"
+    )
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument("--extra", default=None, nargs="+", dest="extras", help="-")
 
     # separate
     fn = separate
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
 
     # examples
     fn = examples
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("src", nargs="?", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--ref", dest="ref", default=None)
-    sparser.add_argument("--limit", dest="limit", default=5, type=int)
-    sparser.add_argument("--expand", dest="use_expand", action="store_true")
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+    sparser.add_argument("src", nargs="?", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--ref", dest="ref", default=None, help="-")
+    sparser.add_argument("--limit", dest="limit", default=5, type=int, help="-")
+    sparser.add_argument("--expand", dest="use_expand", action="store_true", help="-")
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
 
     args = parser.parse_args()
 
