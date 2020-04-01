@@ -28,3 +28,5 @@ TEE ?= 2>&1 >
 03:
 	cat $(shell echo $@*/)$(TARGET) | dictknife transform -i json --code "lambda d: {k.upper():v for k,v in d.items()}" -o json ${TEE} $(shell echo $@*/)person.upcase.json
 	dictknife transform $(shell echo $@*/)$(TARGET) --fn flatten -o json | dictknife transform --fn rows -i json -o md ${TEE} $(shell echo $@*/)person.flatten.md
+	dictknife transform $(shell echo $@*/)$(TARGET) --fn flatten --fn rows -o md ${TEE} $(shell echo $@*/)person.flatten2.md
+	dictknife diff $(shell echo $@*/)person.flatten.md $(shell echo $@*/)person.flatten2.md
