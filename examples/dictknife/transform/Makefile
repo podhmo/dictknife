@@ -20,3 +20,4 @@ TEE ?= 2>&1 >
 02: TARGET ?= person.flatten.json
 02:
 	dictknife transform --src $(shell echo $@*/)$(TARGET) --fn unflatten -o json ${TEE} $(shell echo $@*/)person.flatten.unflatten.json
+	dictknife diff $(shell echo 00*/)person.json  $(shell echo $@*/)person.flatten.unflatten.json ${TEE} $(shell echo $@*/)a.diff

@@ -1,29 +1,29 @@
 {
   "name": "foo",
-  "age": "20",
+  "age": 20,
   "father": {
     "name": "bar",
-    "age": "40"
+    "age": 40
   },
   "mother": {
     "name": "boo",
-    "age": "40"
+    "age": 40
   },
-  "skills": {
-    "0": {
+  "skills": [
+    {
       "name": "x"
     },
-    "1": {
+    {
       "name": "y"
     },
-    "2": {
+    {
       "name": "z"
     }
-  },
-  "groups": {
-    "0": "1",
-    "1": "11"
-  },
+  ],
+  "groups": [
+    1,
+    11
+  ],
   "paths": {
     "/foo/bar/{id}": "hello"
   }
