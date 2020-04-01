@@ -9,7 +9,7 @@
 1. Concat dict like data(JSON, YAML).
 
 ```bash
-$ dictknife concat --format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
+$ dictknife cat --format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
 {
   "name": "foo",
   "age": 20
@@ -20,12 +20,12 @@ $ dictknife concat --format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
 
 ```bash
 # json to yaml
-$ dictknife concat --output-format yaml --input-format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
+$ dictknife cat --output-format yaml --input-format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
 name: foo
 age: 20
 
 # json to toml
-$ dictknife concat --output-format toml --input-format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
+$ dictknife cat --output-format toml --input-format json <(echo '{"name": "foo"}') <(echo '{"age": 20}')
 name = "foo"
 age = 20
 ```
