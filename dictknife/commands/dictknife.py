@@ -214,6 +214,31 @@ def shape(
         loading.dumpfile(r, format=output_format)
 
 
+def shrink(
+    *,
+    files: list,
+    input_format: str,
+    output_format: str,
+    max_length_of_string: int,
+    cont_suffix: str,
+    max_length_of_list: int
+):
+    """shrink"""
+    from dictknife.transform import shrink
+
+    for f in files:
+        with _open(f) as rf:
+            d = loading.load(rf, format=input_format)
+            format = output_format or loading.guess_format(f)
+            r = shrink(
+                d,
+                max_length_of_list=max_length_of_list,
+                max_length_of_string=max_length_of_string,
+                cont_suffix=cont_suffix,
+            )
+            loading.dumpfile(r, format=format)
+
+
 def mkdict(
     *,
     output_format: str,
@@ -427,6 +452,17 @@ def main():
     sparser.add_argument("--with-type", action="store_true")
     sparser.add_argument("--with-example", action="store_true")
     sparser.add_argument("--separator", default="/")
+    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
+    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
+
+    # shrink
+    fn = shrink
+    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser.set_defaults(subcommand=fn)
+    sparser.add_argument("files", nargs="*", default=[sys.stdin])
+    sparser.add_argument("--max-length-of-string", type=int, default=100)
+    sparser.add_argument("--max-length-of-list", type=int, default=3)
+    sparser.add_argument("--cont-suffix", default="...")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
