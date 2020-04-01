@@ -1,6 +1,6 @@
 import re
 from .langhelpers import reify
-from .accessing import ImmutableModifier, MutableModifier
+from .accessing import get_modifier
 
 
 class Guesser:
@@ -47,6 +47,6 @@ class Guesser:
 
 
 def guess(d, *, guesser_factory=Guesser, default=None, mutable=False):
-    modifier = MutableModifier() if mutable else ImmutableModifier()
+    modifier = get_modifier(mutable=mutable)
     g = guesser_factory(modifier, default=default)
     return g.guess(d)

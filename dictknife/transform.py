@@ -62,3 +62,39 @@ def only_num(d):
 
 def only_str(d):
     return {k: v for k, v in d.items() if isinstance(v, str)}
+
+
+def shrink(
+    d,
+    *,
+    max_length_of_string: int = 100,
+    cont_suffix: str = "...",
+    max_length_of_list: int = 3,
+    with_tail: bool = False,
+    mutable: bool = False,
+):
+    # todo: random select
+    # todo: cont suffix for list
+    from dictknife.accessing import get_modifier
+
+    modifier = get_modifier(mutable=mutable)
+
+    def _map(d):
+        if isinstance(d, (list, tuple)):
+            xs = d
+            if len(xs) > max_length_of_list:
+                xs = d[:max_length_of_list]
+            if with_tail:
+                xs.extend(d[-max_length_of_list:])
+            return modifier.modify_list(_map, xs)
+        elif hasattr(d, "keys"):
+            return modifier.modify_dict(_map, d)
+        elif isinstance(d, str):
+            s = d
+            if len(s) > max_length_of_string:
+                s = s[:max_length_of_string] + cont_suffix
+            return s
+        else:
+            return d
+
+    return _map(d)
