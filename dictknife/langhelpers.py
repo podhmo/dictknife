@@ -1,7 +1,9 @@
-# if sys.version_info[:2] >= (3, 6):
-#     make_dict = dict
-# else:
-from collections import OrderedDict as make_dict  # noqa
+import sys
+
+if sys.version_info[:2] >= (3, 6):
+    make_dict = dict
+else:
+    from collections import OrderedDict as make_dict  # noqa
 
 # for backword comaptibility (TODO: remove)
 from .cliutils import traceback_shortly  # noqa F401
