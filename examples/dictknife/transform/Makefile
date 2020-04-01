@@ -1,4 +1,4 @@
-default: 00 01
+default: 00 01 02
 TEE ?= 2>&1 >
 
 # flatten
@@ -15,3 +15,8 @@ TEE ?= 2>&1 >
 	dictknife transform --src $(shell echo $@*/)$(TARGET) --fn camelcase_dict -o json ${TEE} $(shell echo $@*/)output.camelcase.json
 	dictknife transform --src $(shell echo $@*/)$(TARGET) --fn kebabcase_dict -o json ${TEE} $(shell echo $@*/)output.kebabcase.json
 	dictknife transform --src $(shell echo $@*/)$(TARGET) --fn pascalcase_dict -o json ${TEE} $(shell echo $@*/)output.pascalcase.json
+
+# unflatten
+02: TARGET ?= person.flatten.json
+02:
+	dictknife transform --src $(shell echo $@*/)$(TARGET) --fn unflatten -o json ${TEE} $(shell echo $@*/)person.flatten.unflatten.json
