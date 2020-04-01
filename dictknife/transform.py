@@ -15,7 +15,24 @@ def unflatten(d, *, sep="/", accessor=accessing.Accessor()):
     r = accessor.make_dict()
     for k, v in d.items():
         accessor.assign(r, [_as_path_node(x) for x in k.split(sep)], v)
-    return r
+    return _fix_unflatten_list(r)
+
+
+def _fix_unflatten_list(d):
+    if hasattr(d, "keys"):
+        for k in list(d.keys()):
+            d[k] = _fix_unflatten_list(d[k])
+
+        # list ?
+        if "0" in d and str(len(d) - 1) in d:
+            r = []
+            for i in range(len(d)):
+                k = str(i)
+                if k not in d:
+                    return d
+                r.append(d[k])
+            return r
+    return d
 
 
 def flatten(d, *, sep="/"):
@@ -32,9 +49,11 @@ def flatten(d, *, sep="/"):
             for k2, v2 in flatten(v, sep=sep).items()
         }
     elif hasattr(d, "__next__"):
+        # todo: as generator
         return flatten(list(d), sep=sep)
     else:
-        return {None: _as_jsonpointer(str(d))}
+        # todo: peformance improvement
+        return {None: _as_jsonpointer(d) if hasattr(d, "replace") else d}
 
 
 def rows(d, *, kname="name", vname="value"):
