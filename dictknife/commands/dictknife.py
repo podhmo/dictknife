@@ -21,12 +21,6 @@ def _open(f, encoding=None, errors=None):
         return open(f, encoding=encoding, errors=errors)
 
 
-def concat(**kwargs):
-    """concat dicts"""
-    warnings.warn("concat() is deprecated, please using `cat` instead of it.")
-    return cat(**kwargs)
-
-
 def cat(
     *,
     files,
@@ -320,50 +314,6 @@ def main():
 
     # cat
     fn = cat
-    sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
-    )
-    apply_loading_format_extra_arguments_parser(sparser)
-    sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
-    sparser.add_argument("--slurp", action="store_true", help="-")
-
-    sparser.add_argument("--size", type=int, default=None, help="-")
-    sparser.add_argument("--dst", default=None, help="-")
-    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
-    sparser.add_argument(
-        "-i", "--input-format", default=None, choices=formats, help="-"
-    )
-    sparser.add_argument(
-        "-o", "--output-format", default=None, choices=formats, help="-"
-    )
-    sparser.add_argument(
-        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None,
-    )
-    sparser.add_argument(
-        "--errors",
-        default=None,
-        choices=[
-            "strict",
-            "ignore",
-            "replace",
-            "surrogateescape",
-            "xmlcharrefreplace",
-            "backslashreplace",
-            "namereplace",
-        ],
-        help="see pydoc codecs.Codec",
-    )
-    sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
-    sparser.add_argument(
-        "--merge-method",
-        choices=["addtoset", "append", "merge", "replace"],
-        default="addtoset",
-        help="-",
-    )
-
-    # concat (deprecated)
-    fn = concat
     sparser = subparsers.add_parser(
         fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
     )
