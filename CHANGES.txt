@@ -113,7 +113,7 @@
 
 0.4.5
 
-- dictknife concat with list JSON
+- dictknife cat with list JSON
 - omitting deprecated commands (extract, lift)
 
 0.4.4
