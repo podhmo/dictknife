@@ -1,4 +1,4 @@
-default: 00 01 02
+default: 00 01 02 03
 TEE ?= 2>&1 >
 
 # flatten
@@ -21,3 +21,8 @@ TEE ?= 2>&1 >
 02:
 	dictknife transform $(shell echo $@*/)$(TARGET) --fn unflatten -o json ${TEE} $(shell echo $@*/)person.flatten.unflatten.json
 	dictknife diff $(shell echo 00*/)person.json  $(shell echo $@*/)person.flatten.unflatten.json ${TEE} $(shell echo $@*/)a.diff
+
+# stdin
+03: TARGET ?= person.json
+03:
+	cat $(shell echo $@*/)$(TARGET) | dictknife transform -i json --code "lambda d: {k.upper():v for k,v in d.items()}" -o json ${TEE} $(shell echo $@*/)person.upcase.json
