@@ -221,7 +221,8 @@ def shrink(
     output_format: str,
     max_length_of_string: int,
     cont_suffix: str,
-    max_length_of_list: int
+    max_length_of_list: int,
+    with_tail: bool
 ):
     """shrink"""
     from dictknife.transform import shrink
@@ -235,6 +236,7 @@ def shrink(
                 max_length_of_list=max_length_of_list,
                 max_length_of_string=max_length_of_string,
                 cont_suffix=cont_suffix,
+                with_tail=with_tail,
             )
             loading.dumpfile(r, format=format)
 
@@ -463,6 +465,7 @@ def main():
     sparser.add_argument("--max-length-of-string", type=int, default=100)
     sparser.add_argument("--max-length-of-list", type=int, default=3)
     sparser.add_argument("--cont-suffix", default="...")
+    sparser.add_argument("--with-tail", action="store_true")
     sparser.add_argument("-i", "--input-format", default=None, choices=formats)
     sparser.add_argument("-o", "--output-format", default=None, choices=formats)
 
