@@ -1,2 +1,2 @@
 "age","father","mother","name"
-"20","OrderedDict([('age', 40), ('name', 'boo')])","OrderedDict([('age', 40), ('name', 'boo')])","foo"
+"20","{'age': 40, 'name': 'boo'}","{'age': 40, 'name': 'boo'}","foo"

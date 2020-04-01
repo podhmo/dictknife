@@ -76,8 +76,6 @@ def transform(
     *,
     src: str,
     dst: str,
-    config: str,
-    config_file: str,
     code: str,
     functions: str,
     input_format: str,
@@ -87,7 +85,6 @@ def transform(
 ):
     """transform dict"""
     from magicalimport import import_symbol
-    from dictknife import deepmerge
 
     if code is not None:
         transform = eval(code)
@@ -104,15 +101,11 @@ def transform(
         transform = lambda x: x  # NOQA
 
     input_format = input_format or format
-    kwargs = loading.loads(config, format=input_format)
-
-    if config_file:
-        with open(config_file) as rf:
-            kwargs = deepmerge(kwargs, loading.load(rf, format=input_format))
-
     data = loading.loadfile(src, input_format)
-    result = transform(data, **kwargs)
-    loading.dumpfile(result, dst, format=output_format or format, sort_keys=sort_keys)
+    result = transform(data)
+    loading.dumpfile(
+        result, dst, format=output_format or input_format or format, sort_keys=sort_keys
+    )
 
 
 def diff(
@@ -439,10 +432,8 @@ def main():
 
     sparser.print_help = print_help
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("src", nargs="?", help="-")
     sparser.add_argument("--dst", default=None, help="-")
-    sparser.add_argument("--config", default="{}", help="-")
-    sparser.add_argument("--config-file", default=None, help="-")
     sparser.add_argument("--code", default=None, help="-")
     sparser.add_argument(
         "--fn", "--function", default=[], action="append", dest="functions", help="-"

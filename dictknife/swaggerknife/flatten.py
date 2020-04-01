@@ -9,5 +9,5 @@ def flatten(data, replace=True):
         prop = data["definitions"].pop(name)
         extracted = w.extract(prop, Handler([name]))
         extracted[name] = prop
-        data["definitions"].update(reversed(extracted.items()))
+        data["definitions"].update(reversed(list(extracted.items())))
     return data
