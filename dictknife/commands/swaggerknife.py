@@ -141,63 +141,86 @@ def main():
 
     formats = loading.get_formats()
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=type(
+            "_HelpFormatter",
+            (argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter),
+            {},
+        )
+    )
     parser.print_usage = parser.print_help  # hack
     parser.add_argument(
         "--log",
         choices=list(logging._nameToLevel.keys()),
         default="INFO",
         dest="log_level",
+        help="-",
     )
-    parser.add_argument("-q", "--quiet", action="store_true")
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("-q", "--quiet", action="store_true", help="-")
+    parser.add_argument("--debug", action="store_true", help="-")
 
     subparsers = parser.add_subparsers(dest="subcommand", title="subcommands")
     subparsers.required = True
 
     # merge
     fn = merge
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--strict", action="store_true")
-    sparser.add_argument("--style", default="ref", choices=["ref", "whole"])
-    sparser.add_argument("--wrap", default=None)
-    sparser.add_argument("--wrap-section", default="definitions")
+    sparser.add_argument("files", nargs="*", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--strict", action="store_true", help="-")
+    sparser.add_argument("--style", default="ref", choices=["ref", "whole"], help="-")
+    sparser.add_argument("--wrap", default=None, help="-")
+    sparser.add_argument("--wrap-section", default="definitions", help="-")
     # tojsonschema
 
     fn = tojsonschema
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("--src", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("--name", default="top")
+    sparser.add_argument("--src", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument("--name", default="top", help="-")
 
     # json2swagger
     fn = json2swagger
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("files", nargs="*", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("--name", default="top")
-    sparser.add_argument("--detector", default="Detector")
-    sparser.add_argument("--emitter", default="Emitter")
-    sparser.add_argument("--annotate", default=None)
-    sparser.add_argument("--emit", default="schema", choices=["schema", "info"])
-    sparser.add_argument("--with-minimap", action="store_true")
-    sparser.add_argument("--without-example", action="store_true")
+    sparser.add_argument("files", nargs="*", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument("--name", default="top", help="-")
+    sparser.add_argument("--detector", default="Detector", help="-")
+    sparser.add_argument("--emitter", default="Emitter", help="-")
+    sparser.add_argument("--annotate", default=None, help="-")
+    sparser.add_argument(
+        "--emit", default="schema", choices=["schema", "info"], help="-"
+    )
+    sparser.add_argument("--with-minimap", action="store_true", help="-")
+    sparser.add_argument("--without-example", action="store_true", help="-")
 
     # flatten
     fn = flatten
-    sparser = subparsers.add_parser(fn.__name__, description=fn.__doc__)
+    sparser = subparsers.add_parser(
+        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+    )
     sparser.set_defaults(subcommand=fn)
-    sparser.add_argument("src", nargs="?", default=None)
-    sparser.add_argument("--dst", default=None)
-    sparser.add_argument("-i", "--input-format", default=None, choices=formats)
-    sparser.add_argument("-o", "--output-format", default=None, choices=formats)
-    sparser.add_argument("-f", "--format", default=None, choices=formats)
+    sparser.add_argument("src", nargs="?", default=None, help="-")
+    sparser.add_argument("--dst", default=None, help="-")
+    sparser.add_argument(
+        "-i", "--input-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument(
+        "-o", "--output-format", default=None, choices=formats, help="-"
+    )
+    sparser.add_argument("-f", "--format", default=None, choices=formats, help="-")
 
     args = parser.parse_args()
 
