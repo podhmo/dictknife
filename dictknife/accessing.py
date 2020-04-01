@@ -174,3 +174,7 @@ def dictmap(fn, x, *, mutable=False, with_key=False):
             return fn(d)
 
     return _map(x)
+
+
+def get_modifier(*, mutable: bool = False):
+    return MutableModifier() if mutable else ImmutableModifier()

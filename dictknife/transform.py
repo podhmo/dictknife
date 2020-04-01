@@ -67,17 +67,17 @@ def only_str(d):
 def shrink(
     d,
     *,
-    max_length_of_string=100,
-    cont_suffix="...",
-    max_length_of_list=3,
-    with_tail=False
+    max_length_of_string: int = 100,
+    cont_suffix: str = "...",
+    max_length_of_list: int = 3,
+    with_tail: bool = False,
+    mutable: bool = False,
 ):
     # todo: random select
     # todo: cont suffix for list
+    from dictknife.accessing import get_modifier
 
-    from dictknife.accessing import ImmutableModifier
-
-    modifier = ImmutableModifier()
+    modifier = get_modifier(mutable=mutable)
 
     def _map(d):
         if isinstance(d, (list, tuple)):
