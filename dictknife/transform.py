@@ -1,5 +1,7 @@
 from functools import partial
 from dictknife.langhelpers import as_jsonpointer as _as_jsonpointer
+from dictknife.langhelpers import as_path_node as _as_path_node
+from dictknife import accessing
 from dictknife import naming
 
 
@@ -9,12 +11,19 @@ def _make_key(k0, k1, *, sep="/"):
     return "{}{}{}".format(_as_jsonpointer(str(k0)), sep, k1)
 
 
+def unflatten(d, *, sep="/", accessor=accessing.Accessor()):
+    r = accessor.make_dict()
+    for k, v in d.items():
+        accessor.assign(r, [_as_path_node(x) for x in k.split(sep)], v)
+    return r
+
+
 def flatten(d, *, sep="/"):
     if isinstance(d, (list, tuple)):
         return {
             _make_key(i, k, sep=sep): v
             for i, row in enumerate(d)
-            for k, v in flatten(row).items()
+            for k, v in flatten(row, sep=sep).items()
         }
     elif hasattr(d, "get"):
         return {
