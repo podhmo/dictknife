@@ -9,11 +9,11 @@ dst:
 
 # output format
 00: dst
-	dictknife ${OPTS} cat src/00output-format/person.json --dst dst/00person.json
-	dictknife ${OPTS} --compact cat src/00output-format/person.json --dst dst/00person.compact.json
-	dictknife ${OPTS} cat src/00output-format/person.json --dst dst/00person.yaml
-	dictknife ${OPTS} cat src/00output-format/person.json --dst dst/00person.toml
-	dictknife ${OPTS} cat src/00output-format/person.json --dst dst/00person.csv
+	dictknife ${OPTS} cat src/00output-format/person.yaml --dst dst/00person.json
+	dictknife ${OPTS} --compact cat src/00output-format/person.yaml --dst dst/00person.compact.json
+	dictknife ${OPTS} cat src/00output-format/person.yaml --dst dst/00person.yaml
+	dictknife ${OPTS} cat src/00output-format/person.yaml --dst dst/00person.toml
+	dictknife ${OPTS} cat src/00output-format/person.yaml --dst dst/00person.csv
 
 # nested
 01: dst

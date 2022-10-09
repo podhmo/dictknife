@@ -1,2 +1,3 @@
-name: foo
+# this is person's property
+name: foo  # name of person
 age: 20

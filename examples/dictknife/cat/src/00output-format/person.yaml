@@ -1,4 +1,3 @@
-{
-  "name": "foo",
-  "age": 20
-}
+# this is person's property
+name: foo  # name of person
+age: 20
