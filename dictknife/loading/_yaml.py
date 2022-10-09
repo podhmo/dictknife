@@ -14,6 +14,7 @@ _pool = {}  # xxx: memory leak
 
 def load(fp, *args, typ="rt", **kwargs):
     yaml = ruamel.yaml.YAML(typ=typ)  # use round trip loader
+    yaml.preserve_quotes = True
     # use plugins?
     d = yaml.load(fp)
     _pool[id(d)] = yaml
@@ -22,5 +23,11 @@ def load(fp, *args, typ="rt", **kwargs):
 
 def dump(d, fp, *args, typ="rt", **kwargs):
     yaml = _pool.get(id(d)) or ruamel.yaml.YAML(typ=typ)
+
+    def ignore_aliases(data) -> bool:
+        return True
+
+    yaml.indent(mapping=2, sequence=2, offset=0)
+    yaml.representer.ignore_aliases = ignore_aliases
     # use plugins?
     return yaml.dump(d, fp)
