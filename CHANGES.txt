@@ -1,3 +1,9 @@
+0.14.0
+
+- use tomlkit instead of qtoml
+- use ruamel.yaml instead of pyyaml (for preserving comments)
+- add `dictknife diff -o pair`
+
 0.13.0
 
 - loading, see envvar (DICTKNIFE_LOAD_FORMAT, DICTKNIFE_DUMP_FORMAT)
