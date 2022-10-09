@@ -2,8 +2,8 @@ from ._lazyimport import m
 from .raw import setup_extra_parser  # noqa
 
 
-def load(fp, *, loader=None, errors=None, **kwargs):
-    return m.yaml.load(fp, Loader=m.yaml.Loader, **kwargs)
+def load(fp, *, errors=None, **kwargs):
+    return m.yaml.load(fp, **kwargs)
 
 
 def dump(d, fp, *, sort_keys=False):
@@ -12,6 +12,5 @@ def dump(d, fp, *, sort_keys=False):
         fp,
         allow_unicode=True,
         default_flow_style=False,
-        Dumper=m.yaml.Dumper,
         sort_keys=sort_keys,
     )
