@@ -3,4 +3,4 @@ definitions:
     type: object
     properties:
       name:
-        $ref: '#/name.yaml'
+        $ref: "#/name.yaml"

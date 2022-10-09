@@ -11,3 +11,4 @@ definitions:
         type: string
       message:
         type: string
+  #issue: https://github.com/swagger-api/swagger-codegen/issues/7980

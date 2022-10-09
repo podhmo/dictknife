@@ -3,5 +3,5 @@ definitions:
     type: string
     description: document
 description:
-  $xref: 'doc.yaml#/definitions/doc/description'
+  $xref: "doc.yaml#/definitions/doc/description"
 version: 1.0

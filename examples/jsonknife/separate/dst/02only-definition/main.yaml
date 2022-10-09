@@ -1,6 +1,6 @@
 components:
   schemas:
     Date:
-      $ref: 'components/schemas/Date.yaml#/components/schemas/Date'
+      $ref: components/schemas/Date.yaml#/components/schemas/Date
     DateWithExample:
-      $ref: 'components/schemas/DateWithExample.yaml#/components/schemas/DateWithExample'
+      $ref: components/schemas/DateWithExample.yaml#/components/schemas/DateWithExample

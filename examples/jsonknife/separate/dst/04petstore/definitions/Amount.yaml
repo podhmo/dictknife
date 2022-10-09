@@ -1,7 +1,7 @@
 definitions:
   Amount:
     type: object
-    description: |
+    description: >
       some description
     properties:
       value:
@@ -9,7 +9,7 @@ definitions:
         type: number
         minimum: 0.01
         maximum: 1000000000000000
-        description: |
+        description: >
           some description
       currency:
         $ref: 'Currency.yaml#/definitions/Currency'

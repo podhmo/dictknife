@@ -1,13 +1,13 @@
 definitions:
   xuser:
-    $ref: '#/x/definitions/user'
+    $ref: "#/x/definitions/user"
   yuser:
-    $ref: '#/y/definitions/user'
+    $ref: "#/y/definitions/user"
   both:
     x:
-      $ref: '#/definitions/xuser'
+      $ref: "#/definitions/xuser"
     y:
-      $ref: '#/definitions/yuser'
+      $ref: "#/definitions/yuser"
 x:
   definitions:
     user:

@@ -8,15 +8,15 @@ definitions:
         type: object
         additionalProperties:
           oneOf:
-          - $ref: '#/definitions/Schema'
-          - $ref: '#/definitions/Reference'
+          - {$ref: "#/definitions/Schema"}
+          - {$ref: "#/definitions/Reference"}
       properties:
         type: object
         patternProperties:
-          ^[a-zA-Z0-9\.\-_]+$:
+          "^[a-zA-Z0-9\\.\\-_]+$":
             oneOf:
-            - $ref: '#/definitions/Schema'
-            - $ref: '#/definitions/Reference'
+            - {$ref: "#/definitions/Schema"}
+            - {$ref: "#/definitions/Reference"}
     required:
     - type
   Reference:
@@ -33,12 +33,12 @@ properties:
     type: string
   definitions:
     patternProperties:
-      ^[a-zA-Z0-9\.\-_]+$:
-        $ref: '#/definitions/Schema'
+      "^[a-zA-Z0-9\\.\\-_]+$":
+        $ref: "#/definitions/Schema"
   properties:
     patternProperties:
-      ^[a-zA-Z0-9\.\-_]+$:
+      "^[a-zA-Z0-9\\.\\-_]+$":
         oneOf:
-        - $ref: '#/definitions/Schema'
-        - $ref: '#/definitions/Reference'
+        - {$ref: "#/definitions/Schema"}
+        - {$ref: "#/definitions/Reference"}
 additionalProperties: false
