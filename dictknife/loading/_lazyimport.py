@@ -50,8 +50,6 @@ class LoadingModule:
     def yaml(self):
         try:
             from . import _yaml as yaml
-
-            yaml.setup(yaml.Loader, yaml.Dumper)
             return yaml
         except ImportError:
             logger.info("yaml package is not found, failback to json")
@@ -59,20 +57,18 @@ class LoadingModule:
 
             class _fake_yaml:
                 SortedDumper = None
-                Dumper = None
                 Loader = None
 
                 @classmethod
-                def load(cls, *args, Loader=None, **kwargs):
+                def load(cls, *args, typ="rt", **kwargs):
                     return json.load(*args, **kwargs)
 
                 @classmethod
                 def dump(
                     cls,
                     *args,
-                    allow_unicode=None,
-                    default_flow_style=None,
-                    Dumper=None,
+                    # allow_unicode=None,
+                    # default_flow_style=None,
                     **kwargs
                 ):
                     if "indent" not in kwargs:

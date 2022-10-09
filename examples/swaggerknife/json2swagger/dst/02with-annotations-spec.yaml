@@ -4,12 +4,7 @@ definitions:
     items:
       type: integer
       example: 1
-      enum:
-      - 1
-      - 2
-      - 3
-      - 4
-      - 5
+      enum: [1, 2, 3, 4, 5]
   Y:
     type: object
     properties:

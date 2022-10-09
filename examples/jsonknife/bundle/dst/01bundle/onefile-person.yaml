@@ -3,25 +3,25 @@ definitions:
     type: object
     properties:
       name:
-        $ref: '#/definitions/name'
+        $ref: "#/definitions/name"
       age:
         type: integer
       friends:
-        $ref: '#/definitions/friends'
+        $ref: "#/definitions/friends"
   friend:
-    $ref: '#/definitions/person'
+    $ref: "#/definitions/person"
   friends:
     type: array
     items:
       type:
-        $ref: '#/definitions/friend'
+        $ref: "#/definitions/friend"
   pair:
     type: object
     properties:
       left:
-        $ref: '#/definitions/person'
+        $ref: "#/definitions/person"
       right:
-        $ref: '#/definitions/person'
+        $ref: "#/definitions/person"
   name:
     type: string
     descrition: name of something

@@ -1,25 +1,25 @@
+info:
+  title: Sample API
+  description: API description in Markdown.
+  version: 1.0.0
+security:
+- BasicAuth: []
+openapi: 3.0.0
+servers:
+- url: http://api.example.com/v1
+  description: ''
 components:
   securitySchemes:
     BasicAuth:
       type: basic
-info:
-  description: API description in Markdown.
-  title: Sample API
-  version: 1.0.0
-openapi: 3.0.0
 paths:
   /users:
-    $ref: 'api_users.yaml#/paths/~1users'
+    $ref: "api_users.yaml#/paths/~1users"
   /users/{userId}:
-    $ref: 'api_users.yaml#/paths/~1users~1{userId}'
+    $ref: "api_users.yaml#/paths/~1users~1{userId}"
   /users2:
-    $ref: 'api_users2.yaml#/paths/~1users2'
+    $ref: "api_users2.yaml#/paths/~1users2"
   /users2/{userId}:
-    $ref: 'api_users2.yaml#/paths/~1users2~1{userId}'
+    $ref: "api_users2.yaml#/paths/~1users2~1{userId}"
   /users3:
-    $ref: 'api_users3.yaml#/paths/~1users3'
-security:
-- BasicAuth: []
-servers:
-- description: ''
-  url: 'http://api.example.com/v1'
+    $ref: "api_users3.yaml#/paths/~1users3"

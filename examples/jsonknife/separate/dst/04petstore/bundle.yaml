@@ -128,8 +128,8 @@ paths:
       tags:
       - pet
       summary: Finds Pets by tags
-      description: Multiple tags can be provided with comma separated strings. Use
-        tag1, tag2, tag3 for testing.
+      description: 'Multiple tags can be provided with comma separated strings. Use
+        tag1, tag2, tag3 for testing.'
       operationId: findPetsByTags
       produces:
       - application/xml
@@ -157,7 +157,7 @@ paths:
         - 'write:pets'
         - 'read:pets'
       deprecated: true
-  /pet/{petId}:
+  '/pet/{petId}':
     get:
       tags:
       - pet
@@ -247,7 +247,7 @@ paths:
       - petstore_auth:
         - 'write:pets'
         - 'read:pets'
-  /pet/{petId}/uploadImage:
+  '/pet/{petId}/uploadImage':
     post:
       tags:
       - pet
@@ -328,13 +328,13 @@ paths:
             $ref: '#/definitions/Order'
         '400':
           description: Invalid Order
-  /store/order/{orderId}:
+  '/store/order/{orderId}':
     get:
       tags:
       - store
       summary: Find purchase order by ID
-      description: For valid response try integer IDs with value <= 5 or > 10. Other
-        values will generated exceptions
+      description: 'For valid response try integer IDs with value <= 5 or > 10. Other
+        values will generated exceptions'
       operationId: getOrderById
       produces:
       - application/xml
@@ -493,7 +493,7 @@ paths:
       responses:
         default:
           description: successful operation
-  /user/{username}:
+  '/user/{username}':
     get:
       tags:
       - user
@@ -506,7 +506,7 @@ paths:
       parameters:
       - name: username
         in: path
-        description: The name that needs to be fetched. Use user1 for testing.
+        description: 'The name that needs to be fetched. Use user1 for testing.'
         required: true
         type: string
       responses:
@@ -564,7 +564,7 @@ paths:
           description: Invalid username supplied
         '404':
           description: User not found
-  /amount/{amountId}:
+  '/amount/{amountId}':
     get:
       tags:
       - amount
@@ -592,6 +592,7 @@ paths:
           description: Amount not found
       security:
       - api_key: []
+
 securityDefinitions:
   petstore_auth:
     type: oauth2
@@ -711,9 +712,10 @@ definitions:
         type: string
       message:
         type: string
+  #issue: https://github.com/swagger-api/swagger-codegen/issues/7980
   Amount:
     type: object
-    description: |
+    description: >
       some description
     properties:
       value:
@@ -721,7 +723,7 @@ definitions:
         type: number
         minimum: 0.01
         maximum: 1000000000000000
-        description: |
+        description: >
           some description
       currency:
         $ref: '#/definitions/Currency'
@@ -754,8 +756,8 @@ definitions:
       name: Tag
   Currency:
     type: string
-    pattern: ^[A-Z]{3,3}$
-    description: |
+    pattern: '^[A-Z]{3,3}$'
+    description: >
       some description
 externalDocs:
   description: Find out more about Swagger

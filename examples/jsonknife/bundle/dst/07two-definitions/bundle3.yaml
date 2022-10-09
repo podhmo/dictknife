@@ -1,12 +1,13 @@
 propeties:
   people:
-    $ref: '#/definitions/people'
+    $ref: "#/definitions/people"
   person:
-    $ref: '#/definitions/person'
+    $ref: "#/definitions/person"
+
 definitions:
   people:
     items:
-      $ref: '#/definitions/person'
+      $ref: "#/definitions/person"
   person:
     type: object
     propeties:

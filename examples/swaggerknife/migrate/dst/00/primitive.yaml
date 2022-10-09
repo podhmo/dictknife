@@ -1,4 +1,4 @@
 definitions:
   name:
-    description: name of something
     type: string
+    description: name of something

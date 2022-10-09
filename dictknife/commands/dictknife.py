@@ -52,10 +52,10 @@ def cat(
             if size is not None:
                 sd = itertools.islice(sd, size)
 
-            if hasattr(sd, "keys"):
-                d = deepmerge(d, sd, method=merge_method)
-            elif len(files) == 1:
+            if len(files) == 1:
                 d = sd
+            elif hasattr(sd, "keys"):
+                d = deepmerge(d, sd, method=merge_method)
             else:
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
