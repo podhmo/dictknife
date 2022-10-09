@@ -1,0 +1,12 @@
+[                     [
+  {                     {
+    "name": "foo",        "name": "foo",
+    "age": 20,            "age": 20,
+    "type": "person"      "type": "person"
+  },                    },
+  {                     {
+    "name": "bar",        "name": "foo",
+    "age": 21,            "age": 20,
+    "type": "person"      "type": "person"
+  }                     }
+]                     ]
