@@ -1,5 +1,6 @@
 import logging
 import sys
+import io
 import warnings
 import contextlib
 import itertools
@@ -136,6 +137,24 @@ def diff(
             elif output_format == "jsonpatch":
                 r = make_jsonpatch(left_data, right_data, verbose=verbose)
                 loading.dumpfile(list(r), format="json")
+            elif output_format == "pair":
+                # iterator?
+                if hasattr(left_data, "__next__"):
+                    left_data = list(left_data)
+                if hasattr(right_data, "__next__"):
+                    right_data = list(right_data)
+                o = io.StringIO()
+                loading.dump(left_data, o, format="json", sort_keys=sort_keys)
+                o.seek(0)
+                pad_size = len(max(o, key=len)) + 1
+                o.seek(0) 
+                o2 = io.StringIO()
+                loading.dump(right_data, o2, format="json", sort_keys=sort_keys)
+                o2.seek(0)
+                for left_line, right_line in itertools.zip_longest(o, o2):
+                    print(left_line.rstrip().ljust(pad_size), end="")
+                    print(right_line, end="")
+                print("")
             else:
                 if output_format == "dict":
                     output_format = "json"
@@ -332,7 +351,9 @@ def main():
         "-o", "--output-format", default=None, choices=formats, help="-"
     )
     sparser.add_argument(
-        "--encoding", help="input encoding. (e.g. utf-8, cp932, ...)", default=None,
+        "--encoding",
+        help="input encoding. (e.g. utf-8, cp932, ...)",
+        default=None,
     )
     sparser.add_argument(
         "--errors",
@@ -415,7 +436,7 @@ def main():
     sparser.add_argument(
         "-o",
         "--output-format",
-        choices=["diff", "dict", "md", "tsv", "jsonpatch"],
+        choices=["diff", "dict", "md", "tsv", "jsonpatch", "pair"],
         default="diff",
         help="-",
     )

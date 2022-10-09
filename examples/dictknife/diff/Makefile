@@ -11,6 +11,7 @@ dst:
 	dictknife diff src/000person.json src/001person.json -o tsv > dst/00.tsv
 	dictknife diff src/000person.json src/001person.json -o jsonpatch > dst/00.jsonpatch
 	dictknife diff --verbose src/000person.json src/001person.json -o jsonpatch > dst/00.jsonpatch2
+	dictknife diff src/000person.json src/001person.json -o pair > dst/00.pair
 
 # list
 01: dst
@@ -19,3 +20,4 @@ dst:
 	dictknife diff src/010people.tsv src/011people.tsv -o md > dst/01.md
 	dictknife diff src/010people.tsv src/011people.tsv --skip-empty -o md > dst/01.skipped.md
 	dictknife diff src/010people.tsv src/011people.tsv --verbose -o jsonpatch > dst/01.jsonpatch
+	dictknife diff src/010people.tsv src/011people.tsv --verbose -o pair > dst/01.pair

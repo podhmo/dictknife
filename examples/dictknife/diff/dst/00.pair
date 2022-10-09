@@ -1,0 +1,5 @@
+{                   {
+  "name": "foo",      "name": "bar",
+  "age": 20,          "age": 21,
+  "type": "person"    "type": "person"
+}                   }
