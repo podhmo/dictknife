@@ -15,13 +15,15 @@ format:
 
 build:
 #	pip install wheel
-	python setup.py bdist_wheel
+	python setup.py sdist bdist_wheel
 .PHONY: build
 
 upload:
 #	pip install twine
-	twine check dist/dictknife-$(shell cat VERSION)*
-	twine upload dist/dictknife-$(shell cat VERSION)*
+	twine check dist/dictknife-$(shell cat VERSION)*.gz
+	twine check dist/dictknife-$(shell cat VERSION)*.whl
+	twine upload dist/dictknife-$(shell cat VERSION)*.gz
+	twine upload dist/dictknife-$(shell cat VERSION)*.whl
 .PHONY: upload
 
 # integration tests (regression tests)

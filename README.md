@@ -8,6 +8,10 @@ swiss army knife for handling dict.
 $ pip install dictknife[load,command]
 ```
 
+## examples
+
+see [./examples/dictknife](https://github.com/podhmo/dictknife/tree/master/examples/dictknife)
+
 ## doc
 
 http://dictknife.readthedocs.io
