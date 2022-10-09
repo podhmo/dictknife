@@ -147,7 +147,7 @@ def diff(
                 loading.dump(left_data, o, format="json", sort_keys=sort_keys)
                 o.seek(0)
                 pad_size = len(max(o, key=len)) + 1
-                o.seek(0) 
+                o.seek(0)
                 o2 = io.StringIO()
                 loading.dump(right_data, o2, format="json", sort_keys=sort_keys)
                 o2.seek(0)
