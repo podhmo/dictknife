@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
-    with open(os.path.join(here, "README.rst")) as f:
+    with open(os.path.join(here, "README.md")) as f:
         README = f.read()
     with open(os.path.join(here, "CHANGES.txt")) as f:
         CHANGES = f.read()
@@ -17,6 +17,7 @@ setup(
     version=open(os.path.join(here, "VERSION")).read().strip(),
     description="utility set of handling dict",
     long_description=README + "\n\n" + CHANGES,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3 :: Only"

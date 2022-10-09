@@ -1,11 +1,11 @@
 import unittest
 import textwrap
-import yaml
+import ruamel.yaml
 from io import StringIO
 
 
 def loads(s):
-    return yaml.load(StringIO(s))
+    return ruamel.yaml.load(StringIO(s))
 
 
 class Tests(unittest.TestCase):
