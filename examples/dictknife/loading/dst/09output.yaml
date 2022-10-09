@@ -1,4 +1,5 @@
-name: foo
-pair: 'xxx:yyy'
-url: 'https://example.com/foo#/bar'
-xxx: bar
+# comments
+name: "foo" # comments
+pair: "xxx:yyy"
+url: "https://example.com/foo#/bar"
+xxx: "bar" # comments

@@ -1,10 +1,12 @@
 definitions:
   string0: string
-  string1: string
-  string2: string
-  string10: 'string#hash'
-  string11: 'string#hash'
+  string1: "string"
+  string2: 'string'
+
+  string10: string#hash
+  string11: "string#hash"
   string12: 'string#hash'
+
   string20: |
     multiline
     string#hash
