@@ -13,9 +13,18 @@ class LoadingModule:
 
     @reify
     def toml(self):
-        import qtoml
+        import tomlkit
 
-        return qtoml
+        class _TomlAdaptor:
+            @classmethod
+            def load(cls, fp, *args, **kwargs):
+                return tomlkit.load(fp)
+
+            @classmethod
+            def dump(cls, data, fp=None, *args, sort_keys=False, **kwargs):
+                return tomlkit.dump(data, fp, sort_keys=sort_keys)
+
+        return _TomlAdaptor
 
     @reify
     def csv(self):
