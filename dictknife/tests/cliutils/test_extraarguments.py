@@ -27,7 +27,7 @@ class Tests(unittest.TestCase):
             """
         usage: cmd [-h]
 
-        optional arguments:
+        options:
           -h, --help  show this help message and exit
 
         extra arguments: (with --extra<option>)
