@@ -60,7 +60,7 @@ class LoadingModule:
                 Loader = None
 
                 @classmethod
-                def load(cls, *args, typ="rt", **kwargs):
+                def load(cls, *args, typ="rt", loader=None, **kwargs):
                     return json.load(*args, **kwargs)
 
                 @classmethod
