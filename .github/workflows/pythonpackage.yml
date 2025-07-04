@@ -33,7 +33,6 @@ jobs:
         make test
     - name: e2e test
       run: |
-        hatch shell
         make ci
     - name: lint
       run: |
