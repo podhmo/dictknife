@@ -6,9 +6,9 @@ from dictknife.langhelpers import make_dict
 
 
 def _deepmerge_extend(left, right, *, dedup: bool=False):
-    if isinstance(left, (list, tuple)):
+    if isinstance(left, list):
         r = left[:]
-        if isinstance(right, (list, tuple)):
+        if isinstance(right, list):
             for e in right:
                 if not (dedup and e in r):
                     r.append(e)
@@ -16,6 +16,16 @@ def _deepmerge_extend(left, right, *, dedup: bool=False):
             if not (dedup and right in r):
                 r.append(right)
         return r
+    elif isinstance(left, tuple):
+        r = list(left)
+        if isinstance(right, tuple):
+            for e in right:
+                if not (dedup and e in r):
+                    r.append(e)
+        else:
+            if not (dedup and right in r):
+                r.append(right)
+        return tuple(r)
     elif hasattr(left, "get"):
         if hasattr(right, "get"):
             r = left.copy()

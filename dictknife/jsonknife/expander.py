@@ -16,6 +16,7 @@ def detect_circur_reference(doc, d) -> bool:
                 return True
     else:
         return False
+    return False
 
 
 class Expander(object):

@@ -18,7 +18,7 @@ class SimpleContext(object):
 
 class PathContext(object):
     def __init__(self) -> None:
-        self.path = []
+        self.path: list = []
 
     def push(self, v) -> None:
         self.path.append(v)

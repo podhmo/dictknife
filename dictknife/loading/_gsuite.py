@@ -112,7 +112,7 @@ def get_credentials_failback_webbrowser(
 
 class MemoryCache(Cache):
     def __init__(self) -> None:
-        self.cache = {}
+        self.cache: dict[str, object] = {}
 
     def get(self, url):
         return self.cache.get(url)

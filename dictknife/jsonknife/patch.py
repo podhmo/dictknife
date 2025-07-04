@@ -56,7 +56,7 @@ def _merge(r):
 class _Walker:
     # two path scan move, copy
     def __init__(self) -> None:
-        self.move_map = {}  # todo:
+        self.move_map: dict = {}  # todo:
 
     def walk(self, src, dst):
         # xxx: src and dst is None

@@ -18,6 +18,9 @@ is_ref = operators.And(["$ref", _is_string])
 
 
 class AccessingMixin:
+    def __init__(self) -> None:
+        self.doc = {}  # This will be overridden by implementers
+
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):
         if doc is None:
@@ -176,7 +179,7 @@ class StackedAccessor:
 class CachedItemAccessor(StackedAccessor):
     def __init__(self, resolver) -> None:
         super().__init__(resolver)
-        self.cache = {}  # globalref -> item
+        self.cache: dict[tuple[str, str], CachedItem] = {}  # globalref -> item
 
     def _access(self, subresolver, pointer):
         globalref = (subresolver.filename, pointer)

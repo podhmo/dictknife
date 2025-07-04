@@ -8,8 +8,8 @@ Row = namedtuple("Row", "path, type, example")
 
 class _State:
     def __init__(self) -> None:
-        self.paths = []
-        self.examples = defaultdict(list)
+        self.paths: list = []
+        self.examples: defaultdict = defaultdict(list)
 
     def emit(self, path, example) -> None:
         path = tuple(path[:])

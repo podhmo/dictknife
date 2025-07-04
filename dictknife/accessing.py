@@ -86,7 +86,7 @@ missing = object()
 
 class Scope:
     def __init__(self, init=None, *, accessor=None) -> None:
-        self.states = []
+        self.states: list[object] = []
         self.accessor = accessor or Accessor()
         if init is not None:
             self.push(init)

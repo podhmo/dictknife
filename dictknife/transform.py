@@ -113,7 +113,10 @@ def shrink(
             if len(xs) > max_length_of_list:
                 xs = d[:max_length_of_list]
             if with_tail:
-                xs.extend(d[-max_length_of_list:])
+                if isinstance(xs, list):
+                    xs.extend(d[-max_length_of_list:])
+                else:
+                    xs = list(xs) + list(d[-max_length_of_list:])
             return modifier.modify_list(_map, xs)
         elif hasattr(d, "keys"):
             return modifier.modify_dict(_map, d)

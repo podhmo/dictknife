@@ -20,7 +20,7 @@ def _wrap(ob):
         for wv in wvals:
             if wv.keys:
                 keys.update(wv.keys)
-        keys = tuple(sorted(keys))
+        keys = set(sorted(keys))  # fix: keep as set
         for wv in wvals:
             wv.arrange(keys)
         return _Collection(sorted(wvals, key=lambda x: x.uid), keys)
@@ -80,7 +80,7 @@ class _Atom:
 class _Collection:
     def __init__(self, value, keys) -> None:
         self.value = value
-        self.keys = keys
+        self.keys = set(keys)  # fix: ensure keys is always a set
 
     @reify
     def uid(self):
@@ -90,7 +90,7 @@ class _Collection:
         return [v.unwrap() for v in self.value]
 
     def arrange(self, new_keys) -> None:
-        self.keys = new_keys
+        self.keys = set(new_keys)
 
 
 class _Dict:

@@ -10,7 +10,7 @@ class ExtraArgumentsParsers:
         self.dest = dest
 
         self.prefix = prefix
-        self.mapping = {}
+        self.mapping: dict = {}
         self.parser_factory = parser_factory
 
         self.bind(parser)  # xxx: side effect

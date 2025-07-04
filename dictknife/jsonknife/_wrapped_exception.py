@@ -5,11 +5,13 @@ class WrappedExceptionFactory:
     def __init__(self, *, prefix: str="Wrapped", mixin_class=None) -> None:
         self.prefix = prefix
         self.mixin_class = mixin_class or WrappedMixin
-        self.classes = {}
+        self.classes: dict[type, type] = {}
 
     def __call__(self, e: Exception, *, where: str) -> Exception:
         if isinstance(e, self.mixin_class):
-            e.stack.append(where)
+            if not hasattr(e, "stack"):
+                e.stack = []  # type: ignore[attr-defined]
+            e.stack.append(where)  # type: ignore[attr-defined]
             return e
 
         cls = self.classes.get(e.__class__)

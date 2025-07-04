@@ -92,8 +92,8 @@ class Detector:
 
 class Emitter:
     def __init__(self, annotations) -> None:
-        self.doc = make_dict(definitions=make_dict())
-        self.definitions = self.doc["definitions"]
+        self.doc: dict[str, dict] = make_dict(definitions=make_dict())
+        self.definitions: dict = self.doc["definitions"]
 
         self.ns = NameStore()
         self.cw = CommentWriter()
@@ -123,7 +123,7 @@ class Emitter:
 
     def make_array_schema(self, info, parent):
         self.cw.write(info["name"] + "[]", info, parent=parent)
-        d = make_dict(type="array")
+        d: dict[str, object] = make_dict(type="array")
         d["items"] = self.make_schema(info, parent=info, fromarray=True)
         schema_name = self.resolve_name(info, suffix="[]")
         self.definitions[schema_name] = d
@@ -136,9 +136,10 @@ class Emitter:
         if not fromarray:
             self.cw.write(info["name"], info, parent=parent)
 
-        d = make_dict(type="object")
+        d: dict[str, object] = make_dict(type="object")
         d["properties"] = make_dict()
-        props = d["properties"]
+        from typing import Any
+        props: dict[str, Any] = d["properties"]
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
         required = [
@@ -178,7 +179,9 @@ class Emitter:
 
 class CommentWriter(object):
     def __init__(self) -> None:
-        self.cm_map = {}
+        # Using Any for cm_map entries as they need scope(), stmt() and submodule() methods
+        from typing import Any
+        self.cm_map: dict[str, Any] = {}
 
     def write(self, name: str, info, parent=None) -> None:
         if parent is None:

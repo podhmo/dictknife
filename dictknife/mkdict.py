@@ -13,7 +13,7 @@ class _AccessorSupportList(Accessor):
 
     def assign(self, d, path, value) -> None:
         hist = [d]
-        seen = []
+        seen: list[str] = []
         for name in path[:-1]:
             if name == "":
                 if hasattr(d, "keys"):
@@ -58,17 +58,17 @@ class _AccessorSupportList(Accessor):
         else:
             d[name] = value
 
-    def maybe_access(self, d, path):
+    def maybe_access(self, d, path, *, default=None):
         for name in path[:-1]:
             if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
                 name = int(name)
             try:
                 d = d[name]
             except KeyError:
-                return None
+                return default
 
         if not d:
-            return None
+            return default
 
         name = path[-1]
         if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
