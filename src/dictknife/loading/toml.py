@@ -5,9 +5,6 @@ from .raw import setup_extra_parser  # noqa
 def load(fp, *, loader=None, errors=None, **kwargs):
     """Loads TOML data from a file-like object.
 
-    This function requires the `tomlkit` package.
-    For installation details, see the `Loader` class documentation or the project's README.
-
     Args:
         fp: A file-like object supporting .read().
         loader: (Unused) The loader instance.
@@ -22,9 +19,6 @@ def load(fp, *, loader=None, errors=None, **kwargs):
 
 def dump(d, fp, *, sort_keys: bool = False, **kwargs):
     """Dumps a Python object to a file-like object in TOML format.
-
-    This function requires the `tomlkit` package.
-    For installation details, see the `Dumper` class documentation or the project's README.
 
     Note: `tomlkit.dump` does not directly support a `sort_keys` argument.
     If `sort_keys` is True, the input dictionary `d` should be sorted before calling this function,

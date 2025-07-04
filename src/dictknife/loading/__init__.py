@@ -29,7 +29,8 @@ class Loader:
     loading from Google Spreadsheets (via the `loadfile` method with a spreadsheet URL)
     requires `google-api-python-client` and `google-auth-oauthlib`. These can often
     be installed using extras, e.g., `pip install dictknife[spreadsheet]`.
-    Refer to the documentation of individual format handlers for specific requirements.
+    Refer to the documentation of individual format handlers or the project's
+    main documentation for specific requirements and installation instructions.
     """
     def __init__(self, dispatcher) -> None:
         """Initializes the Loader with a dispatcher.
@@ -142,8 +143,9 @@ class Dumper:
     Note: Dumping to certain formats might require optional dependencies. For example,
     YAML format requires `ruamel.yaml`, and TOML format requires `tomlkit`.
     These can often be installed using extras, e.g., `pip install dictknife[load]`
-    (as 'load' extra includes common serialization libraries). Refer to the
-    documentation of individual format handlers for specific requirements.
+    (as the 'load' extra includes common serialization libraries). Refer to the
+    documentation of individual format handlers or the project's main documentation
+    for specific requirements and installation instructions.
     """
     def __init__(self, dispatcher) -> None:
         """Initializes the Dumper with a dispatcher.
@@ -344,9 +346,8 @@ loads = dispatcher.loader.loads
 loadfile = dispatcher.loader.loadfile
 """Alias for `dispatcher.loader.loadfile`.
 
-This function may require optional dependencies for certain file formats.
-See the `Loader` class docstring or individual format loader documentation for details
-on required packages and installation (e.g., using `dictknife[spreadsheet]`).
+For information on optional dependencies required by certain file formats,
+please refer to the `Loader` class docstring or the project documentation.
 """
 dump = dispatcher.dumper.dump
 """Alias for `dispatcher.dumper.dump`."""
@@ -355,9 +356,8 @@ dumps = dispatcher.dumper.dumps
 dumpfile = dispatcher.dumper.dumpfile
 """Alias for `dispatcher.dumper.dumpfile`.
 
-This function may require optional dependencies for certain file formats.
-See the `Dumper` class docstring or individual format dumper documentation for details
-on required packages and installation (e.g., using `dictknife[load]`).
+For information on optional dependencies required by certain file formats,
+please refer to the `Dumper` class docstring or the project documentation.
 """
 guess_format = dispatcher.guess_format
 """Alias for `dispatcher.guess_format`."""
