@@ -31,6 +31,7 @@ class Regexp(object):
     Attributes:
         args: The compiled regular expression pattern.
     """
+
     __repr__ = repr
 
     def __init__(self, rx) -> None:
@@ -47,6 +48,7 @@ class Any(object):
 
     Useful as a wildcard or placeholder in queries.
     """
+
     def __repr__(self) -> str:
         return "<{self.__class__.__name__}>".format(self=self)
 
@@ -63,6 +65,7 @@ class Not(object):
     Attributes:
         args: The query object whose result will be negated.
     """
+
     __repr__ = repr
 
     def __init__(self, value) -> None:
@@ -80,6 +83,7 @@ class Or(object):
     Attributes:
         args: A list or tuple of query objects.
     """
+
     __repr__ = repr
 
     def __init__(self, args) -> None:
@@ -100,6 +104,7 @@ class And(object):
     Attributes:
         args: A list or tuple of query objects.
     """
+
     __repr__ = repr
 
     def __init__(self, args) -> None:

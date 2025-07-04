@@ -9,6 +9,7 @@ class Accessor:
         make_dict: A function to create new dictionary-like objects.
         zero_value: The value to use when an index is out of bounds in a list.
     """
+
     def __init__(self, make_dict=make_dict, zero_value=None) -> None:
         self.make_dict = make_dict
         self.zero_value = zero_value

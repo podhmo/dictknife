@@ -59,6 +59,7 @@ class DictWalker(object):
         handler: A handler object that processes the found values.
         context_factory: A factory function that creates a context object for the walk.
     """
+
     context_factory = PathContext
     handler_factory = ContainerHandler
 
