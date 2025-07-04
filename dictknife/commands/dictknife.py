@@ -35,7 +35,7 @@ def cat(
     size=None,
     slurp=False,
     extra=None,
-    merge_method="addtoset"
+    merge_method="addtoset",
 ):
     from dictknife import deepmerge
 
@@ -76,7 +76,7 @@ def transform(
     input_format: str,
     output_format: str,
     format: str,
-    sort_keys: str
+    sort_keys: str,
 ):
     """transform dict"""
     from magicalimport import import_symbol
@@ -113,7 +113,7 @@ def diff(
     n: int,
     input_format: str,
     output_format: str = "diff",
-    verbose: bool = False
+    verbose: bool = False,
 ):
     """diff dict"""
     from dictknife.diff import diff, diff_rows, make_jsonpatch
@@ -182,7 +182,7 @@ def shape(
     separator,
     with_type,
     with_example,
-    full
+    full,
 ):
     """shape"""
     from dictknife import shape
@@ -228,7 +228,7 @@ def shrink(
     max_length_of_string: int,
     cont_suffix: str,
     max_length_of_list: int,
-    with_tail: bool
+    with_tail: bool,
 ):
     """shrink"""
     from dictknife.transform import shrink
@@ -254,7 +254,7 @@ def mkdict(
     delimiter: str,
     sort_keys: bool,
     squash: bool,
-    extra
+    extra,
 ):
     from dictknife.mkdict import mkdict
 

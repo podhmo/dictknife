@@ -42,7 +42,7 @@ class ExternalFileResolver(AccessingMixin):
         rawfilename=None,
         onload=None,
         format=None,
-        wrap_exception=wrap_exception
+        wrap_exception=wrap_exception,
     ):
         self.rawfilename = rawfilename or filename
         self.filename = os.path.normpath(os.path.abspath(str(filename)))

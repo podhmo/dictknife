@@ -50,6 +50,7 @@ class LoadingModule:
     def yaml(self):
         try:
             from . import _yaml as yaml
+
             return yaml
         except ImportError:
             logger.info("yaml package is not found, failback to json")
@@ -69,7 +70,7 @@ class LoadingModule:
                     *args,
                     # allow_unicode=None,
                     # default_flow_style=None,
-                    **kwargs
+                    **kwargs,
                 ):
                     if "indent" not in kwargs:
                         kwargs["indent"] = 2

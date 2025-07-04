@@ -120,7 +120,7 @@ class Migration:
             loading.dumpfile(
                 self.transform(self.differ.after_data(r.doc)),
                 savepath,
-                **self.dump_options
+                **self.dump_options,
             )
 
     def migrate(
@@ -131,7 +131,7 @@ class Migration:
         where=None,
         inplace=False,
         savedir=None,
-        keep=False
+        keep=False,
     ):
         logger.info(
             "start migration (dry_run=%r, inplace=%r, where=%r)",

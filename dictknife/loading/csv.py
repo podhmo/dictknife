@@ -24,7 +24,7 @@ def load(
     errors=None,
     _registry=_cls_registry,
     create_reader_class=None,
-    **kwargs
+    **kwargs,
 ):
     k = errors
     DictReader = _registry.get(k)

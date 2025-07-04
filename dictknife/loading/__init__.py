@@ -97,7 +97,7 @@ class Dumper:
         format=None,
         sort_keys=False,
         extra=None,
-        _retry=False
+        _retry=False,
     ):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator

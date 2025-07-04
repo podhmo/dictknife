@@ -87,7 +87,7 @@ def mkdict(
     delimiter=";",
     accessor=_AccessorSupportList(make_dict),
     guess=guess,
-    shared=None
+    shared=None,
 ):
     """
     ## examples
@@ -150,7 +150,7 @@ def _mkdict(
     guess,
     depth=0,
     variables=None,
-    shared=None
+    shared=None,
 ):
     L = []
     d = accessor.make_dict()
