@@ -48,14 +48,14 @@ class Detector:
             "values": [],
         }
 
-    def detect(self, d, name, info=None):
+    def detect(self, d, name: str, info=None):
         s = make_dict()
         s[name] = info or self.make_info()
         path = [name]
         self._detect(d, s[name], name, path=path)
         return s[name]
 
-    def _detect(self, d, s, name, path) -> None:
+    def _detect(self, d, s, name: str, path) -> None:
         if hasattr(d, "keys"):
             s["type"] = "object"
             s["name"] = name
@@ -180,7 +180,7 @@ class CommentWriter(object):
     def __init__(self) -> None:
         self.cm_map = {}
 
-    def write(self, name, info, parent=None) -> None:
+    def write(self, name: str, info, parent=None) -> None:
         if parent is None:
             return
         cm = self.cm_map[parent["name"]]

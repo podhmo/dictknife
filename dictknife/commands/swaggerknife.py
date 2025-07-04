@@ -9,7 +9,7 @@ from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
-def tojsonschema(*, src, dst, name) -> None:
+def tojsonschema(*, src, dst, name: str) -> None:
     # todo: id
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)

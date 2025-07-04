@@ -15,7 +15,7 @@ class ExtraArgumentsParsers:
 
         self.bind(parser)  # xxx: side effect
 
-    def add_parser(self, name):
+    def add_parser(self, name: str):
         self.mapping[name] = p = self.parser_factory(
             "{self.prefix} arguments {name}".format(self=self, name=name),
             description="for {self.dest}={name}".format(self=self, name=name),
@@ -57,7 +57,7 @@ class ExtraArgumentsParsers:
         parser.format_help = format_help
         return parser
 
-    def parse_args(self, name, args):
+    def parse_args(self, name: str, args):
         rest = self._transform_args(args)
         return self._parse_args(name, rest)
 
@@ -65,7 +65,7 @@ class ExtraArgumentsParsers:
         prefix = "--{prefix}".format(prefix=self.prefix)
         return [(x[7:] if x.startswith(prefix) else x) for x in args]
 
-    def _parse_args(self, name, rest):
+    def _parse_args(self, name: str, rest):
         parser = self.mapping[name]
         args, rest = parser.parse_known_args(rest, namespace=argparse.Namespace())
         self._show_warnigs(rest)

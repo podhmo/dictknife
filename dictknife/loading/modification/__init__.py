@@ -9,10 +9,10 @@ def _get_modifications_history(dispatcher):
     return dispatcher._modifications
 
 
-def is_used(dispatcher, name) -> bool:
+def is_used(dispatcher, name: str) -> bool:
     return name in _get_modifications_history(dispatcher)
 
 
-def use(dispatcher, name) -> None:
+def use(dispatcher, name: str) -> None:
     logger.debug("use modification, %s", name)
     _get_modifications_history(dispatcher).add(name)

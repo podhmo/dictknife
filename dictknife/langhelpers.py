@@ -10,7 +10,7 @@ from .cliutils import traceback_shortly  # noqa F401
 from .naming import normalize, titleize, untitleize  # noqa F401
 
 
-def pairsplit(s, sep):
+def pairsplit(s, sep: str):
     r = s.split(sep, 1)
     if len(r) == 1:
         return r[0], ""
@@ -18,7 +18,7 @@ def pairsplit(s, sep):
         return r
 
 
-def pairrsplit(s, sep):
+def pairrsplit(s, sep: str):
     r = s.rsplit(sep, 1)
     if len(r) == 1:
         return r[0], ""

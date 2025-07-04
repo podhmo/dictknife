@@ -11,6 +11,7 @@ from dictknife.commands._monkeypatch import (
     apply_loading_format_extra_arguments_parser,
     apply_rest_arguments_as_extra_arguments_parser,
 )
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def cat(
     sort_keys,
     encoding=None,
     errors=None,
-    size=None,
+    size: Optional[int]=None,
     slurp: bool=False,
     extra=None,
     merge_method: str="addtoset",

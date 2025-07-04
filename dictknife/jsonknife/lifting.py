@@ -11,7 +11,7 @@ class Handler:
     def full_name(self):
         return "".join(self.path)
 
-    def add_name(self, name) -> None:
+    def add_name(self, name: str) -> None:
         self.path.append(titleize(name))
 
     def add_array_item(self) -> None:
@@ -20,14 +20,14 @@ class Handler:
     def pop_name(self) -> None:
         self.path.pop()
 
-    def save_object(self, name, definition):
+    def save_object(self, name: str, definition):
         newdef = self.r.__class__()
         newdef["type"] = "object"
         newdef.update(definition)
         self.r[name] = newdef
         return newdef
 
-    def save_array(self, name, definition):
+    def save_array(self, name: str, definition):
         newdef = self.r.__class__()
         newdef["type"] = "array"
         newdef.update(definition)
@@ -58,7 +58,7 @@ class Flattener:
         else:
             return data
 
-    def return_definition(self, definition, fullname, typ: str="object"):
+    def return_definition(self, definition, fullname: str, typ: str="object"):
         if self.replace:
             return {"$ref": "#/definitions/{}".format(fullname)}
         else:

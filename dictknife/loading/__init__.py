@@ -146,7 +146,7 @@ class Dispatcher:
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
-    def add_format(self, fmt, load, dump, *, exts=[], opener=None) -> None:
+    def add_format(self, fmt, load: bool, dump, *, exts=[], opener=None) -> None:
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:

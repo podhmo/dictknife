@@ -11,7 +11,7 @@ class ref(object):
 
 
 class DeepEqualTests(unittest.TestCase):
-    def _callFUT(self, left, right, normalize):
+    def _callFUT(self, left, right, normalize: bool):
         from dictknife import deepequal
 
         return deepequal(left, right, normalize=normalize)
