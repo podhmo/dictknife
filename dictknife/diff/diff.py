@@ -1,13 +1,13 @@
 import difflib
 from dictknife.deepequal import sort_flexibly
 from dictknife.transform import str_dict
-from typing import Optional
+from typing import Optional, Callable, Any
 
 
 def diff(
     d0,
     d1,
-    tostring: Optional[str]=None,
+    tostring: Optional[Callable[[Any], str]]=None,
     fromfile: str="left",
     tofile: str="right",
     n: int=3,

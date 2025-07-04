@@ -10,7 +10,7 @@ class Tests(unittest.TestCase):
     def test_empty(self) -> None:
         from dictknife import diff
 
-        d = {}
+        d: dict[str, object] = {}
         q = {"a": {"b": {"c": "d"}}}
         actual = self._callFUT(d, q)
         self.assertFalse(list(diff(actual, {"a": {"b": {"c": "d"}}})))

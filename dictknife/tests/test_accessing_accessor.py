@@ -9,13 +9,13 @@ class AssignTests(unittest.TestCase):
         return a.assign(d, k, v)
 
     def test_assign_dict(self) -> None:
-        d = {}
+        d: dict[str, object] = {}
         self._callFUT(d, ["x"], 1)
         expected = {"x": 1}
         self.assertDictEqual(d, expected)
 
     def test_assign_deeply(self) -> None:
-        d = {}
+        d: dict[int, object] = {}
         self._callFUT(d, [1, 2, 3, 4, 5, 6, 7, 8, 9], "foo")
         expected = {1: {2: {3: {4: {5: {6: {7: {8: {9: "foo"}}}}}}}}}
         self.assertDictEqual(d, expected)

@@ -2,6 +2,7 @@ import logging
 import os.path
 from collections import defaultdict
 from functools import partial
+from typing import TYPE_CHECKING
 
 from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
@@ -11,6 +12,9 @@ from dictknife import deepmerge
 from .relpath import relpath
 from .accessor import CachedItemAccessor
 from .accessor import is_ref
+
+if TYPE_CHECKING:
+    from .accessor import CachedItem
 
 
 logger = logging.getLogger("jsonknife.bundler")
@@ -38,7 +42,7 @@ class Bundler:
     def __init__(self, resolver, strict: bool=False, *, scanner_factory=None) -> None:
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
-        self.item_map: dict[str, CachedItem] = make_dict()  # localref -> item
+        self.item_map: dict[str, "CachedItem"] = make_dict()  # localref -> item
         self.strict = strict
         self._scanner_factory = scanner_factory or Scanner
 

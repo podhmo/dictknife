@@ -7,7 +7,7 @@ from typing import Any, Type
 
 logger = get_logger(__name__)
 
-_cls_registry: dict[str, Type] = {}
+_cls_registry: dict[str, type] = {}
 
 
 def setup_extra_parser(parser):

@@ -55,7 +55,7 @@ class Tests(unittest.TestCase):
         with contextlib.redirect_stderr(StringIO()) as o:
             args = target.parse_args("toml", ["--extra--sort-keys"])
             actual = vars(args)
-            expected = {}
+            expected: dict[str, object] = {}
             self.assertEqual(actual, expected)
 
         self.assertIn("--sort-keys", o.getvalue())

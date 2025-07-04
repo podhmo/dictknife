@@ -22,10 +22,11 @@ class WrappedExceptionFactory:
             self.classes[e.__class__] = cls
 
         # sync
-        exc = cls.__new__(cls).with_traceback(e.__traceback__)
+        exc = cls.__new__(cls)
         exc.__dict__.update(e.__dict__)
         if hasattr(e, "args"):
             exc.args = e.args
+        exc = exc.with_traceback(e.__traceback__)
         return self(exc, where=where)
 
 

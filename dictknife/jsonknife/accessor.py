@@ -19,7 +19,7 @@ is_ref = operators.And(["$ref", _is_string])
 
 class AccessingMixin:
     def __init__(self) -> None:
-        self.doc = {}  # This will be overridden by implementers
+        self.doc: dict[str, object] = {}  # This will be overridden by implementers
 
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):

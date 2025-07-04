@@ -49,7 +49,7 @@ class Tests(unittest.TestCase):
             f()
         except Exception as e:
             self.assertIsInstance(e, MyException)
-            self.assertListEqual(e.stack, ["g", "f"])
+            self.assertListEqual(getattr(e, "stack", []), ["g", "f"])
             self.assertEqual(getattr(e, "context", None), "oyoyo")
         else:
             self.fail("must be raised")

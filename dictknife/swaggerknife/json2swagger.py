@@ -138,8 +138,8 @@ class Emitter:
 
         d: dict[str, object] = make_dict(type="object")
         d["properties"] = make_dict()
-        from typing import Any
-        props: dict[str, Any] = d["properties"]
+        from typing import Any, cast
+        props: dict[str, Any] = cast(dict[str, Any], d["properties"])
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
         required = [

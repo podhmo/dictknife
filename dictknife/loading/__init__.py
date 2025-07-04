@@ -20,8 +20,8 @@ unknown = "(unknown)"
 class Loader:
     def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
-        self.fn_map = {}
-        self.opener_map = {}
+        self.fn_map: dict[str, object] = {}
+        self.opener_map: dict[str, object] = {}
 
     def add_format(self, fmt, fn, *, opener=None) -> None:
         self.fn_map[fmt] = fn
@@ -66,7 +66,7 @@ class Loader:
 class Dumper:
     def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
-        self.fn_map = {}
+        self.fn_map: dict[str, object] = {}
 
     def add_format(self, fmt, fn) -> None:
         self.fn_map[fmt] = fn
@@ -134,7 +134,7 @@ class Dispatcher:
     def __init__(self) -> None:
         self.loader = self.loader_factory(self)
         self.dumper = self.dumper_factory(self)
-        self.exts_matching = {}
+        self.exts_matching: dict[str, str] = {}
 
     def guess_format(self, filename, *, default=unknown):
         if filename is None:
@@ -146,7 +146,7 @@ class Dispatcher:
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
-    def add_format(self, fmt, load: bool, dump, *, exts=[], opener=None) -> None:
+    def add_format(self, fmt, load, dump, *, exts=[], opener=None) -> None:
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
