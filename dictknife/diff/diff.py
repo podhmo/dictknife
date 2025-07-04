@@ -7,7 +7,7 @@ from typing import Optional, Callable, Any
 def diff(
     d0,
     d1,
-    tostring: Optional[Callable[[Any], str]]=None,
+    tostring: Optional[Callable[..., str]]=None,
     fromfile: str="left",
     tofile: str="right",
     n: int=3,

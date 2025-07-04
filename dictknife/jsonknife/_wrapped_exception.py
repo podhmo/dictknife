@@ -22,7 +22,7 @@ class WrappedExceptionFactory:
             self.classes[e.__class__] = cls
 
         # sync
-        exc = cls.__new__(cls)
+        exc = cls()
         exc.__dict__.update(e.__dict__)
         if hasattr(e, "args"):
             exc.args = e.args

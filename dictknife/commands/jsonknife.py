@@ -1,6 +1,7 @@
 import logging
 import contextlib
 import warnings
+from typing import List, Any, Optional, Callable, Dict # Added Callable and Dict
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
@@ -9,7 +10,7 @@ from dictknife.cliutils import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
-def cut(*, src, dst, refs) -> None:
+def cut(*, src: Optional[str], dst: Optional[str], refs: List[str]) -> None:
     from dictknife.accessing import Accessor
 
     d = loading.loadfile(src)
@@ -37,14 +38,14 @@ def deref(*, src, dst, refs, unwrap, wrap, input_format, output_format, format):
 
 def select(
     *,
-    src: str,
-    dst: str,
-    refs,
-    unwrap,
-    wrap,
-    input_format: str,
-    output_format: str,
-    format: str,
+    src: Optional[str],
+    dst: Optional[str],
+    refs: List[str],
+    unwrap: Optional[str],
+    wrap: Optional[str],
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
 ) -> None:
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
@@ -75,25 +76,25 @@ def select(
 
 def bundle(
     *,
-    src: str,
-    dst: str = None,
-    ref: str = None,
-    input_format: str,
-    output_format: str,
-    format: str,
-    flavor: str,
-    extras: list = None,
+    src: Optional[str],
+    dst: Optional[str] = None,
+    ref: Optional[str] = None,
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
+    flavor: Optional[str],
+    extras: Optional[List[str]] = None,
 ) -> None:
-    from dictknife.jsonknife import bundle
+    from dictknife.jsonknife import bundle as bundle_module
 
-    if ref is not None:
+    if ref is not None and src is not None:
         src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
-    result = bundle(src, format=input_format or format, extras=extras, flavor=flavor)
+    result = bundle_module(src, format=input_format or format, extras=extras, flavor=flavor)
     loading.dumpfile(result, dst, format=output_format or format)
 
 
 def separate(
-    *, src: str, dst: str = None, input_format: str, output_format: str, format: str
+    *, src: Optional[str], dst: Optional[str] = None, input_format: Optional[str], output_format: Optional[str], format: Optional[str]
 ) -> None:
     from dictknife.jsonknife import separate
 
@@ -107,50 +108,51 @@ def separate(
 
 def examples(
     *,
-    src: str,
-    dst: str = None,
-    ref: str,
+    src: Optional[str],
+    dst: Optional[str] = None,
+    ref: Optional[str],
     limit: int,
-    input_format: str,
-    output_format: str,
-    format: str,
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
     use_expand: bool = False,
 ) -> None:
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer
 
+    data: Any
     if use_expand:
-        from dictknife.jsonknife import bundle, expand
+        from dictknife.jsonknife import bundle as bundle_module, expand
 
-        if ref is not None:
+        if ref is not None and src is not None:
             src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
-        data = bundle(src, format=input_format or format)
+        data = bundle_module(src, format=input_format or format)
         data = expand(None, doc=data)
     else:
         data = loading.loadfile(src, format=input_format or format)
 
+    actual_ref = ref
     if src and "#/" in src:
-        _, ref = src.split("#/", 1)
-    if ref is not None:
-        data = access_by_json_pointer(data, ref)
-    d = extract_example(data, limit=limit)
+        _, actual_ref = src.split("#/", 1)
+    if actual_ref is not None:
+        data = access_by_json_pointer(data, actual_ref)
+    d: Any = extract_example(data, limit=limit)
     loading.dumpfile(d, dst, format=output_format or format or "json")
 
 
 def main():
     import argparse
 
+    class HelpFormatter(
+        argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter
+    ):
+        pass
+
     formats = loading.get_formats()
 
-    parser = argparse.ArgumentParser(
-        formatter_class=type(
-            "_HelpFormatter",
-            (argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter),
-            {},
-        )
-    )
-    parser.print_usage = parser.print_help  # hack
+    parser = argparse.ArgumentParser(formatter_class=HelpFormatter)
+    # parser.print_usage = parser.print_help  # hack # mypy: error: Cannot assign to a method
     parser.add_argument(
         "--log",
         choices=list(logging._nameToLevel.keys()),
@@ -165,9 +167,11 @@ def main():
     subparsers.required = True
 
     # cut
-    fn = cut
+    def run_cut(args: argparse.Namespace) -> None:
+        cut(src=args.src, dst=args.dst, refs=args.refs)
+    fn = run_cut
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        cut.__name__, help=cut.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None, help="-")
@@ -175,7 +179,18 @@ def main():
     sparser.add_argument("--ref", dest="refs", action="append", help="-")
 
     # deref
-    fn = deref
+    def run_deref(args: argparse.Namespace) -> None:
+        deref(
+            src=args.src,
+            dst=args.dst,
+            refs=args.refs,
+            unwrap=args.unwrap,
+            wrap=args.wrap,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+        )
+    fn = run_deref
     sparser = subparsers.add_parser(
         fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
     )
@@ -193,9 +208,20 @@ def main():
         "-o", "--output-format", default=None, choices=formats, help="-"
     )
     # select
-    fn = select
+    def run_select(args: argparse.Namespace) -> None:
+        select(
+            src=args.src,
+            dst=args.dst,
+            refs=args.refs,
+            unwrap=args.unwrap,
+            wrap=args.wrap,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+        )
+    fn = run_select
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        select.__name__, help=select.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None, help="-")
@@ -212,9 +238,20 @@ def main():
     )
 
     # bundle
-    fn = bundle
+    def run_bundle(args: argparse.Namespace) -> None:
+        bundle(
+            src=args.src,
+            dst=args.dst,
+            ref=args.ref,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+            flavor=args.flavor,
+            extras=args.extras,
+        )
+    fn = run_bundle
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        bundle.__name__, help=bundle.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None, help="-")
@@ -233,9 +270,17 @@ def main():
     sparser.add_argument("--extra", default=None, nargs="+", dest="extras", help="-")
 
     # separate
-    fn = separate
+    def run_separate(args: argparse.Namespace) -> None:
+        separate(
+            src=args.src,
+            dst=args.dst,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+        )
+    fn = run_separate
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        separate.__name__, help=separate.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None, help="-")
@@ -249,9 +294,20 @@ def main():
     )
 
     # examples
-    fn = examples
+    def run_examples(args: argparse.Namespace) -> None:
+        examples(
+            src=args.src,
+            dst=args.dst,
+            ref=args.ref,
+            limit=args.limit,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+            use_expand=args.use_expand,
+        )
+    fn = run_examples
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        examples.__name__, help=examples.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", default=None, help="-")
@@ -277,4 +333,5 @@ def main():
             warnings.simplefilter("ignore")
         logging.basicConfig(level=getattr(logging, params.pop("log_level")))
         with traceback_shortly(params.pop("debug")):
-            return params.pop("subcommand")(**params)
+            subcommand_func = params.pop("subcommand")
+            return subcommand_func(argparse.Namespace(**params))

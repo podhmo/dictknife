@@ -11,7 +11,7 @@ from dictknife.commands._monkeypatch import (
     apply_loading_format_extra_arguments_parser,
     apply_rest_arguments_as_extra_arguments_parser,
 )
-from typing import Optional
+from typing import Optional, Any, List, Dict, Generator, IO, Union, Callable
 
 logger = logging.getLogger(__name__)
 
@@ -25,32 +25,33 @@ def _open(f, encoding=None, errors=None):
 
 def cat(
     *,
-    files,
-    dst,
-    format,
-    input_format,
-    output_format,
-    sort_keys,
-    encoding=None,
-    errors=None,
-    size: Optional[int]=None,
-    slurp: bool=False,
-    extra=None,
-    merge_method: str="addtoset",
+    files: List[Any],
+    dst: Optional[str],
+    format: Optional[str],
+    input_format: Optional[str],
+    output_format: Optional[str],
+    sort_keys: bool,
+    encoding: Optional[str] = None,
+    errors: Optional[str] = None,
+    size: Optional[int] = None,
+    slurp: bool = False,
+    extra: Optional[Dict[str, Any]] = None,
+    merge_method: str = "addtoset",
 ) -> None:
     from dictknife import deepmerge
 
-    input_format = input_format or format
-    d = make_dict()
+    actual_input_format = input_format or format
+    d: Any = make_dict()
     with contextlib.ExitStack() as s:
         for f in files:
             logger.debug("merge: %s", f)
-            opener = loading.get_opener(filename=f, format=input_format, default=_open)
+            opener = loading.get_opener(filename=f, format=actual_input_format, default=_open)
             rf = s.enter_context(opener(f, encoding=encoding, errors=errors))
+            sd: Any
             if slurp:
-                sd = (loading.loads(line, format=input_format) for line in rf)
+                sd = (loading.loads(line, format=actual_input_format) for line in rf)
             else:
-                sd = loading.load(rf, format=input_format, errors=errors)
+                sd = loading.load(rf, format=actual_input_format, errors=errors)
             if size is not None:
                 sd = itertools.islice(sd, size)
 
@@ -61,23 +62,23 @@ def cat(
             else:
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
-                d = deepmerge(d, sd, method=merge_method)
+                d = deepmerge(d, list(sd) if hasattr(sd, "__iter__") and not isinstance(sd, (list, tuple, dict)) else sd, method=merge_method)
 
         loading.dumpfile(
-            d, dst, format=output_format or format, sort_keys=sort_keys, extra=extra
+            d, dst, format=(output_format or format), sort_keys=sort_keys, extra=extra
         )
 
 
 def transform(
     *,
-    src: str,
-    dst: str,
-    code: str,
-    functions: str,
-    input_format: str,
-    output_format: str,
-    format: str,
-    sort_keys: str,
+    src: Optional[str],
+    dst: Optional[str],
+    code: Optional[str],
+    functions: List[str],
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
+    sort_keys: bool,
 ) -> None:
     """transform dict"""
     from magicalimport import import_symbol
@@ -109,23 +110,23 @@ def diff(
     normalize: bool,
     sort_keys: bool,
     skip_empty: bool,
-    left: dict,
-    right: dict,
+    left: str,
+    right: str,
     n: int,
-    input_format: str,
-    output_format: str = "diff",
+    input_format: Optional[str],
+    output_format: Optional[str] = "diff",
     verbose: bool = False,
 ) -> None:
     """diff dict"""
-    from dictknife.diff import diff, diff_rows, make_jsonpatch
+    from dictknife.diff import diff as diff_module, diff_rows, make_jsonpatch
 
-    with open(left) as rf:
-        left_data = loading.load(rf, format=input_format)
-        with open(right) as rf:
-            right_data = loading.load(rf, format=input_format)
+    with open(left) as rf_left:
+        left_data = loading.load(rf_left, format=input_format)
+        with open(right) as rf_right:
+            right_data = loading.load(rf_right, format=input_format)
 
             if output_format == "diff":
-                for line in diff(
+                for line in diff_module(
                     left_data,
                     right_data,
                     fromfile=left,
@@ -137,7 +138,7 @@ def diff(
                     print(line)
             elif output_format == "jsonpatch":
                 r = make_jsonpatch(left_data, right_data, verbose=verbose)
-                loading.dumpfile(list(r), format="json")
+                loading.dumpfile(list(r), filename=None, format="json")
             elif output_format == "pair":
                 # iterator?
                 if hasattr(left_data, "__next__"):
@@ -175,32 +176,32 @@ def diff(
 
 def shape(
     *,
-    files,
-    input_format,
-    output_format,
-    squash,
-    skiplist,
-    separator,
-    with_type,
-    with_example,
-    full,
+    files: List[Any],
+    input_format: Optional[str],
+    output_format: Optional[str],
+    squash: bool,
+    skiplist: bool,
+    separator: str,
+    with_type: bool,
+    with_example: bool,
+    full: bool,
 ) -> None:
     """shape"""
-    from dictknife import shape
+    from dictknife import shape as shape_module
 
-    dataset = []
+    dataset: List[Any] = []
     for f in files:
         with _open(f) as rf:
-            d = loading.load(rf, format=input_format)
+            loaded_data = loading.load(rf, format=input_format)
             if squash:
-                dataset.extend(d)
+                dataset.extend(loaded_data)
             else:
-                dataset.append(d)
-    rows = shape(dataset, squash=True, skiplist=skiplist, separator=separator)
+                dataset.append(loaded_data)
+    rows: List[Any] = shape_module(dataset, squash=True, skiplist=skiplist, separator=separator)
 
-    r = []
+    r: List[Dict[str, Any]] = []
     for row in rows:
-        d = make_dict()
+        d: Dict[str, Any] = make_dict()
         d["path"] = row.path
         if with_type:
             typenames = [t.__name__ for t in row.type]
@@ -215,17 +216,17 @@ def shape(
         r.append(d)
 
     if output_format is None:
-        for d in r:
-            print(*d.values())
+        for item_d in r:
+            print(*item_d.values())
     else:
-        loading.dumpfile(r, format=output_format)
+        loading.dumpfile(r, filename=None, format=output_format)
 
 
 def shrink(
     *,
-    files: list,
-    input_format: str,
-    output_format: str,
+    files: List[Any],
+    input_format: Optional[str],
+    output_format: Optional[str],
     max_length_of_string: int,
     cont_suffix: str,
     max_length_of_list: int,
@@ -255,55 +256,57 @@ def mkdict(
     delimiter: str,
     sort_keys: bool,
     squash: bool,
-    extra,
+    extra: List[str],
 ) -> None:
-    from dictknife.mkdict import mkdict
+    from dictknife.mkdict import mkdict as mkdict_module
 
+    r: Any
     if not extra:
-        r = []
-        variables = {}
-        for code in sys.stdin:
-            d = mkdict(code, separator=separator, shared=variables)
+        r_list: List[Any] = []
+        variables: Dict[str, Any] = {}
+        for code_line in sys.stdin:
+            d: Any = mkdict_module(code_line.strip(), separator=separator, shared=variables)
             if not d:
                 continue
             if isinstance(d, list):
-                r.extend(d)
+                r_list.extend(d)
             else:
-                r.append(d)
-        if len(r) == 1:
-            r = r[0]
+                r_list.append(d)
+        if len(r_list) == 1:
+            r = r_list[0]
+        else:
+            r = r_list
     else:
-        args = []
-        for x in extra:
-            if "=" not in x:
-                args.append(repr(x))
+        args: List[str] = []
+        for x_item in extra:
+            if "=" not in x_item:
+                args.append(repr(x_item))
             else:
-                for e in x.split("=", 1):
-                    args.append(repr(e))
-        r = mkdict(" ".join(args), separator=separator)
+                for e_item in x_item.split("=", 1):
+                    args.append(repr(e_item))
+        r = mkdict_module(" ".join(args), separator=separator)
 
-    if squash:
-        for row in r:
-            loading.dumpfile(row, format=output_format, sort_keys=sort_keys)
+    if squash and isinstance(r, list):
+        for row_item in r:
+            loading.dumpfile(row_item, filename=None, format=output_format, sort_keys=sort_keys)
             sys.stdout.write("\n")
     else:
-        loading.dumpfile(r, format=output_format, sort_keys=sort_keys)
+        loading.dumpfile(r, filename=None, format=output_format, sort_keys=sort_keys)
         sys.stdout.write("\n")
 
 
 def main():
     import argparse
 
+    class HelpFormatter(
+        argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter
+    ):
+        pass
+
     formats = loading.get_formats()
 
-    parser = argparse.ArgumentParser(
-        formatter_class=type(
-            "_HelpFormatter",
-            (argparse.ArgumentDefaultsHelpFormatter, argparse.RawTextHelpFormatter),
-            {},
-        )
-    )
-    parser.print_usage = parser.print_help  # hack
+    parser = argparse.ArgumentParser(formatter_class=HelpFormatter)
+    # parser.print_usage = parser.print_help  # hack # mypy: error: Cannot assign to a method
     parser.add_argument(
         "--log",
         choices=list(logging._nameToLevel.keys()),
@@ -333,9 +336,24 @@ def main():
     subparsers.required = True
 
     # cat
-    fn = cat
+    def run_cat(args: argparse.Namespace) -> None:
+        cat(
+            files=args.files,
+            dst=args.dst,
+            format=args.format,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            sort_keys=args.sort_keys,
+            encoding=args.encoding,
+            errors=args.errors,
+            size=args.size,
+            slurp=args.slurp,
+            extra=getattr(args, "extra", None),  # apply_loading_format_extra_arguments_parserで追加される想定
+            merge_method=args.merge_method,
+        )
+    fn = run_cat
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        cat.__name__, help=cat.__doc__, formatter_class=parser.formatter_class
     )
     apply_loading_format_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
@@ -379,9 +397,20 @@ def main():
     )
 
     # transform
-    fn = transform
+    def run_transform(args: argparse.Namespace) -> None:
+        transform(
+            src=args.src,
+            dst=args.dst,
+            code=args.code,
+            functions=args.functions,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            format=args.format,
+            sort_keys=args.sort_keys,
+        )
+    fn = run_transform
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        transform.__name__, help=transform.__doc__, formatter_class=parser.formatter_class
     )
 
     def print_help(*, file=None, self=sparser) -> None:
@@ -402,7 +431,7 @@ def main():
                 )
         self._print_message(self.format_help(), file)
 
-    sparser.print_help = print_help
+    # sparser.print_help = print_help # mypy: error: Cannot assign to a method
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("src", nargs="?", help="-")
     sparser.add_argument("--dst", default=None, help="-")
@@ -420,9 +449,21 @@ def main():
     sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
 
     # diff
-    fn = diff
+    def run_diff(args: argparse.Namespace) -> None:
+        diff(
+            normalize=args.normalize,
+            sort_keys=args.sort_keys,
+            skip_empty=args.skip_empty,
+            left=args.left,
+            right=args.right,
+            n=args.n,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            verbose=args.verbose,
+        )
+    fn = run_diff
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        diff.__name__, help=diff.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--normalize", action="store_true", help="-")
@@ -444,9 +485,21 @@ def main():
     sparser.add_argument("-S", "--sort-keys", action="store_true", help="-")
 
     # shape
-    fn = shape
+    def run_shape(args: argparse.Namespace) -> None:
+        shape(
+            files=args.files,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            squash=args.squash,
+            skiplist=args.skiplist,
+            separator=args.separator,
+            with_type=args.with_type,
+            with_example=args.with_example,
+            full=args.full,
+        )
+    fn = run_shape
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        shape.__name__, help=shape.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
@@ -464,9 +517,19 @@ def main():
     )
 
     # shrink
-    fn = shrink
+    def run_shrink(args: argparse.Namespace) -> None:
+        shrink(
+            files=args.files,
+            input_format=args.input_format,
+            output_format=args.output_format,
+            max_length_of_string=args.max_length_of_string,
+            cont_suffix=args.cont_suffix,
+            max_length_of_list=args.max_length_of_list,
+            with_tail=args.with_tail,
+        )
+    fn = run_shrink
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        shrink.__name__, help=shrink.__doc__, formatter_class=parser.formatter_class
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=[sys.stdin], help="-")
@@ -482,9 +545,18 @@ def main():
     )
 
     # mkdict
-    fn = mkdict
+    def run_mkdict(args: argparse.Namespace) -> None:
+        mkdict(
+            output_format=args.output_format,
+            separator=args.separator,
+            delimiter=args.delimiter,
+            sort_keys=args.sort_keys,
+            squash=args.squash,
+            extra=args.extra,
+        )
+    fn = run_mkdict
     sparser = subparsers.add_parser(
-        fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
+        mkdict.__name__, help=mkdict.__doc__, formatter_class=parser.formatter_class
     )
     apply_rest_arguments_as_extra_arguments_parser(sparser)
     sparser.set_defaults(subcommand=fn)
@@ -531,4 +603,7 @@ def main():
                                 "{}:setup() is not found".format(module_path)
                             )
                         m.setup(loading.dispatcher)
-            return params.pop("subcommand")(**params)
+
+            subcommand_func = params.pop("subcommand")
+            # argparse.Namespace 型を期待するラッパー関数を呼び出す
+            return subcommand_func(argparse.Namespace(**params))
