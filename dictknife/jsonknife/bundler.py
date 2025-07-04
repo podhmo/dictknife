@@ -38,7 +38,7 @@ class Bundler:
     def __init__(self, resolver, strict: bool=False, *, scanner_factory=None) -> None:
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
-        self.item_map = make_dict()  # localref -> item
+        self.item_map: dict[str, CachedItem] = make_dict()  # localref -> item
         self.strict = strict
         self._scanner_factory = scanner_factory or Scanner
 
@@ -61,7 +61,7 @@ class Scanner:
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
-        self.seen = set()
+        self.seen: set[str] = set()
 
         # todo: rename
         self.localref_fixer = localref_fixer or LocalrefFixer(
@@ -77,7 +77,7 @@ class Scanner:
         return SimpleConflictFixer(self.item_map, strict=self.strict)
 
     def scan(self, doc):
-        conflicted = defaultdict(list)
+        conflicted: dict[str, list] = defaultdict(list)
         self._scan_refs(doc, conflicted=conflicted)
         self._scan_toplevel(doc, conflicted=conflicted)
         return conflicted
@@ -151,7 +151,7 @@ class Emitter:
 
     def emit(self, resolver, doc, *, conflicted):
         # side effect
-        d = make_dict()
+        d: dict[str, object] = make_dict()
         for path, sd in self.ref_walking.iterate(doc):
             self.replace_ref(resolver, sd)
 

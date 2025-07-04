@@ -3,10 +3,11 @@ from ._lazyimport import m
 from dictknife.langhelpers import make_dict
 from dictknife.guessing import guess
 from logging import getLogger as get_logger
+from typing import Any, Type
 
 logger = get_logger(__name__)
 
-_cls_registry = {}
+_cls_registry: dict[str, Type] = {}
 
 
 def setup_extra_parser(parser):
@@ -111,7 +112,7 @@ def _create_reader_class(csv, errors=None, retry: int=10):
         make_dictReader.__next__ = __next__
     else:
 
-        def __next__(self):
+        def __next__(self, retry=None):
             d = original_next(self)
             return guess(d, mutable=True)
 
