@@ -99,7 +99,7 @@ class Emitter:
         self.cw = CommentWriter()
         self.annotations = annotations or {}  # Dict[string, Dict]
 
-    def resolve_name(self, info, fromarray: bool=False, suffix=""):
+    def resolve_name(self, info, fromarray: bool=False, suffix: str=""):
         ref = info["ref"] + suffix
         if ref in self.annotations and "name" in self.annotations[ref]:
             name = self.annotations[ref]["name"]

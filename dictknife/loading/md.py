@@ -5,7 +5,7 @@ import itertools
 
 
 def load(
-    fp, *, loader=None, errors=None, make_dict=make_dict, null_value="null", **kwargs
+    fp, *, loader=None, errors=None, make_dict=make_dict, null_value: str="null", **kwargs
 ):
     keys = None
     while keys is None:
@@ -44,7 +44,7 @@ def load(
         yield row
 
 
-def dump(rows, fp, *, sort_keys: bool=False, null_value="null", **kwargs) -> None:
+def dump(rows, fp, *, sort_keys: bool=False, null_value: str="null", **kwargs) -> None:
     if not rows:
         return
     if hasattr(rows, "keys"):

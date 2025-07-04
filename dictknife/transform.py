@@ -5,13 +5,13 @@ from dictknife import accessing
 from dictknife import naming
 
 
-def _make_key(k0, k1, *, sep="/"):
+def _make_key(k0, k1, *, sep: str="/"):
     if k1 is None:
         return _as_jsonpointer(str(k0))
     return "{}{}{}".format(_as_jsonpointer(str(k0)), sep, k1)
 
 
-def unflatten(d, *, sep="/", accessor=accessing.Accessor()):
+def unflatten(d, *, sep: str="/", accessor=accessing.Accessor()):
     r = accessor.make_dict()
     for k, v in d.items():
         accessor.assign(r, [_as_path_node(x) for x in k.split(sep)], v)
@@ -35,7 +35,7 @@ def _fix_unflatten_list(d):
     return d
 
 
-def flatten(d, *, sep="/"):
+def flatten(d, *, sep: str="/"):
     if isinstance(d, (list, tuple)):
         return {
             _make_key(i, k, sep=sep): v
@@ -56,7 +56,7 @@ def flatten(d, *, sep="/"):
         return {None: _as_jsonpointer(d) if hasattr(d, "replace") else d}
 
 
-def rows(d, *, kname="name", vname="value"):
+def rows(d, *, kname: str="name", vname: str="value"):
     return [{kname: k, vname: v} for k, v in d.items()]
 
 

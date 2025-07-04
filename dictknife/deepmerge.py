@@ -84,7 +84,7 @@ def _deepmerge_merge(left, right):
 METHODS = ["merge", "append", "addtoset", "replace"]
 
 
-def deepmerge(*ds, override: bool=False, method="addtoset"):
+def deepmerge(*ds, override: bool=False, method: str="addtoset"):
     """deepmerge: methods in {METHODS!r}""".format(METHODS=METHODS)
     if len(ds) == 0:
         return make_dict()

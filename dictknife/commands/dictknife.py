@@ -35,7 +35,7 @@ def cat(
     size=None,
     slurp: bool=False,
     extra=None,
-    merge_method="addtoset",
+    merge_method: str="addtoset",
 ) -> None:
     from dictknife import deepmerge
 

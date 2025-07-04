@@ -15,7 +15,7 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class OneDocResolver(AccessingMixin):
-    def __init__(self, doc, *, name="*root*", onload=None, format=None) -> None:
+    def __init__(self, doc, *, name: str="*root*", onload=None, format=None) -> None:
         self.doc = doc
         self.name = name
         self.onload = onload

@@ -1,4 +1,4 @@
-def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra") -> None:
+def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest: str="extra") -> None:
     original = parser.parse_known_args
 
     def parse_known_args(*args, **kwargs):

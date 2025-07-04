@@ -23,7 +23,7 @@ def expand(filename, *, onload=None, doc=None, format=None):
 
 
 def bundle(
-    filename, *, onload=None, doc=None, format=None, extras=None, flavor="openapiv2"
+    filename, *, onload=None, doc=None, format=None, extras=None, flavor: str="openapiv2"
 ):
     jsonref = ""
     if filename:

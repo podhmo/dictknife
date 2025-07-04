@@ -58,7 +58,7 @@ class Flattener:
         else:
             return data
 
-    def return_definition(self, definition, fullname, typ="object"):
+    def return_definition(self, definition, fullname, typ: str="object"):
         if self.replace:
             return {"$ref": "#/definitions/{}".format(fullname)}
         else:

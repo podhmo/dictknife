@@ -4,7 +4,7 @@ import argparse
 
 class ExtraArgumentsParsers:
     def __init__(
-        self, parser, dest, *, prefix="extra", parser_factory=argparse.ArgumentParser
+        self, parser, dest, *, prefix: str="extra", parser_factory=argparse.ArgumentParser
     ) -> None:
         self.parser = parser
         self.dest = dest

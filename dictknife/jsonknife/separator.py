@@ -20,7 +20,7 @@ logger = logging.getLogger(".".join(__name__.split(".")[1:]))
 # todo: test
 
 
-def _with_format(name: str, *, format: str = None, default=".yaml"):
+def _with_format(name: str, *, format: str = None, default: str=".yaml"):
     if os.path.splitext(name)[1]:
         return name
     ext = format or default
@@ -43,7 +43,7 @@ class Separator:  # todo: rename
     def emitter(self):
         return Emitter(self.resolver, format=self.format, here=self.here)
 
-    def separate(self, doc=None, *, name="main", dst=None) -> None:
+    def separate(self, doc=None, *, name: str="main", dst=None) -> None:
         doc = doc or self.resolver.doc
 
         ns_map = self.scanner.scan(doc)

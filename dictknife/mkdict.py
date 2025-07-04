@@ -83,8 +83,8 @@ class _AccessorSupportList(Accessor):
 def mkdict(
     line,
     *,
-    separator="/",
-    delimiter=";",
+    separator: str="/",
+    delimiter: str=";",
     accessor=_AccessorSupportList(make_dict),
     guess=guess,
     shared=None,

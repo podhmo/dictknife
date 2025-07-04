@@ -2,7 +2,7 @@ from dictknife.langhelpers import reify
 
 
 class WrappedExceptionFactory:
-    def __init__(self, *, prefix="Wrapped", mixin_class=None) -> None:
+    def __init__(self, *, prefix: str="Wrapped", mixin_class=None) -> None:
         self.prefix = prefix
         self.mixin_class = mixin_class or WrappedMixin
         self.classes = {}
