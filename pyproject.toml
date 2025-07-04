@@ -46,10 +46,10 @@ spreadsheet = ["google-api-python-client", "google-auth-oauthlib"]
 dev = [
     "dictknife[testing]",
     "dictknife[lint]",
-    "dictknife[docs]",
     "dictknife[load]",
     "dictknife[command]",
-    "dictknife[spreadsheet]",
+#    "dictknife[docs]",
+#    "dictknife[spreadsheet]",
 ]
 
 [tool.hatch.version]
