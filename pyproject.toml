@@ -1,0 +1,90 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dictknife"
+dynamic = ["version"]
+description = "utility set of handling dict"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = ["dict", "dict-handling"]
+authors = [
+  { name = "podhmo", email = "ababjam61@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Homepage = "https://github.com/podhmo/dictknife"
+Documentation = "http://dictknife.readthedocs.io"
+Repository = "https://github.com/podhmo/dictknife"
+
+[project.scripts]
+dictknife = "dictknife.commands.dictknife:main"
+jsonknife = "dictknife.commands.jsonknife:main"
+swaggerknife = "dictknife.commands.swaggerknife:main"
+
+[project.optional-dependencies]
+testing = [
+    "ruamel.yaml",
+    "jsonpatch",
+    "pytest",
+]
+lint = ["flake8", "black"]
+docs = ["sphinx", "recommonmark", "sphinx_rtd_theme"]
+load = ["ruamel.yaml", "tomlkit"]
+command = ["ruamel.yaml", "magicalimport", "prestring"]
+spreadsheet = ["google-api-python-client", "google-auth-oauthlib"]
+dev = [
+    "dictknife[testing]",
+    "dictknife[lint]",
+    "dictknife[docs]",
+    "dictknife[load]",
+    "dictknife[command]",
+    "dictknife[spreadsheet]",
+]
+
+[tool.hatch.version]
+path = "VERSION"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/dictknife/tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["dictknife"]
+
+[tool.hatch.envs.default]
+description = "Default environment for everyday tasks"
+dependencies = [
+  "dictknife[dev]",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:dictknife/tests}"
+lint = "flake8 --show-source --ignore=E501,E121,W503 dictknife"
+format = "black dictknife"
+check = [
+  "lint",
+  "format --check --diff",
+]
+all = [
+  "check",
+  "test",
+]
+
+[tool.hatch.envs.docs]
+description = "Environment for building documentation"
+dependencies = [
+  "dictknife[docs]",
+]
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -b html docs/ docs/_build/html"
