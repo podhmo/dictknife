@@ -3,7 +3,6 @@ from ._lazyimport import m
 from dictknife.langhelpers import make_dict
 from dictknife.guessing import guess
 from logging import getLogger as get_logger
-from typing import Any, Type
 
 logger = get_logger(__name__)
 

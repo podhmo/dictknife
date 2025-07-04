@@ -1,7 +1,7 @@
 import difflib
 from dictknife.deepequal import sort_flexibly
 from dictknife.transform import str_dict
-from typing import Optional, Callable, Any
+from typing import Optional, Callable
 
 
 def diff(
