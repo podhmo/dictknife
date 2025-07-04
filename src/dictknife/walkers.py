@@ -52,6 +52,13 @@ class DataHandler(object):
 
 
 class DictWalker(object):
+    """Walks through a dictionary-like object and yields values based on a query.
+
+    Attributes:
+        qs: A list of query objects that specify the path to the desired values.
+        handler: A handler object that processes the found values.
+        context_factory: A factory function that creates a context object for the walk.
+    """
     context_factory = PathContext
     handler_factory = ContainerHandler
 

@@ -15,7 +15,30 @@ def diff(
     normalize: bool = False,
     sort_keys: bool = False,
 ):
-    """fancy diff"""
+    """Compares two dictionary-like objects and returns a unified diff.
+
+    Args:
+        d0: The first dictionary-like object.
+        d1: The second dictionary-like object.
+        tostring (callable, optional): A function to convert the objects to strings
+            for comparison. Defaults to a JSON string representation with indentation.
+        fromfile (str, optional): Label for the first object in the diff output.
+            Defaults to "left".
+        tofile (str, optional): Label for the second object in the diff output.
+            Defaults to "right".
+        n (int, optional): Number of context lines to show in the diff. Defaults to 3.
+        terminator (str, optional): The line terminator used when splitting the
+            string representation of objects. Defaults to "\\n".
+        normalize (bool, optional): If True, sorts lists and dictionary keys
+            (flexibly, attempting to handle unorderable types) before comparison.
+            Defaults to False.
+        sort_keys (bool, optional): If True, sorts dictionary keys when converting
+            objects to strings. This is passed to the `tostring` function.
+            Defaults to False.
+
+    Returns:
+        An iterator yielding lines of the unified diff.
+    """
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)

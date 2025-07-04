@@ -109,6 +109,32 @@ def shape(
     separator: str = "/",
     transform=as_jsonpointer,
 ):
+    """Generates a summary of the structure (shape) of a dictionary-like object.
+
+    It traverses the input object and identifies the paths to all elements,
+    along with their types and an example value.
+
+    Args:
+        d: The dictionary-like object to analyze.
+        traverse (callable, optional): A function that traverses the input object
+            and returns an intermediate representation (_State object).
+            Defaults to Traverser().traverse.
+        aggregate (callable, optional): A function that processes the intermediate
+            representation and returns the final list of Row namedtuples.
+            Defaults to _build_pathlist_from_state.
+        squash (bool, optional): If True, removes the initial "[]" from paths
+            if the root is a list. Defaults to False.
+        skiplist (bool, optional): If True, skips paths that end with "[]" (lists themselves).
+            Defaults to False.
+        separator (str, optional): The separator character to use when joining path segments.
+            Defaults to "/".
+        transform (callable, optional): A function to transform each path segment before joining.
+            Defaults to `as_jsonpointer`.
+
+    Returns:
+        list[Row]: A list of Row namedtuples, where each Row represents a unique path
+                   and contains `path` (str), `type` (list of types), and `example` (value).
+    """
     return aggregate(
         traverse(d),
         squash=squash,

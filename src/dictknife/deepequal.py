@@ -2,6 +2,18 @@ from .langhelpers import reify
 
 
 def deepequal(d0, d1, normalize: bool = False):
+    """Recursively compares two dictionary-like objects for equality.
+
+    Args:
+        d0: The first dictionary-like object.
+        d1: The second dictionary-like object.
+        normalize (bool, optional): If True, sorts lists and dictionary keys
+            before comparison. This allows for equality checks even if the
+            order of elements is different. Defaults to False.
+
+    Returns:
+        True if the objects are deeply equal, False otherwise.
+    """
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)

@@ -95,7 +95,30 @@ METHODS = ["merge", "append", "addtoset", "replace"]
 
 
 def deepmerge(*ds, override: bool = False, method: str = "addtoset"):
-    """deepmerge: methods in {METHODS!r}""".format(METHODS=METHODS)
+    """Recursively merges multiple dictionary-like objects.
+
+    Args:
+        *ds: A variable number of dictionary-like objects to merge.
+        override (bool, optional): Deprecated. If True, uses the 'replace' method.
+            Defaults to False.
+        method (str, optional): The merge strategy to use.
+            Available methods are:
+            - 'addtoset': (Default) Extends lists and sets, ensuring uniqueness in lists.
+                          For dicts, merges keys, recursively merging values.
+            - 'append': Extends lists and sets without ensuring uniqueness.
+                        For dicts, merges keys, recursively merging values.
+            - 'merge': For lists and tuples, merges elements pairwise.
+                       For dicts, merges keys, recursively merging values using 'append' strategy for lists.
+            - 'replace': Replaces the value in the left dictionary with the value from the right.
+                         For lists and tuples, the entire list/tuple is replaced.
+            Defaults to "addtoset".
+
+    Returns:
+        A new dictionary-like object containing the merged data.
+
+    Raises:
+        ValueError: If an invalid merge method is provided.
+    """
     if len(ds) == 0:
         return make_dict()
 
