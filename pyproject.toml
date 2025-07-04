@@ -53,12 +53,9 @@ dev = [
 ]
 
 [tool.hatch.version]
-path = "VERSION"
+path = "dictknife/__version__.py"
 
 [tool.hatch.build.targets.sdist]
-exclude = [
-  "/dictknife/tests",
-]
 
 [tool.hatch.build.targets.wheel]
 packages = ["dictknife"]
