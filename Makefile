@@ -1,7 +1,7 @@
 # Makefile for managing the project with Hatch.
 # This file provides shortcuts for common development tasks defined in pyproject.toml.
 
-.PHONY: test docs lint format build upload run ci _find-candidates
+.PHONY: test docs lint format build upload run ci _find-candidates type-check
 
 # Run tests using the 'test' environment defined in pyproject.toml
 test:
@@ -14,6 +14,10 @@ docs:
 # Run the linter
 lint:
 	hatch run lint
+
+# Run mypy
+type-check:
+	mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional ./dictknife
 
 # Format the code with black
 format:
