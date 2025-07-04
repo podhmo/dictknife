@@ -1,9 +1,8 @@
-from collections import OrderedDict
 from dictknife import Accessor
 from dictknife.pp import pp, indent
 
-a = Accessor(OrderedDict)
-d = OrderedDict()
+a = Accessor(dict)
+d = dict()
 
 # assign
 a.assign(d, ['a', 'b', 'c'], 'v')

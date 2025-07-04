@@ -1,6 +1,6 @@
 assign:
 
-  OrderedDict([('a', OrderedDict([('b', OrderedDict([('c', 'v')]))]))])
+  {'a': {'b': {'c': 'v'}}}
   {
     "a": {
       "b": {
@@ -31,7 +31,7 @@ maybe_remove:
 maybe_access_container:
 
   ['a', 'b', 'x'] None
-  ['a', 'b', 'c'] OrderedDict([('c', 'v')])
+  ['a', 'b', 'c'] {'c': 'v'}
 
 maybe_access:
 
