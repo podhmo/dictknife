@@ -6,6 +6,8 @@ from dictknife import DictWalker
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit, make_dict
 
+from typing import List, Tuple, Dict, Any
+
 from .resolver import ExternalFileResolver
 from .accessor import is_ref
 from .relpath import relpath, fixref
@@ -63,14 +65,14 @@ class Scanner:
     def ref_walker(self) -> DictWalker:
         return DictWalker([is_ref])
 
-    def scan(self, doc: dict) -> dict:
+    def scan(self, doc: dict) -> dict[str, list]:
         namespaces = self._collect_namespaces(doc)
-        r = {}
+        r: dict[str, list] = {}
         for ns in namespaces:
             r[ns] = self._collect_def_items(ns)
         return r
 
-    def _collect_def_items(self, ns):
+    def _collect_def_items(self, ns: str) -> list:
         data = self.resolver.access_by_json_pointer(ns)
         defs = []
         for name, definition in data.items():
@@ -89,8 +91,8 @@ class Scanner:
             )
         return defs
 
-    def _collect_namespaces(self, doc: dict) -> dict:
-        namespaces = []
+    def _collect_namespaces(self, doc: dict) -> list[str]:
+        namespaces: list[str] = []
         seen = set()
 
         for path, d in self.ref_walker.walk(doc):
@@ -113,7 +115,7 @@ class Emitter:
         self.resolver = resolver
         self.here = here or resolver.name
         self.format = format
-        self.registered = []  # List[Tuple[str, dict]]
+        self.registered: List[Tuple[str, Dict[str, str]]] = []
 
     @reify
     def ref_walker(self) -> DictWalker:
@@ -134,7 +136,7 @@ class Emitter:
         sresolver, query = self.resolver.resolve(def_item["$ref"])
         data = sresolver.access_by_json_pointer(query)
 
-        doc = make_dict()
+        doc: Dict[str, Any] = make_dict()
         self.resolver.assign_by_json_pointer(def_item["$ref"], data, doc=doc)
 
         for _, d in self.ref_walker.walk(data):

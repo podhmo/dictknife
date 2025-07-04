@@ -2,7 +2,7 @@ import logging
 import os.path
 from collections import defaultdict
 from functools import partial
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
@@ -174,7 +174,7 @@ class Emitter:
 
         # adhoc paths support
         will_removes = set()
-        paths = d.get("paths") or {}
+        paths = cast(dict, d.get("paths", {}))
         for path, sub in list(paths.items()):
             if "$ref" in sub and sub["$ref"].startswith("#/"):
                 related_path = tuple(sub["$ref"][2:].split("/"))
