@@ -1,7 +1,7 @@
 import logging
 import contextlib
 import warnings
-from typing import List, Any, Optional, Callable, Dict  # Added Callable and Dict
+from typing import List, Any, Optional
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge

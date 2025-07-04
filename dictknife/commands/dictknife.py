@@ -11,7 +11,7 @@ from dictknife.commands._monkeypatch import (
     apply_loading_format_extra_arguments_parser,
     apply_rest_arguments_as_extra_arguments_parser,
 )
-from typing import Optional, Any, List, Dict, Generator, IO, Union, Callable
+from typing import Optional, Any, List, Dict
 
 logger = logging.getLogger(__name__)
 
