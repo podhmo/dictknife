@@ -3,6 +3,13 @@ from .langhelpers import make_dict
 
 
 class Accessor:
+    """Provides methods for accessing and modifying nested dictionary-like objects.
+
+    Attributes:
+        make_dict: A function to create new dictionary-like objects.
+        zero_value: The value to use when an index is out of bounds in a list.
+    """
+
     def __init__(self, make_dict=make_dict, zero_value=None) -> None:
         self.make_dict = make_dict
         self.zero_value = zero_value
@@ -159,6 +166,21 @@ class MutableModifier:
 
 
 def dictmap(fn, x, *, mutable: bool = False, with_key: bool = False):
+    """Recursively applies a function to the values of a dictionary-like object.
+
+    Args:
+        fn: The function to apply to each value.
+        x: The dictionary-like object to map.
+        mutable: If True, modifies the original object in place.
+                 Otherwise, returns a new object.
+        with_key: If True, the function `fn` will be called with the key as the first argument
+                  and the value as the second argument for dictionary elements.
+                  For list elements, it's called with the value only.
+                  If False (default), `fn` is always called with the value only.
+
+    Returns:
+        The mapped dictionary-like object.
+    """
     modifier = get_modifier(mutable=mutable)
     if with_key:
         modify_dict = modifier.modify_dict_with_keys

@@ -5,6 +5,15 @@ from typing import Optional
 
 
 def pp(d, out=None) -> None:
+    """Pretty prints a dictionary-like object to the specified output stream.
+
+    It uses JSON formatting with indentation and sorted keys (if possible).
+
+    Args:
+        d: The dictionary-like object to print.
+        out (file-like object, optional): The output stream.
+            Defaults to sys.stdout.
+    """
     import json
 
     out = out or sys.stdout
