@@ -71,12 +71,12 @@ class Dumper:
     def add_format(self, fmt, fn) -> None:
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *, format=None, sort_keys=False, extra=None, **kwargs):
+    def dumps(self, d, *, format=None, sort_keys: bool=False, extra=None, **kwargs):
         fp = StringIO()
         self.dump(d, fp, format=format, sort_keys=sort_keys, extra=extra, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, *, format=None, sort_keys=False, extra=None):
+    def dump(self, d, fp, *, format=None, sort_keys: bool=False, extra=None):
         if format is not None:
             dumper = self.fn_map[format]
         else:
@@ -95,9 +95,9 @@ class Dumper:
         filename=None,
         *,
         format=None,
-        sort_keys=False,
+        sort_keys: bool=False,
         extra=None,
-        _retry=False,
+        _retry: bool=False,
     ):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator

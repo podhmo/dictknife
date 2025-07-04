@@ -31,7 +31,7 @@ def kebabcase(
     return replaced.replace(other, separator)
 
 
-def camelcase(name, *, soft=True):
+def camelcase(name, *, soft: bool=True):
     if soft and name[0].isupper():
         return pascalcase(name)
     else:

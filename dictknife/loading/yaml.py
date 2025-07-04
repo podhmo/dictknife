@@ -6,7 +6,7 @@ def load(fp, *, errors=None, **kwargs):
     return m.yaml.load(fp, **kwargs)
 
 
-def dump(d, fp, *, sort_keys=False):
+def dump(d, fp, *, sort_keys: bool=False):
     return m.yaml.dump(
         d,
         fp,

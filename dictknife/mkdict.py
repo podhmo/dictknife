@@ -265,7 +265,7 @@ if sys.version_info[:2] < (3, 6):
     from collections import deque
 
     def __init__(
-        self, instream=None, infile=None, posix=False, punctuation_chars=False
+        self, instream=None, infile=None, posix: bool=False, punctuation_chars: bool=False
     ) -> None:
         if isinstance(instream, str):
             instream = StringIO(instream)

@@ -48,7 +48,7 @@ def load(pattern, *, errors=None, loader=None, **kwargs):
     return _loader.load_sheet(guessed)
 
 
-def dump(rows, fp, *, sort_keys=False):
+def dump(rows, fp, *, sort_keys: bool=False):
     raise NotImplementedError("><")
 
 

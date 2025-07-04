@@ -158,7 +158,7 @@ class MutableModifier:
         return d
 
 
-def dictmap(fn, x, *, mutable=False, with_key=False):
+def dictmap(fn, x, *, mutable: bool=False, with_key: bool=False):
     modifier = get_modifier(mutable=mutable)
     if with_key:
         modify_dict = modifier.modify_dict_with_keys

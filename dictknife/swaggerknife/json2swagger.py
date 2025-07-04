@@ -99,7 +99,7 @@ class Emitter:
         self.cw = CommentWriter()
         self.annotations = annotations or {}  # Dict[string, Dict]
 
-    def resolve_name(self, info, fromarray=False, suffix=""):
+    def resolve_name(self, info, fromarray: bool=False, suffix=""):
         ref = info["ref"] + suffix
         if ref in self.annotations and "name" in self.annotations[ref]:
             name = self.annotations[ref]["name"]
@@ -112,7 +112,7 @@ class Emitter:
         self.ns[signature] = name
         return self.ns[signature]
 
-    def make_schema(self, info, parent=None, fromarray=False):
+    def make_schema(self, info, parent=None, fromarray: bool=False):
         info["signature"] = make_signature(info)  # xxx:
         if not fromarray and info.get("type2") == "array":
             return self.make_array_schema(info, parent=parent)
@@ -132,7 +132,7 @@ class Emitter:
             d.pop("name", None)
         return {"$ref": "#/definitions/{name}".format(name=schema_name)}
 
-    def make_object_schema(self, info, parent, fromarray=False):
+    def make_object_schema(self, info, parent, fromarray: bool=False):
         if not fromarray:
             self.cw.write(info["name"], info, parent=parent)
 

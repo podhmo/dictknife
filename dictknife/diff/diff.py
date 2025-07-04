@@ -11,8 +11,8 @@ def diff(
     tofile="right",
     n=3,
     terminator="\n",
-    normalize=False,
-    sort_keys=False,
+    normalize: bool=False,
+    sort_keys: bool=False,
 ):
     """fancy diff"""
     if normalize:
@@ -35,7 +35,7 @@ def diff(
     )
 
 
-def _default_tostring(d, *, default=str, sort_keys=True):
+def _default_tostring(d, *, default=str, sort_keys: bool=True):
     import json
 
     return json.dumps(

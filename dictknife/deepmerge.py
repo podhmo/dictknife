@@ -5,7 +5,7 @@ from functools import partial
 from dictknife.langhelpers import make_dict
 
 
-def _deepmerge_extend(left, right, *, dedup=False):
+def _deepmerge_extend(left, right, *, dedup: bool=False):
     if isinstance(left, (list, tuple)):
         r = left[:]
         if isinstance(right, (list, tuple)):
@@ -84,7 +84,7 @@ def _deepmerge_merge(left, right):
 METHODS = ["merge", "append", "addtoset", "replace"]
 
 
-def deepmerge(*ds, override=False, method="addtoset"):
+def deepmerge(*ds, override: bool=False, method="addtoset"):
     """deepmerge: methods in {METHODS!r}""".format(METHODS=METHODS)
     if len(ds) == 0:
         return make_dict()

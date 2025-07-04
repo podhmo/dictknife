@@ -33,7 +33,7 @@ def cat(
     encoding=None,
     errors=None,
     size=None,
-    slurp=False,
+    slurp: bool=False,
     extra=None,
     merge_method="addtoset",
 ) -> None:

@@ -59,7 +59,7 @@ class Traverser:
 
 
 def _build_pathlist_from_state(
-    s, *, squash=False, skiplist=False, separator="/", transform=str
+    s, *, squash: bool=False, skiplist: bool=False, separator="/", transform=str
 ):  # str or _default_transform
     r = []
     for path in s.paths:
@@ -98,8 +98,8 @@ def shape(
     traverse=Traverser().traverse,
     aggregate=_build_pathlist_from_state,
     *,
-    squash=False,
-    skiplist=False,
+    squash: bool=False,
+    skiplist: bool=False,
     separator="/",
     transform=as_jsonpointer,
 ):

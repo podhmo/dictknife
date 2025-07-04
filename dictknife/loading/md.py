@@ -44,7 +44,7 @@ def load(
         yield row
 
 
-def dump(rows, fp, *, sort_keys=False, null_value="null", **kwargs) -> None:
+def dump(rows, fp, *, sort_keys: bool=False, null_value="null", **kwargs) -> None:
     if not rows:
         return
     if hasattr(rows, "keys"):
