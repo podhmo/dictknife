@@ -24,6 +24,12 @@ class Loader:
     The Loader class provides methods to load data from file-like objects or strings.
     It uses a dispatcher to determine the correct loading function based on the format
     or file extension.
+
+    Note: Loading certain formats might require optional dependencies. For example,
+    loading from Google Spreadsheets (via the `loadfile` method with a spreadsheet URL)
+    requires `google-api-python-client` and `google-auth-oauthlib`. These can often
+    be installed using extras, e.g., `pip install dictknife[spreadsheet]`.
+    Refer to the documentation of individual format handlers for specific requirements.
     """
     def __init__(self, dispatcher) -> None:
         """Initializes the Loader with a dispatcher.
@@ -132,6 +138,12 @@ class Dumper:
     The Dumper class provides methods to dump data to file-like objects or strings.
     It uses a dispatcher to determine the correct dumping function based on the format
     or file extension.
+
+    Note: Dumping to certain formats might require optional dependencies. For example,
+    YAML format requires `ruamel.yaml`, and TOML format requires `tomlkit`.
+    These can often be installed using extras, e.g., `pip install dictknife[load]`
+    (as 'load' extra includes common serialization libraries). Refer to the
+    documentation of individual format handlers for specific requirements.
     """
     def __init__(self, dispatcher) -> None:
         """Initializes the Dumper with a dispatcher.
@@ -332,8 +344,9 @@ loads = dispatcher.loader.loads
 loadfile = dispatcher.loader.loadfile
 """Alias for `dispatcher.loader.loadfile`.
 
-This function might require optional dependencies for certain formats.
-For example, 'spreadsheet' format requires 'google-api-python-client' and 'google-auth-oauthlib'.
+This function may require optional dependencies for certain file formats.
+See the `Loader` class docstring or individual format loader documentation for details
+on required packages and installation (e.g., using `dictknife[spreadsheet]`).
 """
 dump = dispatcher.dumper.dump
 """Alias for `dispatcher.dumper.dump`."""
@@ -342,8 +355,9 @@ dumps = dispatcher.dumper.dumps
 dumpfile = dispatcher.dumper.dumpfile
 """Alias for `dispatcher.dumper.dumpfile`.
 
-This function might require optional dependencies for certain formats.
-For example, 'yaml' format requires 'ruamel.yaml' and 'toml' format requires 'tomlkit'.
+This function may require optional dependencies for certain file formats.
+See the `Dumper` class docstring or individual format dumper documentation for details
+on required packages and installation (e.g., using `dictknife[load]`).
 """
 guess_format = dispatcher.guess_format
 """Alias for `dispatcher.guess_format`."""

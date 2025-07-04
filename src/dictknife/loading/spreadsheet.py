@@ -34,7 +34,7 @@ def guess(
         `range` and `sheet_id` can be None if not present in the pattern.
 
     Raises:
-        AssertionError: If the pattern is a URL but the spreadsheet ID cannot be extracted.
+        ValueError: If the pattern is a URL but the spreadsheet ID cannot be extracted.
     """
     if not pattern.startswith("http") or "://" not in pattern:
         # Shorthand pattern: "SPREADSHEET_ID" or "SPREADSHEET_ID#/sheet_name!A1:B2"
@@ -50,8 +50,6 @@ def guess(
 
     match = sheet_rx.search(parsed_url.path)
     if match is None:
-        # This case should ideally raise a more specific error if the URL is expected to be valid.
-        # For now, it relies on the assertion, but a ValueError might be more informative.
         raise ValueError(f"Could not extract spreadsheet ID from URL path: {parsed_url.path}")
     spreadsheet_id = match.group(1)
 
@@ -69,8 +67,8 @@ def load(pattern: str, *, errors=None, loader=None, **kwargs):
     """Loads data from a Google Spreadsheet specified by a URL or pattern.
 
     This function requires the `google-api-python-client` and `google-auth-oauthlib`
-    packages to be installed, as well as proper authentication configured for
-    accessing Google Sheets API. These can be installed via `pip install dictknife[spreadsheet]`.
+    packages, and proper authentication for Google Sheets API.
+    For installation details, see the `Loader` class documentation or the project's README.
 
     The `pattern` is first parsed by the `guess` function to extract spreadsheet ID,
     range, and sheet GID. Then, it uses a lazily initialized `gsuite.Loader`
@@ -91,16 +89,12 @@ def load(pattern: str, *, errors=None, loader=None, **kwargs):
     """
     global _loader
     # Use the provided loader if available, otherwise fall back to the global _loader.
-    # This allows for dependency injection, e.g., for testing or custom configurations.
     current_loader = loader or _loader
     if current_loader is None:
-        # Lazily initialize the global loader if it hasn't been created yet.
-        # This avoids importing m.gsuite and its dependencies unless actually needed.
         _loader = m.gsuite.Loader()
         current_loader = _loader
 
     guessed_params = guess(pattern)
-    # The actual loading is delegated to the gsuite.Loader instance.
     return current_loader.load_sheet(guessed_params)
 
 
