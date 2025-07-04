@@ -36,7 +36,7 @@ class Handler:
 
 
 class Flattener:
-    def __init__(self, replace: bool=True) -> None:
+    def __init__(self, replace: bool = True) -> None:
         self.replace = replace
 
     def extract(self, data, ctx):
@@ -45,7 +45,7 @@ class Flattener:
             ctx.r[k] = copy.deepcopy(ctx.r[k])
         return ctx.r
 
-    def _extract(self, data, ctx, from_array: bool=False):
+    def _extract(self, data, ctx, from_array: bool = False):
         typ = data.get("type")
         if typ == "array" and "items" in data:
             return self.on_array_has_items(data, ctx)
@@ -58,7 +58,7 @@ class Flattener:
         else:
             return data
 
-    def return_definition(self, definition, fullname: str, typ: str="object"):
+    def return_definition(self, definition, fullname: str, typ: str = "object"):
         if self.replace:
             return {"$ref": "#/definitions/{}".format(fullname)}
         else:

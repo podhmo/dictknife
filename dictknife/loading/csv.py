@@ -21,7 +21,7 @@ def load(
     fp,
     *,
     loader=None,
-    delimiter: str=",",
+    delimiter: str = ",",
     errors=None,
     _registry=_cls_registry,
     create_reader_class=None,
@@ -37,7 +37,9 @@ def load(
     return reader
 
 
-def dump(rows, fp, *, delimiter: str=",", sort_keys: bool=False, fullscan: bool=False) -> None:
+def dump(
+    rows, fp, *, delimiter: str = ",", sort_keys: bool = False, fullscan: bool = False
+) -> None:
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):
@@ -66,7 +68,7 @@ def dump(rows, fp, *, delimiter: str=",", sort_keys: bool=False, fullscan: bool=
     writer.writerows(itr)
 
 
-def _create_reader_class(csv, errors=None, retry: int=10):
+def _create_reader_class(csv, errors=None, retry: int = 10):
     if sys.version_info[:2] >= (3, 6):
         make_dictReader = csv.DictReader
     else:

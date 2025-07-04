@@ -1,7 +1,7 @@
 from .langhelpers import reify
 
 
-def deepequal(d0, d1, normalize: bool=False):
+def deepequal(d0, d1, normalize: bool = False):
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)

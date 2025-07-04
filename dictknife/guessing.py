@@ -46,7 +46,7 @@ class Guesser:
         return v
 
 
-def guess(d, *, guesser_factory=Guesser, default=None, mutable: bool=False):
+def guess(d, *, guesser_factory=Guesser, default=None, mutable: bool = False):
     modifier = get_modifier(mutable=mutable)
     g = guesser_factory(modifier, default=default)
     return g.guess(d)

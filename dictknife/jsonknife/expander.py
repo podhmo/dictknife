@@ -33,7 +33,7 @@ class Expander(object):
             return self.resolver.doc
         return self.accessor.access(ref)
 
-    def expand(self, *, _expect_stack_size: int=1):
+    def expand(self, *, _expect_stack_size: int = 1):
         doc = self.expand_subpart(self.resolver.doc)
         assert len(self.accessor.stack) == _expect_stack_size
         return doc

@@ -7,13 +7,13 @@ from typing import Optional, Callable, Any
 def diff(
     d0,
     d1,
-    tostring: Optional[Callable[..., str]]=None,
-    fromfile: str="left",
-    tofile: str="right",
-    n: int=3,
-    terminator: str="\n",
-    normalize: bool=False,
-    sort_keys: bool=False,
+    tostring: Optional[Callable[..., str]] = None,
+    fromfile: str = "left",
+    tofile: str = "right",
+    n: int = 3,
+    terminator: str = "\n",
+    normalize: bool = False,
+    sort_keys: bool = False,
 ):
     """fancy diff"""
     if normalize:
@@ -36,7 +36,7 @@ def diff(
     )
 
 
-def _default_tostring(d, *, default=str, sort_keys: bool=True):
+def _default_tostring(d, *, default=str, sort_keys: bool = True):
     import json
 
     return json.dumps(

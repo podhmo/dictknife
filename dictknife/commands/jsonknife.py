@@ -1,7 +1,7 @@
 import logging
 import contextlib
 import warnings
-from typing import List, Any, Optional, Callable, Dict # Added Callable and Dict
+from typing import List, Any, Optional, Callable, Dict  # Added Callable and Dict
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
@@ -89,12 +89,19 @@ def bundle(
 
     if ref is not None and src is not None:
         src = "{prefix}#/{name}".format(prefix=src, name=ref.lstrip("#/"))
-    result = bundle_module(src, format=input_format or format, extras=extras, flavor=flavor)
+    result = bundle_module(
+        src, format=input_format or format, extras=extras, flavor=flavor
+    )
     loading.dumpfile(result, dst, format=output_format or format)
 
 
 def separate(
-    *, src: Optional[str], dst: Optional[str] = None, input_format: Optional[str], output_format: Optional[str], format: Optional[str]
+    *,
+    src: Optional[str],
+    dst: Optional[str] = None,
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
 ) -> None:
     from dictknife.jsonknife import separate
 
@@ -169,6 +176,7 @@ def main():
     # cut
     def run_cut(args: argparse.Namespace) -> None:
         cut(src=args.src, dst=args.dst, refs=args.refs)
+
     fn = run_cut
     sparser = subparsers.add_parser(
         cut.__name__, help=cut.__doc__, formatter_class=parser.formatter_class
@@ -190,6 +198,7 @@ def main():
             output_format=args.output_format,
             format=args.format,
         )
+
     fn = run_deref
     sparser = subparsers.add_parser(
         fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
@@ -207,6 +216,7 @@ def main():
     sparser.add_argument(
         "-o", "--output-format", default=None, choices=formats, help="-"
     )
+
     # select
     def run_select(args: argparse.Namespace) -> None:
         select(
@@ -219,6 +229,7 @@ def main():
             output_format=args.output_format,
             format=args.format,
         )
+
     fn = run_select
     sparser = subparsers.add_parser(
         select.__name__, help=select.__doc__, formatter_class=parser.formatter_class
@@ -249,6 +260,7 @@ def main():
             flavor=args.flavor,
             extras=args.extras,
         )
+
     fn = run_bundle
     sparser = subparsers.add_parser(
         bundle.__name__, help=bundle.__doc__, formatter_class=parser.formatter_class
@@ -278,6 +290,7 @@ def main():
             output_format=args.output_format,
             format=args.format,
         )
+
     fn = run_separate
     sparser = subparsers.add_parser(
         separate.__name__, help=separate.__doc__, formatter_class=parser.formatter_class
@@ -305,6 +318,7 @@ def main():
             format=args.format,
             use_expand=args.use_expand,
         )
+
     fn = run_examples
     sparser = subparsers.add_parser(
         examples.__name__, help=examples.__doc__, formatter_class=parser.formatter_class

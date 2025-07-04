@@ -47,7 +47,12 @@ class Loader:
         return load_func(fp, loader=self, errors=errors)
 
     def loadfile(
-        self, filename=None, format=None, opener: Callable = None, encoding=None, errors=None
+        self,
+        filename=None,
+        format=None,
+        opener: Callable = None,
+        encoding=None,
+        errors=None,
     ):
         """load file or stdin"""
         if filename is None:
@@ -73,12 +78,12 @@ class Dumper:
     def add_format(self, fmt, fn: Callable) -> None:
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *, format=None, sort_keys: bool=False, extra=None, **kwargs):
+    def dumps(self, d, *, format=None, sort_keys: bool = False, extra=None, **kwargs):
         fp = StringIO()
         self.dump(d, fp, format=format, sort_keys=sort_keys, extra=extra, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, *, format=None, sort_keys: bool=False, extra=None):
+    def dump(self, d, fp, *, format=None, sort_keys: bool = False, extra=None):
         dump_func: Callable
         if format is not None:
             dump_func = self.fn_map[format]
@@ -98,9 +103,9 @@ class Dumper:
         filename=None,
         *,
         format=None,
-        sort_keys: bool=False,
+        sort_keys: bool = False,
         extra=None,
-        _retry: bool=False,
+        _retry: bool = False,
     ):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator
@@ -145,11 +150,15 @@ class Dispatcher:
         _, ext = os.path.splitext(filename)
         return self.exts_matching.get(ext) or default
 
-    def dispatch(self, filename, fn_map: dict[str, Callable], default=unknown) -> Callable:
+    def dispatch(
+        self, filename, fn_map: dict[str, Callable], default=unknown
+    ) -> Callable:
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
-    def add_format(self, fmt, load: Callable, dump: Callable, *, exts=[], opener: Callable = None) -> None:
+    def add_format(
+        self, fmt, load: Callable, dump: Callable, *, exts=[], opener: Callable = None
+    ) -> None:
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:

@@ -37,17 +37,17 @@ class AccessingMixin:
             doc = self.doc
         return a.maybe_access(doc, path)
 
-    def access_by_json_pointer(self, jsonref, *, doc=None, guess: bool=True):
+    def access_by_json_pointer(self, jsonref, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return access_by_json_pointer(doc, jsonref, guess=guess)
 
-    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess: bool=True):
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return assign_by_json_pointer(doc, jsonref, value, guess=guess)
 
-    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess: bool=True):
+    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return maybe_remove_by_json_pointer(doc, jsonref)
@@ -77,7 +77,7 @@ def json_pointer_to_path(ref):
     return [as_path_node(p) for p in ref.lstrip("#/").split("/")]
 
 
-def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess: bool=False):
+def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess: bool = False):
     if query == "":
         return doc
     try:
@@ -102,7 +102,7 @@ def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess: bool=False
         raise KeyError(query)
 
 
-def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess: bool=False):
+def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess: bool = False):
     if query == "":
         return doc
     try:
@@ -136,7 +136,9 @@ def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
 
 
 class StackedAccessor:
-    def __init__(self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception) -> None:
+    def __init__(
+        self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception
+    ) -> None:
         self.stack = [resolver]
         self.accessor = accessor
         self.wrap_exception = wrap_exception

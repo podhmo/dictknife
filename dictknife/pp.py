@@ -16,7 +16,7 @@ def pp(d, out=None) -> None:
 
 
 @contextlib.contextmanager
-def indent(n, prefix: Optional[str]=None, newline: bool=True):
+def indent(n, prefix: Optional[str] = None, newline: bool = True):
     buf = StringIO()
     with contextlib.redirect_stdout(buf):
         yield buf

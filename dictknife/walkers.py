@@ -66,7 +66,7 @@ class DictWalker(object):
     def create_context(self, ctx=None):
         return ctx or self.context_factory()
 
-    def walk(self, d, qs=None, depth: int=-1, ctx=None):
+    def walk(self, d, qs=None, depth: int = -1, ctx=None):
         qs = qs or self.qs
         ctx = self.create_context(ctx)
         return self._walk(ctx, deque(self.qs), d, depth=depth)

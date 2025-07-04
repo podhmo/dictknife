@@ -45,7 +45,9 @@ def cat(
     with contextlib.ExitStack() as s:
         for f in files:
             logger.debug("merge: %s", f)
-            opener = loading.get_opener(filename=f, format=actual_input_format, default=_open)
+            opener = loading.get_opener(
+                filename=f, format=actual_input_format, default=_open
+            )
             rf = s.enter_context(opener(f, encoding=encoding, errors=errors))
             sd: Any
             if slurp:
@@ -62,7 +64,16 @@ def cat(
             else:
                 if not isinstance(d, (list, tuple)):
                     d = [d] if d else []
-                d = deepmerge(d, list(sd) if hasattr(sd, "__iter__") and not isinstance(sd, (list, tuple, dict)) else sd, method=merge_method)
+                d = deepmerge(
+                    d,
+                    (
+                        list(sd)
+                        if hasattr(sd, "__iter__")
+                        and not isinstance(sd, (list, tuple, dict))
+                        else sd
+                    ),
+                    method=merge_method,
+                )
 
         loading.dumpfile(
             d, dst, format=(output_format or format), sort_keys=sort_keys, extra=extra
@@ -197,7 +208,9 @@ def shape(
                 dataset.extend(loaded_data)
             else:
                 dataset.append(loaded_data)
-    rows: List[Any] = shape_module(dataset, squash=True, skiplist=skiplist, separator=separator)
+    rows: List[Any] = shape_module(
+        dataset, squash=True, skiplist=skiplist, separator=separator
+    )
 
     r: List[Dict[str, Any]] = []
     for row in rows:
@@ -265,7 +278,9 @@ def mkdict(
         r_list: List[Any] = []
         variables: Dict[str, Any] = {}
         for code_line in sys.stdin:
-            d: Any = mkdict_module(code_line.strip(), separator=separator, shared=variables)
+            d: Any = mkdict_module(
+                code_line.strip(), separator=separator, shared=variables
+            )
             if not d:
                 continue
             if isinstance(d, list):
@@ -288,7 +303,9 @@ def mkdict(
 
     if squash and isinstance(r, list):
         for row_item in r:
-            loading.dumpfile(row_item, filename=None, format=output_format, sort_keys=sort_keys)
+            loading.dumpfile(
+                row_item, filename=None, format=output_format, sort_keys=sort_keys
+            )
             sys.stdout.write("\n")
     else:
         loading.dumpfile(r, filename=None, format=output_format, sort_keys=sort_keys)
@@ -348,9 +365,12 @@ def main():
             errors=args.errors,
             size=args.size,
             slurp=args.slurp,
-            extra=getattr(args, "extra", None),  # apply_loading_format_extra_arguments_parserで追加される想定
+            extra=getattr(
+                args, "extra", None
+            ),  # apply_loading_format_extra_arguments_parserで追加される想定
             merge_method=args.merge_method,
         )
+
     fn = run_cat
     sparser = subparsers.add_parser(
         cat.__name__, help=cat.__doc__, formatter_class=parser.formatter_class
@@ -408,9 +428,12 @@ def main():
             format=args.format,
             sort_keys=args.sort_keys,
         )
+
     fn = run_transform
     sparser = subparsers.add_parser(
-        transform.__name__, help=transform.__doc__, formatter_class=parser.formatter_class
+        transform.__name__,
+        help=transform.__doc__,
+        formatter_class=parser.formatter_class,
     )
 
     def print_help(*, file=None, self=sparser) -> None:
@@ -461,6 +484,7 @@ def main():
             output_format=args.output_format,
             verbose=args.verbose,
         )
+
     fn = run_diff
     sparser = subparsers.add_parser(
         diff.__name__, help=diff.__doc__, formatter_class=parser.formatter_class
@@ -497,6 +521,7 @@ def main():
             with_example=args.with_example,
             full=args.full,
         )
+
     fn = run_shape
     sparser = subparsers.add_parser(
         shape.__name__, help=shape.__doc__, formatter_class=parser.formatter_class
@@ -527,6 +552,7 @@ def main():
             max_length_of_list=args.max_length_of_list,
             with_tail=args.with_tail,
         )
+
     fn = run_shrink
     sparser = subparsers.add_parser(
         shrink.__name__, help=shrink.__doc__, formatter_class=parser.formatter_class
@@ -554,6 +580,7 @@ def main():
             squash=args.squash,
             extra=args.extra,
         )
+
     fn = run_mkdict
     sparser = subparsers.add_parser(
         mkdict.__name__, help=mkdict.__doc__, formatter_class=parser.formatter_class

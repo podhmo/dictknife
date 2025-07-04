@@ -167,7 +167,7 @@ class Loader:
             self._save_cache(self.cache)
         return service
 
-    def load_sheet(self, guessed, *, with_header: bool=True):
+    def load_sheet(self, guessed, *, with_header: bool = True):
         resource = self.service.spreadsheets()
 
         range_value = guessed.range

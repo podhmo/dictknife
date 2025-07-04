@@ -2,7 +2,7 @@ import os.path
 import logging
 import warnings
 import contextlib
-from typing import Dict, Any, List, Optional, cast # Added Optional, cast
+from typing import Dict, Any, List, Optional, cast  # Added Optional, cast
 from dictknife import loading
 from dictknife.cliutils import traceback_shortly
 from magicalimport import import_symbol
@@ -10,7 +10,9 @@ from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
-def tojsonschema(*, src: Optional[str], dst: Optional[str], name: Optional[str]) -> None:
+def tojsonschema(
+    *, src: Optional[str], dst: Optional[str], name: Optional[str]
+) -> None:
     # todo: id
     assert src is not None, "src must be specified for tojsonschema"
     assert name is not None, "name must be specified for tojsonschema"
@@ -141,7 +143,9 @@ def merge(
                     }
         # r[wrap_section] が存在し、かつそれが辞書であることを期待
         if wrap_section not in r or not isinstance(r[wrap_section], dict):
-            r[wrap_section] = make_dict() # もし存在しないか、辞書でなければ新しい辞書を作成
+            r[wrap_section] = (
+                make_dict()
+            )  # もし存在しないか、辞書でなければ新しい辞書を作成
 
         # r[wrap_section] が辞書であることを保証した上でアクセス
         # しかし、mypyはこれだけでは納得しない可能性があるため、キャストを検討
@@ -156,7 +160,14 @@ def merge(
     loading.dumpfile(r, dst)
 
 
-def flatten(*, src: Optional[str], dst: Optional[str], input_format: Optional[str], output_format: Optional[str], format: Optional[str]) -> None:
+def flatten(
+    *,
+    src: Optional[str],
+    dst: Optional[str],
+    input_format: Optional[str],
+    output_format: Optional[str],
+    format: Optional[str],
+) -> None:
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten as flatten_module
 
@@ -202,6 +213,7 @@ def main():
             wrap=args.wrap,
             wrap_section=args.wrap_section,
         )
+
     fn = run_merge
     sparser = subparsers.add_parser(
         merge.__name__, help=merge.__doc__, formatter_class=parser.formatter_class
@@ -213,12 +225,16 @@ def main():
     sparser.add_argument("--style", default="ref", choices=["ref", "whole"], help="-")
     sparser.add_argument("--wrap", default=None, help="-")
     sparser.add_argument("--wrap-section", default="definitions", help="-")
+
     # tojsonschema
     def run_tojsonschema(args: argparse.Namespace) -> None:
         tojsonschema(src=args.src, dst=args.dst, name=args.name)
+
     fn = run_tojsonschema
     sparser = subparsers.add_parser(
-        tojsonschema.__name__, help=tojsonschema.__doc__, formatter_class=parser.formatter_class
+        tojsonschema.__name__,
+        help=tojsonschema.__doc__,
+        formatter_class=parser.formatter_class,
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("--src", default=None, help="-")
@@ -241,9 +257,12 @@ def main():
             with_minimap=args.with_minimap,
             without_example=args.without_example,
         )
+
     fn = run_json2swagger
     sparser = subparsers.add_parser(
-        json2swagger.__name__, help=json2swagger.__doc__, formatter_class=parser.formatter_class
+        json2swagger.__name__,
+        help=json2swagger.__doc__,
+        formatter_class=parser.formatter_class,
     )
     sparser.set_defaults(subcommand=fn)
     sparser.add_argument("files", nargs="*", default=None, help="-")
@@ -270,6 +289,7 @@ def main():
             output_format=args.output_format,
             format=args.format,
         )
+
     fn = run_flatten
     sparser = subparsers.add_parser(
         flatten.__name__, help=flatten.__doc__, formatter_class=parser.formatter_class

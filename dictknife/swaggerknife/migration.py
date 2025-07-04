@@ -127,11 +127,11 @@ class Migration:
         self,
         doc=None,
         *,
-        dry_run: bool=False,
+        dry_run: bool = False,
         where=None,
-        inplace: bool=False,
+        inplace: bool = False,
         savedir=None,
-        keep: bool=False,
+        keep: bool = False,
     ):
         logger.info(
             "start migration (dry_run=%r, inplace=%r, where=%r)",
@@ -254,7 +254,9 @@ class _Updater:
     def update(self, ref, v, *, resolver=None):
         return self.update_by_path(json_pointer_to_path(ref), v, resolver=resolver)
 
-    def update_by_path(self, path, v, *, resolver=None, skip_logging: bool=False) -> None:
+    def update_by_path(
+        self, path, v, *, resolver=None, skip_logging: bool = False
+    ) -> None:
         if skip_logging:
             logger.debug("update file=%s path=%s", self.name, path)
         resolver = resolver or self.resolver

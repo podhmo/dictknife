@@ -5,7 +5,13 @@ from dictknife.transform import str_dict
 
 
 def diff_rows(
-    d0, d1, *, fromfile: str="left", tofile: str="right", diff_key: str="diff", normalize: bool=False
+    d0,
+    d1,
+    *,
+    fromfile: str = "left",
+    tofile: str = "right",
+    diff_key: str = "diff",
+    normalize: bool = False,
 ):
     if normalize:
         d0 = sort_flexibly(d0)

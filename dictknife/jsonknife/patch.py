@@ -3,7 +3,7 @@ from collections import namedtuple
 diff = namedtuple("diff", "op, value, x_from, x_to")
 
 
-def make_jsonpatch(src, dst, *, verbose: bool=False):
+def make_jsonpatch(src, dst, *, verbose: bool = False):
     # iterator?
     if hasattr(src, "__next__"):
         src = list(src)

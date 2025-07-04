@@ -39,7 +39,7 @@ def create_scanner_factory_from_flavor(flavor: str):
 
 
 class Bundler:
-    def __init__(self, resolver, strict: bool=False, *, scanner_factory=None) -> None:
+    def __init__(self, resolver, strict: bool = False, *, scanner_factory=None) -> None:
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
         self.item_map: dict[str, "CachedItem"] = make_dict()  # localref -> item
@@ -61,7 +61,9 @@ class Bundler:
 
 
 class Scanner:
-    def __init__(self, accessor, item_map, strict: bool=False, localref_fixer=None) -> None:
+    def __init__(
+        self, accessor, item_map, strict: bool = False, localref_fixer=None
+    ) -> None:
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
@@ -225,7 +227,7 @@ class LocalrefFixer:  # todo: rename
 
 
 class SimpleConflictFixer:  # todo: rename
-    def __init__(self, item_map, strict: bool=False) -> None:
+    def __init__(self, item_map, strict: bool = False) -> None:
         self.item_map = item_map
         self.strict = strict
 
