@@ -200,7 +200,6 @@ def get_unknown(dispatcher=dispatcher):
 
 
 def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):
-    global loading_config
     if input is not None:
         logger.debug("setup input format: %s", input)
         dispatcher.loader.add_format(unknown, input)
