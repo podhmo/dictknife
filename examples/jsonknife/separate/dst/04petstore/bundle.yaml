@@ -91,7 +91,8 @@ paths:
       tags:
       - pet
       summary: Finds Pets by status
-      description: Multiple status values can be provided with comma separated strings
+      description: Multiple status values can be provided with comma separated 
+        strings
       operationId: findPetsByStatus
       produces:
       - application/xml
@@ -361,8 +362,8 @@ paths:
       tags:
       - store
       summary: Delete purchase order by ID
-      description: For valid response try integer IDs with value < 1000. Anything
-        above 1000 or nonintegers will generate API errors
+      description: For valid response try integer IDs with value < 1000. 
+        Anything above 1000 or nonintegers will generate API errors
       operationId: deleteOrder
       produces:
       - application/xml
