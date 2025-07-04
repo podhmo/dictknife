@@ -16,7 +16,7 @@ class Tests(unittest.TestCase):
             self._getTarget()(d, format=format)
         return o.getvalue()
 
-    def test_dumpfile_with_iterator(self):
+    def test_dumpfile_with_iterator(self) -> None:
         from collections import namedtuple
 
         def iterator():

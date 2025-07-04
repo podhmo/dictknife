@@ -7,7 +7,7 @@ class TestDeepMerge(unittest.TestCase):
 
         return deepmerge(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         d0 = {
             "a": {"x": 1},
             "b": {"y": 10},
@@ -18,7 +18,7 @@ class TestDeepMerge(unittest.TestCase):
         self.assertEqual(actual, expected)
         self.assertNotEqual(actual, d0, msg="not modified!!")
 
-    def test_it__override(self):
+    def test_it__override(self) -> None:
         d0 = {
             "name": "foo",
             "object": {"x": 1, "z": 1},
@@ -40,7 +40,7 @@ class TestDeepMerge(unittest.TestCase):
         self.assertEqual(actual, expected)
         self.assertNotEqual(actual, d0, msg="not modified!!")
 
-    def test_with_empty(self):
+    def test_with_empty(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "d0 d1 override expected")

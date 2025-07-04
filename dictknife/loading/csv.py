@@ -6,7 +6,7 @@ from logging import getLogger as get_logger
 
 logger = get_logger(__name__)
 
-_cls_registry = {}
+_cls_registry: dict[str, type] = {}
 
 
 def setup_extra_parser(parser):
@@ -20,7 +20,7 @@ def load(
     fp,
     *,
     loader=None,
-    delimiter=",",
+    delimiter: str = ",",
     errors=None,
     _registry=_cls_registry,
     create_reader_class=None,
@@ -36,7 +36,9 @@ def load(
     return reader
 
 
-def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
+def dump(
+    rows, fp, *, delimiter: str = ",", sort_keys: bool = False, fullscan: bool = False
+) -> None:
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):
@@ -65,7 +67,7 @@ def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
     writer.writerows(itr)
 
 
-def _create_reader_class(csv, errors=None, retry=10):
+def _create_reader_class(csv, errors=None, retry: int = 10):
     if sys.version_info[:2] >= (3, 6):
         make_dictReader = csv.DictReader
     else:
@@ -111,7 +113,7 @@ def _create_reader_class(csv, errors=None, retry=10):
         make_dictReader.__next__ = __next__
     else:
 
-        def __next__(self):
+        def __next__(self, retry=None):
             d = original_next(self)
             return guess(d, mutable=True)
 

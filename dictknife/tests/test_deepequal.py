@@ -3,7 +3,7 @@ import unittest
 
 
 class ref(object):
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         self.value = value
 
     def __eq__(self, other):
@@ -11,12 +11,12 @@ class ref(object):
 
 
 class DeepEqualTests(unittest.TestCase):
-    def _callFUT(self, left, right, normalize):
+    def _callFUT(self, left, right, normalize: bool):
         from dictknife import deepequal
 
         return deepequal(left, right, normalize=normalize)
 
-    def test_it(self):
+    def test_it(self) -> None:
         d0 = {
             "a": ref(1),
             "b": {"x": {"i": ref(2)}, "y": {"j": ref(3)}},
@@ -28,13 +28,13 @@ class DeepEqualTests(unittest.TestCase):
         self.assertEqual(ref(1), ref(1), msg="prepare")
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
-    def test_it2(self):
+    def test_it2(self) -> None:
         d0 = {"color": {"type": "string", "enum": ["C", "M", "Y", "K"]}}
         d1 = {"color": {"type": "string", "enum": ["K", "Y", "M", "C"]}}
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
-    def test_it3(self):
+    def test_it3(self) -> None:
         from dictknife.langhelpers import make_dict
 
         d0 = make_dict([("type", "string"), ("enum", ["C", "M", "Y", "K"])])
@@ -42,13 +42,13 @@ class DeepEqualTests(unittest.TestCase):
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
-    def test_it4(self):
+    def test_it4(self) -> None:
         d0 = [[[1, 2, 3], [1]], [[1, 2], [2, 3], [3, 4]]]
         d1 = [[[1], [1, 2, 3]], [[1, 2], [3, 4], [2, 3]]]
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
-    def test_it5(self):
+    def test_it5(self) -> None:
         d0 = [
             {"xs": [{"name": "i"}, {"name": "j"}, {"name": "k"}]},
             {"xs": [{"name": "x"}, {"name": "y"}, {"name": "z"}]},
@@ -60,7 +60,7 @@ class DeepEqualTests(unittest.TestCase):
         self.assertNotEqual(d0, d1)
         self.assertTrue(self._callFUT(d0, d1, normalize=True))
 
-    def test_it6(self):
+    def test_it6(self) -> None:
         d0 = [
             [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
             [[10, 11, 12], [11, 12, 13], [12, 13, 14]],

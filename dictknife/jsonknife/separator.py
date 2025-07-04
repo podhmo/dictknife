@@ -6,6 +6,8 @@ from dictknife import DictWalker
 from dictknife import loading
 from dictknife.langhelpers import reify, pairrsplit, make_dict
 
+from typing import List, Tuple, Dict, Any
+
 from .resolver import ExternalFileResolver
 from .accessor import is_ref
 from .relpath import relpath, fixref
@@ -20,7 +22,7 @@ logger = logging.getLogger(".".join(__name__.split(".")[1:]))
 # todo: test
 
 
-def _with_format(name: str, *, format: str = None, default=".yaml"):
+def _with_format(name: str, *, format: str = None, default: str = ".yaml"):
     if os.path.splitext(name)[1]:
         return name
     ext = format or default
@@ -30,7 +32,7 @@ def _with_format(name: str, *, format: str = None, default=".yaml"):
 
 
 class Separator:  # todo: rename
-    def __init__(self, resolver, *, format=None, here=None):
+    def __init__(self, resolver, *, format=None, here=None) -> None:
         self.resolver = resolver
         self.format = format
         self.here = here
@@ -43,7 +45,7 @@ class Separator:  # todo: rename
     def emitter(self):
         return Emitter(self.resolver, format=self.format, here=self.here)
 
-    def separate(self, doc=None, *, name="main", dst=None):
+    def separate(self, doc=None, *, name: str = "main", dst=None) -> None:
         doc = doc or self.resolver.doc
 
         ns_map = self.scanner.scan(doc)
@@ -54,7 +56,9 @@ class Separator:  # todo: rename
 
 
 class Scanner:
-    def __init__(self, resolver: ExternalFileResolver, *, here=None, format=None):
+    def __init__(
+        self, resolver: ExternalFileResolver, *, here=None, format=None
+    ) -> None:
         self.resolver = resolver
         self.here = here or resolver.name
         self.format = format
@@ -63,14 +67,14 @@ class Scanner:
     def ref_walker(self) -> DictWalker:
         return DictWalker([is_ref])
 
-    def scan(self, doc: dict) -> dict:
+    def scan(self, doc: dict) -> dict[str, list]:
         namespaces = self._collect_namespaces(doc)
-        r = {}
+        r: dict[str, list] = {}
         for ns in namespaces:
             r[ns] = self._collect_def_items(ns)
         return r
 
-    def _collect_def_items(self, ns):
+    def _collect_def_items(self, ns: str) -> list:
         data = self.resolver.access_by_json_pointer(ns)
         defs = []
         for name, definition in data.items():
@@ -89,8 +93,8 @@ class Scanner:
             )
         return defs
 
-    def _collect_namespaces(self, doc: dict) -> dict:
-        namespaces = []
+    def _collect_namespaces(self, doc: dict) -> list[str]:
+        namespaces: list[str] = []
         seen = set()
 
         for path, d in self.ref_walker.walk(doc):
@@ -109,11 +113,11 @@ class Scanner:
 
 
 class Emitter:
-    def __init__(self, resolver, *, here: str = None, format=None):
+    def __init__(self, resolver, *, here: str = None, format=None) -> None:
         self.resolver = resolver
         self.here = here or resolver.name
         self.format = format
-        self.registered = []  # List[Tuple[str, dict]]
+        self.registered: List[Tuple[str, Dict[str, str]]] = []
 
     @reify
     def ref_walker(self) -> DictWalker:
@@ -134,7 +138,7 @@ class Emitter:
         sresolver, query = self.resolver.resolve(def_item["$ref"])
         data = sresolver.access_by_json_pointer(query)
 
-        doc = make_dict()
+        doc: Dict[str, Any] = make_dict()
         self.resolver.assign_by_json_pointer(def_item["$ref"], data, doc=doc)
 
         for _, d in self.ref_walker.walk(data):
@@ -158,7 +162,9 @@ class Emitter:
         # todo: to dumper
         loading.dumpfile(doc, def_item["new_filepath"])
 
-    def emit_main(self, *, doc: dict = None, dst: str = None, name: str = "main"):
+    def emit_main(
+        self, *, doc: dict = None, dst: str = None, name: str = "main"
+    ) -> None:
         doc = doc or self.resolver.doc
         new_doc = copy.deepcopy(doc)
         for ref, data in self.registered:

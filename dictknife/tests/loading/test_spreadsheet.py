@@ -11,7 +11,7 @@ class GuessTests(unittest.TestCase):
 
         return guess(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from dictknife.loading.spreadsheet import Guessed
 
         C = namedtuple("C", "input, output")

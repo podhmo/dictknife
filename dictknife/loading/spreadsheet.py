@@ -39,7 +39,7 @@ def guess(
     return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=sheet_id)
 
 
-def load(pattern, *, errors=None, loader=None, **kwargs):
+def load(pattern: str, *, errors=None, loader=None, **kwargs):
     global _loader
     loader = loader or _loader
     if _loader is None:
@@ -48,7 +48,7 @@ def load(pattern, *, errors=None, loader=None, **kwargs):
     return _loader.load_sheet(guessed)
 
 
-def dump(rows, fp, *, sort_keys=False):
+def dump(rows, fp, *, sort_keys: bool = False):
     raise NotImplementedError("><")
 
 

@@ -3,7 +3,7 @@ import contextlib
 
 
 @contextlib.contextmanager
-def traceback_shortly(debug):
+def traceback_shortly(debug: bool):
     try:
         yield
     except Exception as e:

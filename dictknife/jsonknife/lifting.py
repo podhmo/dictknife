@@ -4,30 +4,30 @@ from dictknife.langhelpers import titleize
 
 
 class Handler:
-    def __init__(self, path, r=None):
+    def __init__(self, path, r=None) -> None:
         self.path = path
         self.r = r or make_dict()
 
     def full_name(self):
         return "".join(self.path)
 
-    def add_name(self, name):
+    def add_name(self, name: str) -> None:
         self.path.append(titleize(name))
 
-    def add_array_item(self):
+    def add_array_item(self) -> None:
         self.add_name("item")
 
-    def pop_name(self):
+    def pop_name(self) -> None:
         self.path.pop()
 
-    def save_object(self, name, definition):
+    def save_object(self, name: str, definition):
         newdef = self.r.__class__()
         newdef["type"] = "object"
         newdef.update(definition)
         self.r[name] = newdef
         return newdef
 
-    def save_array(self, name, definition):
+    def save_array(self, name: str, definition):
         newdef = self.r.__class__()
         newdef["type"] = "array"
         newdef.update(definition)
@@ -36,7 +36,7 @@ class Handler:
 
 
 class Flattener:
-    def __init__(self, replace=True):
+    def __init__(self, replace: bool = True) -> None:
         self.replace = replace
 
     def extract(self, data, ctx):
@@ -45,7 +45,7 @@ class Flattener:
             ctx.r[k] = copy.deepcopy(ctx.r[k])
         return ctx.r
 
-    def _extract(self, data, ctx, from_array=False):
+    def _extract(self, data, ctx, from_array: bool = False):
         typ = data.get("type")
         if typ == "array" and "items" in data:
             return self.on_array_has_items(data, ctx)
@@ -58,7 +58,7 @@ class Flattener:
         else:
             return data
 
-    def return_definition(self, definition, fullname, typ="object"):
+    def return_definition(self, definition, fullname: str, typ: str = "object"):
         if self.replace:
             return {"$ref": "#/definitions/{}".format(fullname)}
         else:

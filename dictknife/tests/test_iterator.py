@@ -10,7 +10,7 @@ class IteratorTests(unittest.TestCase):
     def _makeOne(self, *args, **kwargs):
         return self._getTargetClass()(*args, **kwargs)
 
-    def test_rec(self):
+    def test_rec(self) -> None:
         from ..operators import ANY
 
         s = []

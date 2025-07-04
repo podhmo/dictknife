@@ -16,13 +16,13 @@ class Tests(unittest.TestCase):
         expander = Expander(OneDocResolver(doc))
         return expander.expand()
 
-    def assert_defs(self, actual, expected):
+    def assert_defs(self, actual, expected) -> None:
         from dictknife import diff
 
         self.assertEqual("\n".join(diff(expected, actual)), "")
 
     @unittest.skip("hmm")
-    def test_self_recursion(self):
+    def test_self_recursion(self) -> None:
         defs_text = textwrap.dedent(
             """
         definitions:
@@ -54,7 +54,7 @@ class Tests(unittest.TestCase):
         self.assert_defs(actual, expected)
 
     @unittest.skip("hmm")
-    def test_mutual_recursion(self):
+    def test_mutual_recursion(self) -> None:
         defs_text = textwrap.dedent(
             """
         definitions:

@@ -8,19 +8,19 @@ class AssignTests(unittest.TestCase):
         a = Accessor(make_dict=dict)
         return a.assign(d, k, v)
 
-    def test_assign_dict(self):
-        d = {}
+    def test_assign_dict(self) -> None:
+        d: dict[str, object] = {}
         self._callFUT(d, ["x"], 1)
         expected = {"x": 1}
         self.assertDictEqual(d, expected)
 
-    def test_assign_deeply(self):
-        d = {}
+    def test_assign_deeply(self) -> None:
+        d: dict[int, object] = {}
         self._callFUT(d, [1, 2, 3, 4, 5, 6, 7, 8, 9], "foo")
         expected = {1: {2: {3: {4: {5: {6: {7: {8: {9: "foo"}}}}}}}}}
         self.assertDictEqual(d, expected)
 
-    def test_assign_list(self):
+    def test_assign_list(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "d, path, v, expected")
@@ -52,14 +52,14 @@ class AssignTests(unittest.TestCase):
                 self._callFUT(c.d, c.path, c.v)
                 self.assertDictEqual(c.d, c.expected)
 
-    def test_assign_list2(self):
+    def test_assign_list2(self) -> None:
         d = {"x": [1]}
         self._callFUT(d, ["x", 2], 3)
         self._callFUT(d, ["x", 1, "a"], 10)
         expected = {"x": [1, {"a": 10}, 3]}
         self.assertDictEqual(d, expected)
 
-    def test_assign_list_nested(self):
+    def test_assign_list_nested(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "d, path, v, expected")
@@ -88,7 +88,7 @@ class AssignTests(unittest.TestCase):
                 self._callFUT(c.d, c.path, c.v)
                 self.assertDictEqual(c.d, c.expected)
 
-    def test_assign_list_nested2(self):
+    def test_assign_list_nested2(self) -> None:
         d = {"x": [{"name": "foo"}]}
         self._callFUT(d, ["x", 3, "name"], "boo")
         self._callFUT(d, ["x", 1, "name"], "bar")
@@ -103,7 +103,7 @@ class MaybeAccessTests(unittest.TestCase):
         a = Accessor(make_dict=dict)
         return a.maybe_access(d, path)
 
-    def test_maybe_access(self):
+    def test_maybe_access(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "d, path, expected")

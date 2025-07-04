@@ -1,9 +1,10 @@
 import sys
 import contextlib
 from io import StringIO
+from typing import Optional
 
 
-def pp(d, out=None):
+def pp(d, out=None) -> None:
     import json
 
     out = out or sys.stdout
@@ -15,7 +16,7 @@ def pp(d, out=None):
 
 
 @contextlib.contextmanager
-def indent(n, prefix=None, newline=True):
+def indent(n, prefix: Optional[str] = None, newline: bool = True):
     buf = StringIO()
     with contextlib.redirect_stdout(buf):
         yield buf

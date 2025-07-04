@@ -8,7 +8,7 @@ class OperatorsTests(unittest.TestCase):
 
         return apply(op, value)
 
-    def test_it(self):
+    def test_it(self) -> None:
         C = namedtuple("C", "value, expected")
 
         candidates = [
@@ -23,7 +23,7 @@ class OperatorsTests(unittest.TestCase):
                 actual = self._callFUT(op, c.value)
                 self.assertEqual(actual, c.expected)
 
-    def test_and(self):
+    def test_and(self) -> None:
         from ..operators import And
 
         C = namedtuple("C", "value, expected")
@@ -40,7 +40,7 @@ class OperatorsTests(unittest.TestCase):
                 actual = self._callFUT(op, c.value)
                 self.assertEqual(actual, c.expected)
 
-    def test_or(self):
+    def test_or(self) -> None:
         from ..operators import Or
 
         C = namedtuple("C", "value, expected")
@@ -57,7 +57,7 @@ class OperatorsTests(unittest.TestCase):
                 actual = self._callFUT(op, c.value)
                 self.assertEqual(actual, c.expected)
 
-    def test_and2(self):
+    def test_and2(self) -> None:
         from ..operators import And, Not
 
         C = namedtuple("C", "value, expected")

@@ -1,18 +1,19 @@
 import difflib
 from dictknife.deepequal import sort_flexibly
 from dictknife.transform import str_dict
+from typing import Optional, Callable
 
 
 def diff(
     d0,
     d1,
-    tostring=None,
-    fromfile="left",
-    tofile="right",
-    n=3,
-    terminator="\n",
-    normalize=False,
-    sort_keys=False,
+    tostring: Optional[Callable[..., str]] = None,
+    fromfile: str = "left",
+    tofile: str = "right",
+    n: int = 3,
+    terminator: str = "\n",
+    normalize: bool = False,
+    sort_keys: bool = False,
 ):
     """fancy diff"""
     if normalize:
@@ -35,7 +36,7 @@ def diff(
     )
 
 
-def _default_tostring(d, *, default=str, sort_keys=True):
+def _default_tostring(d, *, default=str, sort_keys: bool = True):
     import json
 
     return json.dumps(

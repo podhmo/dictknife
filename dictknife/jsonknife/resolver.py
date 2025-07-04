@@ -2,6 +2,7 @@ import sys
 import logging
 import os.path
 from collections import deque
+from typing import List, Any, Union, Type
 
 from dictknife import loading
 from dictknife.walkers import DictWalker
@@ -15,7 +16,7 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class OneDocResolver(AccessingMixin):
-    def __init__(self, doc, *, name="*root*", onload=None, format=None):
+    def __init__(self, doc, *, name: str = "*root*", onload=None, format=None) -> None:
         self.doc = doc
         self.name = name
         self.onload = onload
@@ -37,18 +38,20 @@ class ExternalFileResolver(AccessingMixin):
         *,
         cache=None,
         loader=None,
-        history=None,
+        history: List[Union["ExternalFileResolver", Type["ROOT"]]] = None,
         doc=None,
         rawfilename=None,
         onload=None,
         format=None,
         wrap_exception=wrap_exception,
-    ):
+    ) -> None:
         self.rawfilename = rawfilename or filename
         self.filename = os.path.normpath(os.path.abspath(str(filename)))
         self.cache = {} if cache is None else cache  # filename -> resolver
         self.loader = loader or loading
-        self.history = history or [ROOT]
+        self.history: List[Union["ExternalFileResolver", Type["ROOT"]]] = history or [
+            ROOT
+        ]
         self.onload = onload
         self.format = format
         self.wrap_exception = wrap_exception
@@ -57,7 +60,7 @@ class ExternalFileResolver(AccessingMixin):
             if self.onload is not None:
                 self.onload(doc, self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<FileResolver {!r}>".format(self.filename)
 
     @property
@@ -139,7 +142,7 @@ class ExternalFileResolver(AccessingMixin):
 class ROOT:
     filename = "*root*"
     rawfilename = "*root*"
-    history = []
+    history: List[Any] = []
 
 
 def get_resolver(filename, *, loader=loading, doc=None, onload=None, format=None):
@@ -161,7 +164,7 @@ get_resolver_from_filename = get_resolver
 
 
 def build_subset(resolver, ref):
-    subset = {}
+    subset: dict[str, Any] = {}
 
     refs = deque([ref])
     seen = set()

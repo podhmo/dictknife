@@ -2,6 +2,7 @@ import logging
 import os.path
 from collections import defaultdict
 from functools import partial
+from typing import TYPE_CHECKING, cast
 
 from dictknife.langhelpers import make_dict, titleize, reify, pairrsplit
 from dictknife import DictWalker
@@ -11,6 +12,9 @@ from dictknife import deepmerge
 from .relpath import relpath
 from .accessor import CachedItemAccessor
 from .accessor import is_ref
+
+if TYPE_CHECKING:
+    from .accessor import CachedItem
 
 
 logger = logging.getLogger("jsonknife.bundler")
@@ -35,10 +39,10 @@ def create_scanner_factory_from_flavor(flavor: str):
 
 
 class Bundler:
-    def __init__(self, resolver, strict=False, *, scanner_factory=None):
+    def __init__(self, resolver, strict: bool = False, *, scanner_factory=None) -> None:
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
-        self.item_map = make_dict()  # localref -> item
+        self.item_map: dict[str, "CachedItem"] = make_dict()  # localref -> item
         self.strict = strict
         self._scanner_factory = scanner_factory or Scanner
 
@@ -57,11 +61,13 @@ class Bundler:
 
 
 class Scanner:
-    def __init__(self, accessor, item_map, strict=False, localref_fixer=None):
+    def __init__(
+        self, accessor, item_map, strict: bool = False, localref_fixer=None
+    ) -> None:
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
-        self.seen = set()
+        self.seen: set[str] = set()
 
         # todo: rename
         self.localref_fixer = localref_fixer or LocalrefFixer(
@@ -77,12 +83,12 @@ class Scanner:
         return SimpleConflictFixer(self.item_map, strict=self.strict)
 
     def scan(self, doc):
-        conflicted = defaultdict(list)
+        conflicted: dict[str, list] = defaultdict(list)
         self._scan_refs(doc, conflicted=conflicted)
         self._scan_toplevel(doc, conflicted=conflicted)
         return conflicted
 
-    def _scan_toplevel(self, doc, *, conflicted):
+    def _scan_toplevel(self, doc, *, conflicted) -> None:
         assert len(self.accessor.stack) == 1
         for name in list(self.item_map.keys()):
             try:
@@ -104,7 +110,7 @@ class Scanner:
                 self.accessor.pop_stack()
         assert len(self.accessor.stack) == 1
 
-    def _scan_refs(self, doc, *, conflicted):
+    def _scan_refs(self, doc, *, conflicted) -> None:
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
@@ -134,7 +140,7 @@ class Scanner:
 
 
 class Emitter:
-    def __init__(self, accessor, item_map):
+    def __init__(self, accessor, item_map) -> None:
         self.raw_accessor = Accessor()
         self.accessor = accessor
         self.item_map = item_map
@@ -151,7 +157,7 @@ class Emitter:
 
     def emit(self, resolver, doc, *, conflicted):
         # side effect
-        d = make_dict()
+        d: dict[str, object] = make_dict()
         for path, sd in self.ref_walking.iterate(doc):
             self.replace_ref(resolver, sd)
 
@@ -170,7 +176,7 @@ class Emitter:
 
         # adhoc paths support
         will_removes = set()
-        paths = d.get("paths") or {}
+        paths = cast(dict, d.get("paths", {}))
         for path, sub in list(paths.items()):
             if "$ref" in sub and sub["$ref"].startswith("#/"):
                 related_path = tuple(sub["$ref"][2:].split("/"))
@@ -180,7 +186,7 @@ class Emitter:
             self.raw_accessor.maybe_remove(d, related_path)
         return d
 
-    def replace_ref(self, resolver, sd):
+    def replace_ref(self, resolver, sd) -> None:
         filename, _, pointer = resolver.resolve_pathset(sd["$ref"])
         related = self.get_item_by_globalref((filename, pointer))
         new_ref = "#/{}".format(related.localref)
@@ -221,7 +227,7 @@ class LocalrefFixer:  # todo: rename
 
 
 class SimpleConflictFixer:  # todo: rename
-    def __init__(self, item_map, strict=False):
+    def __init__(self, item_map, strict: bool = False) -> None:
         self.item_map = item_map
         self.strict = strict
 

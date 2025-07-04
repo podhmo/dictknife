@@ -21,7 +21,7 @@ class LoadingModule:
                 return tomlkit.load(fp)
 
             @classmethod
-            def dump(cls, data, fp=None, *args, sort_keys=False, **kwargs):
+            def dump(cls, data, fp=None, *args, sort_keys: bool = False, **kwargs):
                 return tomlkit.dump(data, fp, sort_keys=sort_keys)
 
         return _TomlAdaptor
@@ -61,7 +61,7 @@ class LoadingModule:
                 Loader = None
 
                 @classmethod
-                def load(cls, *args, typ="rt", loader=None, **kwargs):
+                def load(cls, *args, typ: str = "rt", loader=None, **kwargs):
                     return json.load(*args, **kwargs)
 
                 @classmethod

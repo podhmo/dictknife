@@ -3,7 +3,7 @@ from collections import namedtuple
 diff = namedtuple("diff", "op, value, x_from, x_to")
 
 
-def make_jsonpatch(src, dst, *, verbose=False):
+def make_jsonpatch(src, dst, *, verbose: bool = False):
     # iterator?
     if hasattr(src, "__next__"):
         src = list(src)
@@ -55,8 +55,8 @@ def _merge(r):
 
 class _Walker:
     # two path scan move, copy
-    def __init__(self):
-        self.move_map = {}  # todo:
+    def __init__(self) -> None:
+        self.move_map: dict = {}  # todo:
 
     def walk(self, src, dst):
         # xxx: src and dst is None

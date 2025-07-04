@@ -3,11 +3,11 @@ from .langhelpers import make_dict
 
 
 class Accessor:
-    def __init__(self, make_dict=make_dict, zero_value=None):
+    def __init__(self, make_dict=make_dict, zero_value=None) -> None:
         self.make_dict = make_dict
         self.zero_value = zero_value
 
-    def assign(self, d, path, value):
+    def assign(self, d, path, value) -> None:
         original = d
         for name in path[:-1]:
             try:
@@ -40,12 +40,12 @@ class Accessor:
                 d = d[int(name)]
         return d
 
-    def maybe_remove(self, d, path):
+    def maybe_remove(self, d, path) -> None:
         container = self.maybe_access_container(d, path)
         if container is not None:
             container.pop(path[-1])
 
-    def exists(self, d, path):
+    def exists(self, d, path) -> bool:
         return self.maybe_access_container(d, path) is not None
 
     def maybe_access(self, d, path, *, default=None):
@@ -85,8 +85,8 @@ missing = object()
 
 
 class Scope:
-    def __init__(self, init=None, *, accessor=None):
-        self.states = []
+    def __init__(self, init=None, *, accessor=None) -> None:
+        self.states: list[object] = []
         self.accessor = accessor or Accessor()
         if init is not None:
             self.push(init)
@@ -106,10 +106,10 @@ class Scope:
             return v
         raise KeyError(path)
 
-    def push(self, state):
+    def push(self, state) -> None:
         self.states.append(state)
 
-    def pop(self):
+    def pop(self) -> None:
         self.states.pop()
 
     @contextlib.contextmanager
@@ -158,7 +158,7 @@ class MutableModifier:
         return d
 
 
-def dictmap(fn, x, *, mutable=False, with_key=False):
+def dictmap(fn, x, *, mutable: bool = False, with_key: bool = False):
     modifier = get_modifier(mutable=mutable)
     if with_key:
         modify_dict = modifier.modify_dict_with_keys

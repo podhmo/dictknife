@@ -4,7 +4,7 @@ from .accessing import get_modifier
 
 
 class Guesser:
-    def __init__(self, modifier, default=None):
+    def __init__(self, modifier, default=None) -> None:
         self.modifier = modifier
         self.default = default or self.guess_default
 
@@ -46,7 +46,7 @@ class Guesser:
         return v
 
 
-def guess(d, *, guesser_factory=Guesser, default=None, mutable=False):
+def guess(d, *, guesser_factory=Guesser, default=None, mutable: bool = False):
     modifier = get_modifier(mutable=mutable)
     g = guesser_factory(modifier, default=default)
     return g.guess(d)

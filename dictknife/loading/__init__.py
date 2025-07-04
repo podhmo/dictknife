@@ -3,6 +3,7 @@ import sys
 import os.path
 import logging
 from io import StringIO
+from typing import Callable
 from . import json
 from . import raw
 from . import env
@@ -18,12 +19,12 @@ unknown = "(unknown)"
 
 
 class Loader:
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
-        self.fn_map = {}
-        self.opener_map = {}
+        self.fn_map: dict[str, Callable] = {}
+        self.opener_map: dict[str, Callable] = {}
 
-    def add_format(self, fmt, fn, *, opener=None):
+    def add_format(self, fmt, fn: Callable, *, opener: Callable = None) -> None:
         self.fn_map[fmt] = fn
         if opener is not None:
             self.opener_map[fmt] = opener
@@ -32,27 +33,33 @@ class Loader:
         return load(StringIO(s), *args, **kwargs)
 
     def load(self, fp, format=None, errors=None):
+        load_func: Callable
         if format is not None:
-            load = self.fn_map[format]
+            load_func = self.fn_map[format]
         else:
             format = os.environ.get("DICTKNIFE_LOAD_FORMAT")
             if format is not None:
-                load = self.fn_map[format]
+                load_func = self.fn_map[format]
             else:
                 fname = getattr(fp, "name", "(unknown)")
-                load = self.dispatcher.dispatch(fname, self.fn_map)
+                load_func = self.dispatcher.dispatch(fname, self.fn_map)
 
-        return load(fp, loader=self, errors=errors)
+        return load_func(fp, loader=self, errors=errors)
 
     def loadfile(
-        self, filename=None, format=None, opener=None, encoding=None, errors=None
+        self,
+        filename=None,
+        format=None,
+        opener: Callable = None,
+        encoding=None,
+        errors=None,
     ):
         """load file or stdin"""
         if filename is None:
             return self.load(sys.stdin, format=format)
         else:
-            opener = opener or self.opener_map.get(format) or open
-            with opener(filename, encoding=encoding, errors=errors) as rf:
+            actual_opener: Callable = opener or self.opener_map.get(format) or open
+            with actual_opener(filename, encoding=encoding, errors=errors) as rf:
                 r = self.load(rf, format=format, errors=errors)
                 if (
                     not hasattr(r, "keys")
@@ -64,30 +71,31 @@ class Loader:
 
 
 class Dumper:
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
-        self.fn_map = {}
+        self.fn_map: dict[str, Callable] = {}
 
-    def add_format(self, fmt, fn):
+    def add_format(self, fmt, fn: Callable) -> None:
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *, format=None, sort_keys=False, extra=None, **kwargs):
+    def dumps(self, d, *, format=None, sort_keys: bool = False, extra=None, **kwargs):
         fp = StringIO()
         self.dump(d, fp, format=format, sort_keys=sort_keys, extra=extra, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, *, format=None, sort_keys=False, extra=None):
+    def dump(self, d, fp, *, format=None, sort_keys: bool = False, extra=None):
+        dump_func: Callable
         if format is not None:
-            dumper = self.fn_map[format]
+            dump_func = self.fn_map[format]
         else:
             format = os.environ.get("DICTKNIFE_DUMP_FORMAT")
             if format is not None:
-                dumper = self.fn_map[format]
+                dump_func = self.fn_map[format]
             else:
                 fname = getattr(fp, "name", "(unknown)")
-                dumper = self.dispatcher.dispatch(fname, self.fn_map)
+                dump_func = self.dispatcher.dispatch(fname, self.fn_map)
         extra = extra or {}
-        return dumper(d, fp, sort_keys=sort_keys, **extra)
+        return dump_func(d, fp, sort_keys=sort_keys, **extra)
 
     def dumpfile(
         self,
@@ -95,9 +103,9 @@ class Dumper:
         filename=None,
         *,
         format=None,
-        sort_keys=False,
+        sort_keys: bool = False,
         extra=None,
-        _retry=False,
+        _retry: bool = False,
     ):
         """dump file or stdout"""
         if hasattr(d, "__next__"):  # iterator
@@ -131,10 +139,10 @@ class Dispatcher:
     loader_factory = Loader
     dumper_factory = Dumper
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.loader = self.loader_factory(self)
         self.dumper = self.dumper_factory(self)
-        self.exts_matching = {}
+        self.exts_matching: dict[str, str] = {}
 
     def guess_format(self, filename, *, default=unknown):
         if filename is None:
@@ -142,11 +150,15 @@ class Dispatcher:
         _, ext = os.path.splitext(filename)
         return self.exts_matching.get(ext) or default
 
-    def dispatch(self, filename, fn_map, default=unknown):
+    def dispatch(
+        self, filename, fn_map: dict[str, Callable], default=unknown
+    ) -> Callable:
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
-    def add_format(self, fmt, load, dump, *, exts=[], opener=None):
+    def add_format(
+        self, fmt, load: Callable, dump: Callable, *, exts=[], opener: Callable = None
+    ) -> None:
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
@@ -199,7 +211,7 @@ def get_unknown(dispatcher=dispatcher):
     return sys.modules[loader.__module__]
 
 
-def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):
+def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown) -> None:
     if input is not None:
         logger.debug("setup input format: %s", input)
         dispatcher.loader.add_format(unknown, input)

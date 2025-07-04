@@ -8,12 +8,12 @@ from .accessing import Accessor
 
 
 class _AccessorSupportList(Accessor):
-    def __init__(self, make_dict=make_dict):
+    def __init__(self, make_dict=make_dict) -> None:
         self.make_dict = make_dict
 
-    def assign(self, d, path, value):
+    def assign(self, d, path, value) -> None:
         hist = [d]
-        seen = []
+        seen: list[str] = []
         for name in path[:-1]:
             if name == "":
                 if hasattr(d, "keys"):
@@ -58,17 +58,17 @@ class _AccessorSupportList(Accessor):
         else:
             d[name] = value
 
-    def maybe_access(self, d, path):
+    def maybe_access(self, d, path, *, default=None):
         for name in path[:-1]:
             if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
                 name = int(name)
             try:
                 d = d[name]
             except KeyError:
-                return None
+                return default
 
         if not d:
-            return None
+            return default
 
         name = path[-1]
         if name.isdigit() or (name.startswith("-") and name[1:].isdigit()):
@@ -83,8 +83,8 @@ class _AccessorSupportList(Accessor):
 def mkdict(
     line,
     *,
-    separator="/",
-    delimiter=";",
+    separator: str = "/",
+    delimiter: str = ";",
     accessor=_AccessorSupportList(make_dict),
     guess=guess,
     shared=None,
@@ -148,7 +148,7 @@ def _mkdict(
     delimiter,
     accessor,
     guess,
-    depth=0,
+    depth: int = 0,
     variables=None,
     shared=None,
 ):
@@ -265,8 +265,12 @@ if sys.version_info[:2] < (3, 6):
     from collections import deque
 
     def __init__(
-        self, instream=None, infile=None, posix=False, punctuation_chars=False
-    ):
+        self,
+        instream=None,
+        infile=None,
+        posix: bool = False,
+        punctuation_chars: bool = False,
+    ) -> None:
         if isinstance(instream, str):
             instream = StringIO(instream)
         if instream is not None:

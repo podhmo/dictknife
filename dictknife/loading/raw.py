@@ -2,7 +2,7 @@ def load(fp, *, loader=None, errors=None):
     return fp.read()
 
 
-def dump(text, fp, sort_keys=False):
+def dump(text: str, fp, sort_keys: bool = False):
     return fp.write(text)
 
 

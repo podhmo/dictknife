@@ -1,7 +1,7 @@
 from .langhelpers import reify
 
 
-def deepequal(d0, d1, normalize=False):
+def deepequal(d0, d1, normalize: bool = False):
     if normalize:
         d0 = sort_flexibly(d0)
         d1 = sort_flexibly(d1)
@@ -20,7 +20,7 @@ def _wrap(ob):
         for wv in wvals:
             if wv.keys:
                 keys.update(wv.keys)
-        keys = tuple(sorted(keys))
+        keys = set(sorted(keys))  # fix: keep as set
         for wv in wvals:
             wv.arrange(keys)
         return _Collection(sorted(wvals, key=lambda x: x.uid), keys)
@@ -59,7 +59,7 @@ def halfequal(left, right):
 
 
 class _Atom:
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         self.value = value
 
     @reify
@@ -73,14 +73,14 @@ class _Atom:
     def unwrap(self):
         return self.value
 
-    def arrange(self, new_keys):
+    def arrange(self, new_keys) -> None:
         pass
 
 
 class _Collection:
-    def __init__(self, value, keys):
+    def __init__(self, value, keys) -> None:
         self.value = value
-        self.keys = keys
+        self.keys = set(keys)  # fix: ensure keys is always a set
 
     @reify
     def uid(self):
@@ -89,12 +89,12 @@ class _Collection:
     def unwrap(self):
         return [v.unwrap() for v in self.value]
 
-    def arrange(self, new_keys):
-        self.keys = new_keys
+    def arrange(self, new_keys) -> None:
+        self.keys = set(new_keys)
 
 
 class _Dict:
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         self.value = value
 
     @reify
@@ -111,7 +111,7 @@ class _Dict:
             d[k] = d[k].unwrap()
         return d
 
-    def arrange(self, new_keys):
+    def arrange(self, new_keys) -> None:
         self.keys = new_keys
 
 

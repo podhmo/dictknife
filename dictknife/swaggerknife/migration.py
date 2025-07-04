@@ -25,7 +25,7 @@ def is_empty_collection(coll):
 class _Empty:
     __slots__ = ("v",)
 
-    def __init__(self, v):
+    def __init__(self, v) -> None:
         self.v = v
 
     def unwrap(self):
@@ -35,7 +35,7 @@ class _Empty:
 class Migration:
     def __init__(
         self, resolver, *, make_dict=make_dict, dump_options=None, transform=None
-    ):
+    ) -> None:
         self.resolver = resolver
         self.item_map = make_dict()
         self.make_dict = make_dict
@@ -55,7 +55,7 @@ class Migration:
     def updater(self):
         return _Updater(self.resolver, self.item_map, make_dict=self.make_dict)
 
-    def _prepare(self, *, doc, where):
+    def _prepare(self, *, doc, where) -> None:
         logger.debug("prepare (where=%s)", where)
         accessor = CachedItemAccessor(self.resolver)
         scanner = Scanner(
@@ -127,11 +127,11 @@ class Migration:
         self,
         doc=None,
         *,
-        dry_run=False,
+        dry_run: bool = False,
         where=None,
-        inplace=False,
+        inplace: bool = False,
         savedir=None,
-        keep=False,
+        keep: bool = False,
     ):
         logger.info(
             "start migration (dry_run=%r, inplace=%r, where=%r)",
@@ -167,7 +167,7 @@ class Migration:
 
 
 class _Differ:
-    def __init__(self, *, make_dict=make_dict):
+    def __init__(self, *, make_dict=make_dict) -> None:
         self.make_dict = make_dict
 
     def diff(self, r, *, where):
@@ -212,7 +212,7 @@ class _Differ:
 
 
 class _Updater:
-    def __init__(self, resolver, item_map, *, make_dict=make_dict, where=None):
+    def __init__(self, resolver, item_map, *, make_dict=make_dict, where=None) -> None:
         self.resolver = resolver
         self.item_map = item_map
         self.make_dict = make_dict
@@ -235,7 +235,7 @@ class _Updater:
     def new_child(self, resolver):
         return self.__class__(resolver, self.item_map, make_dict=self.make_dict)
 
-    def has(self, ref, *, resolver=None):
+    def has(self, ref, *, resolver=None) -> bool:
         resolver = resolver or self.resolver
         try:
             return resolver.access_by_json_pointer(ref) is not None
@@ -254,7 +254,9 @@ class _Updater:
     def update(self, ref, v, *, resolver=None):
         return self.update_by_path(json_pointer_to_path(ref), v, resolver=resolver)
 
-    def update_by_path(self, path, v, *, resolver=None, skip_logging=False):
+    def update_by_path(
+        self, path, v, *, resolver=None, skip_logging: bool = False
+    ) -> None:
         if skip_logging:
             logger.debug("update file=%s path=%s", self.name, path)
         resolver = resolver or self.resolver

@@ -23,7 +23,7 @@ def resolve_type(val):
 
 
 class NameResolver:
-    def __init__(self):
+    def __init__(self) -> None:
         self.ns = NameStore()
 
 
@@ -48,14 +48,14 @@ class Detector:
             "values": [],
         }
 
-    def detect(self, d, name, info=None):
+    def detect(self, d, name: str, info=None):
         s = make_dict()
         s[name] = info or self.make_info()
         path = [name]
         self._detect(d, s[name], name, path=path)
         return s[name]
 
-    def _detect(self, d, s, name, path):
+    def _detect(self, d, s, name: str, path) -> None:
         if hasattr(d, "keys"):
             s["type"] = "object"
             s["name"] = name
@@ -91,15 +91,15 @@ class Detector:
 
 
 class Emitter:
-    def __init__(self, annotations):
-        self.doc = make_dict(definitions=make_dict())
-        self.definitions = self.doc["definitions"]
+    def __init__(self, annotations) -> None:
+        self.doc: dict[str, dict] = make_dict(definitions=make_dict())
+        self.definitions: dict = self.doc["definitions"]
 
         self.ns = NameStore()
         self.cw = CommentWriter()
         self.annotations = annotations or {}  # Dict[string, Dict]
 
-    def resolve_name(self, info, fromarray=False, suffix=""):
+    def resolve_name(self, info, fromarray: bool = False, suffix: str = ""):
         ref = info["ref"] + suffix
         if ref in self.annotations and "name" in self.annotations[ref]:
             name = self.annotations[ref]["name"]
@@ -112,7 +112,7 @@ class Emitter:
         self.ns[signature] = name
         return self.ns[signature]
 
-    def make_schema(self, info, parent=None, fromarray=False):
+    def make_schema(self, info, parent=None, fromarray: bool = False):
         info["signature"] = make_signature(info)  # xxx:
         if not fromarray and info.get("type2") == "array":
             return self.make_array_schema(info, parent=parent)
@@ -123,7 +123,7 @@ class Emitter:
 
     def make_array_schema(self, info, parent):
         self.cw.write(info["name"] + "[]", info, parent=parent)
-        d = make_dict(type="array")
+        d: dict[str, object] = make_dict(type="array")
         d["items"] = self.make_schema(info, parent=info, fromarray=True)
         schema_name = self.resolve_name(info, suffix="[]")
         self.definitions[schema_name] = d
@@ -132,13 +132,15 @@ class Emitter:
             d.pop("name", None)
         return {"$ref": "#/definitions/{name}".format(name=schema_name)}
 
-    def make_object_schema(self, info, parent, fromarray=False):
+    def make_object_schema(self, info, parent, fromarray: bool = False):
         if not fromarray:
             self.cw.write(info["name"], info, parent=parent)
 
-        d = make_dict(type="object")
+        d: dict[str, object] = make_dict(type="object")
         d["properties"] = make_dict()
-        props = d["properties"]
+        from typing import Any, cast
+
+        props: dict[str, Any] = cast(dict[str, Any], d["properties"])
         for name, value in info["children"].items():
             props[name] = self.make_schema(value, parent=info)
         required = [
@@ -177,10 +179,13 @@ class Emitter:
 
 
 class CommentWriter(object):
-    def __init__(self):
-        self.cm_map = {}
+    def __init__(self) -> None:
+        # Using Any for cm_map entries as they need scope(), stmt() and submodule() methods
+        from typing import Any
 
-    def write(self, name, info, parent=None):
+        self.cm_map: dict[str, Any] = {}
+
+    def write(self, name: str, info, parent=None) -> None:
         if parent is None:
             return
         cm = self.cm_map[parent["name"]]

@@ -18,6 +18,9 @@ is_ref = operators.And(["$ref", _is_string])
 
 
 class AccessingMixin:
+    def __init__(self) -> None:
+        self.doc: dict[str, object] = {}  # This will be overridden by implementers
+
     # need self.doc
     def assign(self, path, value, *, doc=None, a=Accessor()):
         if doc is None:
@@ -34,17 +37,17 @@ class AccessingMixin:
             doc = self.doc
         return a.maybe_access(doc, path)
 
-    def access_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+    def access_by_json_pointer(self, jsonref, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return access_by_json_pointer(doc, jsonref, guess=guess)
 
-    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess=True):
+    def assign_by_json_pointer(self, jsonref, value, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return assign_by_json_pointer(doc, jsonref, value, guess=guess)
 
-    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess=True):
+    def maybe_remove_by_json_pointer(self, jsonref, *, doc=None, guess: bool = True):
         if doc is None:
             doc = self.doc
         return maybe_remove_by_json_pointer(doc, jsonref)
@@ -53,14 +56,14 @@ class AccessingMixin:
 class CachedItem:
     __slots__ = ("file", "localref", "globalref", "resolver", "data")
 
-    def __init__(self, file, localref, globalref, resolver, data):
+    def __init__(self, file, localref, globalref, resolver, data) -> None:
         self.file = file
         self.localref = localref
         self.globalref = globalref
         self.resolver = resolver
         self.data = data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} localref={self.localref!r},  globalref={self.globalref!r}>".format(
             self.__class__.__name__, self=self
         )
@@ -74,7 +77,7 @@ def json_pointer_to_path(ref):
     return [as_path_node(p) for p in ref.lstrip("#/").split("/")]
 
 
-def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
+def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess: bool = False):
     if query == "":
         return doc
     try:
@@ -99,7 +102,7 @@ def access_by_json_pointer(doc, query, *, accessor=Accessor(), guess=False):
         raise KeyError(query)
 
 
-def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess=False):
+def assign_by_json_pointer(doc, query, v, *, accessor=Accessor(), guess: bool = False):
     if query == "":
         return doc
     try:
@@ -133,7 +136,9 @@ def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
 
 
 class StackedAccessor:
-    def __init__(self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception):
+    def __init__(
+        self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception
+    ) -> None:
         self.stack = [resolver]
         self.accessor = accessor
         self.wrap_exception = wrap_exception
@@ -174,9 +179,9 @@ class StackedAccessor:
 
 
 class CachedItemAccessor(StackedAccessor):
-    def __init__(self, resolver):
+    def __init__(self, resolver) -> None:
         super().__init__(resolver)
-        self.cache = {}  # globalref -> item
+        self.cache: dict[tuple[str, str], CachedItem] = {}  # globalref -> item
 
     def _access(self, subresolver, pointer):
         globalref = (subresolver.filename, pointer)
