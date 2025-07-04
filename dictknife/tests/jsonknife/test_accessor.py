@@ -7,7 +7,7 @@ class Tests(unittest.TestCase):
 
         return access_by_json_pointer(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         # from: https://tools.ietf.org/html/rfc6901#section-5
         doc = {
             "foo": ["bar", "baz"],

@@ -10,7 +10,7 @@ class DiffRowsTests(unittest.TestCase):
 
         return diff_rows(d0, right)
 
-    def test_primitives(self):
+    def test_primitives(self) -> None:
         C = namedtuple("C", "left, right, expected, msg")
         # yapf: disable
         candidates = [
@@ -46,7 +46,7 @@ class DiffRowsTests(unittest.TestCase):
                 got = self._callFUT(c.left, c.right)
                 self.assertListEqual(got, c.expected)
 
-    def test_it(self):
+    def test_it(self) -> None:
         left = OrderedDict(
             [
                 ("x", 10),

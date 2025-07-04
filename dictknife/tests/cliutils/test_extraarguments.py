@@ -21,7 +21,7 @@ class Tests(unittest.TestCase):
         sparser1 = target.add_parser("toml")  # noqa
         return target
 
-    def test_help_message(self):
+    def test_help_message(self) -> None:
         target = self._makeOne()
         expected = textwrap.dedent(
             """
@@ -39,14 +39,14 @@ class Tests(unittest.TestCase):
         actual = target.parser.format_help().strip()
         self.assertEqual(actual, expected)
 
-    def test_parse_extra_arguments(self):
+    def test_parse_extra_arguments(self) -> None:
         target = self._makeOne()
         args = target.parse_args("json", ["--extra--sort-keys"])
         actual = vars(args)
         expected = {"sort_keys": True}
         self.assertEqual(actual, expected)
 
-    def test_parse_extra_arguments_are_ignored(self):
+    def test_parse_extra_arguments_are_ignored(self) -> None:
         import contextlib
         from io import StringIO
 

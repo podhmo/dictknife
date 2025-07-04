@@ -3,7 +3,7 @@ import contextlib
 from io import StringIO
 
 
-def pp(d, out=None):
+def pp(d, out=None) -> None:
     import json
 
     out = out or sys.stdout

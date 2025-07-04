@@ -111,13 +111,13 @@ def get_credentials_failback_webbrowser(
 
 
 class MemoryCache(Cache):
-    def __init__(self):
+    def __init__(self) -> None:
         self.cache = {}
 
     def get(self, url):
         return self.cache.get(url)
 
-    def set(self, url, content):
+    def set(self, url, content) -> None:
         self.cache[url] = content
 
     @property
@@ -142,7 +142,7 @@ class Loader:
         scopes=[SCOPE],
         get_credentials=get_credentials_failback_webbrowser,
         http=None,
-    ):
+    ) -> None:
         self.config_path = os.path.expanduser(config_path)
         self.discovery_cache_path = os.path.expanduser(discovery_cache_path)
         self.scopes = scopes
@@ -152,7 +152,7 @@ class Loader:
     def cache(self):
         return _get_discovery_cache(self.discovery_cache_path)
 
-    def _save_cache(self, cache):
+    def _save_cache(self, cache) -> None:
         with open(self.discovery_cache_path, "wb") as wf:
             pickle.dump(cache, wf)
 

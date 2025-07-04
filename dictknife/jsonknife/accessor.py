@@ -53,14 +53,14 @@ class AccessingMixin:
 class CachedItem:
     __slots__ = ("file", "localref", "globalref", "resolver", "data")
 
-    def __init__(self, file, localref, globalref, resolver, data):
+    def __init__(self, file, localref, globalref, resolver, data) -> None:
         self.file = file
         self.localref = localref
         self.globalref = globalref
         self.resolver = resolver
         self.data = data
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{} localref={self.localref!r},  globalref={self.globalref!r}>".format(
             self.__class__.__name__, self=self
         )
@@ -133,7 +133,7 @@ def maybe_remove_by_json_pointer(doc, query, *, accessor=Accessor()):
 
 
 class StackedAccessor:
-    def __init__(self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception):
+    def __init__(self, resolver, *, accessor=Accessor(), wrap_exception=wrap_exception) -> None:
         self.stack = [resolver]
         self.accessor = accessor
         self.wrap_exception = wrap_exception
@@ -174,7 +174,7 @@ class StackedAccessor:
 
 
 class CachedItemAccessor(StackedAccessor):
-    def __init__(self, resolver):
+    def __init__(self, resolver) -> None:
         super().__init__(resolver)
         self.cache = {}  # globalref -> item
 

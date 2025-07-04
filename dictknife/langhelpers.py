@@ -30,7 +30,7 @@ def pairrsplit(s, sep):
 class reify(object):
     """cached property"""
 
-    def __init__(self, wrapped):
+    def __init__(self, wrapped) -> None:
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__

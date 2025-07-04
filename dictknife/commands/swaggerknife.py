@@ -9,7 +9,7 @@ from magicalimport import import_symbol
 logger = logging.getLogger(__name__)
 
 
-def tojsonschema(*, src, dst, name):
+def tojsonschema(*, src, dst, name) -> None:
     # todo: id
     d = loading.loadfile(src)
     root = d["definitions"].pop(name)
@@ -29,7 +29,7 @@ def json2swagger(
     emit,
     with_minimap: bool,
     without_example: bool,
-):
+) -> None:
     from prestring import Module
     from dictknife import DictWalker
 
@@ -126,7 +126,7 @@ def merge(
     loading.dumpfile(r, dst)
 
 
-def flatten(*, src: str, dst: str, input_format: str, output_format: str, format: str):
+def flatten(*, src: str, dst: str, input_format: str, output_format: str, format: str) -> None:
     """flatten jsonschema sub definitions"""
     from dictknife.swaggerknife.flatten import flatten
 

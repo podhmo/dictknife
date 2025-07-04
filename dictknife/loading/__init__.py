@@ -18,12 +18,12 @@ unknown = "(unknown)"
 
 
 class Loader:
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
         self.fn_map = {}
         self.opener_map = {}
 
-    def add_format(self, fmt, fn, *, opener=None):
+    def add_format(self, fmt, fn, *, opener=None) -> None:
         self.fn_map[fmt] = fn
         if opener is not None:
             self.opener_map[fmt] = opener
@@ -64,11 +64,11 @@ class Loader:
 
 
 class Dumper:
-    def __init__(self, dispatcher):
+    def __init__(self, dispatcher) -> None:
         self.dispatcher = dispatcher
         self.fn_map = {}
 
-    def add_format(self, fmt, fn):
+    def add_format(self, fmt, fn) -> None:
         self.fn_map[fmt] = fn
 
     def dumps(self, d, *, format=None, sort_keys=False, extra=None, **kwargs):
@@ -131,7 +131,7 @@ class Dispatcher:
     loader_factory = Loader
     dumper_factory = Dumper
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.loader = self.loader_factory(self)
         self.dumper = self.dumper_factory(self)
         self.exts_matching = {}
@@ -146,7 +146,7 @@ class Dispatcher:
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
-    def add_format(self, fmt, load, dump, *, exts=[], opener=None):
+    def add_format(self, fmt, load, dump, *, exts=[], opener=None) -> None:
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
@@ -199,7 +199,7 @@ def get_unknown(dispatcher=dispatcher):
     return sys.modules[loader.__module__]
 
 
-def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown):
+def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown) -> None:
     if input is not None:
         logger.debug("setup input format: %s", input)
         dispatcher.loader.add_format(unknown, input)

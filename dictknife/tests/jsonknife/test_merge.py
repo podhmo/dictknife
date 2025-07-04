@@ -7,7 +7,7 @@ class Tests(unittest.TestCase):
 
         return merge(d, q)
 
-    def test_empty(self):
+    def test_empty(self) -> None:
         from dictknife import diff
 
         d = {}
@@ -15,7 +15,7 @@ class Tests(unittest.TestCase):
         actual = self._callFUT(d, q)
         self.assertFalse(list(diff(actual, {"a": {"b": {"c": "d"}}})))
 
-    def test_it(self):
+    def test_it(self) -> None:
         from dictknife import diff
 
         d = {

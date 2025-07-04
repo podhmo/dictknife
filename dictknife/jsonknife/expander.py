@@ -3,7 +3,7 @@ from dictknife.langhelpers import reify
 from .accessor import StackedAccessor
 
 
-def detect_circur_reference(doc, d):
+def detect_circur_reference(doc, d) -> bool:
     if id(doc) == id(d):
         return True
     elif isinstance(d, dict):
@@ -19,7 +19,7 @@ def detect_circur_reference(doc, d):
 
 
 class Expander(object):
-    def __init__(self, resolver):
+    def __init__(self, resolver) -> None:
         self.accessor = StackedAccessor(resolver)
         self.resolver = resolver
 

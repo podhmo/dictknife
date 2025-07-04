@@ -1,4 +1,4 @@
-def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra"):
+def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra") -> None:
     original = parser.parse_known_args
 
     def parse_known_args(*args, **kwargs):
@@ -9,7 +9,7 @@ def apply_rest_arguments_as_extra_arguments_parser(parser, *, dest="extra"):
     parser.parse_known_args = parse_known_args
 
 
-def apply_loading_format_extra_arguments_parser(parser):
+def apply_loading_format_extra_arguments_parser(parser) -> None:
     import sys
     import argparse
     from importlib import import_module

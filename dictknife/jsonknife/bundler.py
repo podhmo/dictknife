@@ -35,7 +35,7 @@ def create_scanner_factory_from_flavor(flavor: str):
 
 
 class Bundler:
-    def __init__(self, resolver, strict=False, *, scanner_factory=None):
+    def __init__(self, resolver, strict=False, *, scanner_factory=None) -> None:
         self.resolver = resolver
         self.accessor = CachedItemAccessor(resolver)
         self.item_map = make_dict()  # localref -> item
@@ -57,7 +57,7 @@ class Bundler:
 
 
 class Scanner:
-    def __init__(self, accessor, item_map, strict=False, localref_fixer=None):
+    def __init__(self, accessor, item_map, strict=False, localref_fixer=None) -> None:
         self.accessor = accessor
         self.item_map = item_map
         self.strict = strict
@@ -82,7 +82,7 @@ class Scanner:
         self._scan_toplevel(doc, conflicted=conflicted)
         return conflicted
 
-    def _scan_toplevel(self, doc, *, conflicted):
+    def _scan_toplevel(self, doc, *, conflicted) -> None:
         assert len(self.accessor.stack) == 1
         for name in list(self.item_map.keys()):
             try:
@@ -104,7 +104,7 @@ class Scanner:
                 self.accessor.pop_stack()
         assert len(self.accessor.stack) == 1
 
-    def _scan_refs(self, doc, *, conflicted):
+    def _scan_refs(self, doc, *, conflicted) -> None:
         for path, sd in self.ref_walking.iterate(doc):
             try:
                 item = self.accessor.access(sd["$ref"])
@@ -134,7 +134,7 @@ class Scanner:
 
 
 class Emitter:
-    def __init__(self, accessor, item_map):
+    def __init__(self, accessor, item_map) -> None:
         self.raw_accessor = Accessor()
         self.accessor = accessor
         self.item_map = item_map
@@ -180,7 +180,7 @@ class Emitter:
             self.raw_accessor.maybe_remove(d, related_path)
         return d
 
-    def replace_ref(self, resolver, sd):
+    def replace_ref(self, resolver, sd) -> None:
         filename, _, pointer = resolver.resolve_pathset(sd["$ref"])
         related = self.get_item_by_globalref((filename, pointer))
         new_ref = "#/{}".format(related.localref)
@@ -221,7 +221,7 @@ class LocalrefFixer:  # todo: rename
 
 
 class SimpleConflictFixer:  # todo: rename
-    def __init__(self, item_map, strict=False):
+    def __init__(self, item_map, strict=False) -> None:
         self.item_map = item_map
         self.strict = strict
 

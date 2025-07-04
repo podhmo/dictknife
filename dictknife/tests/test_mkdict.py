@@ -7,7 +7,7 @@ class TokenizeTests(unittest.TestCase):
 
         return tokenize(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "input, output")
@@ -52,7 +52,7 @@ class MkDictTests(unittest.TestCase):
             iter(tokens), delimiter=";", separator="/", accessor=Accessor(), guess=guess
         )
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "tokens, expected")

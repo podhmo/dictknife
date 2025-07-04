@@ -4,20 +4,20 @@ from dictknife.langhelpers import titleize
 
 
 class Handler:
-    def __init__(self, path, r=None):
+    def __init__(self, path, r=None) -> None:
         self.path = path
         self.r = r or make_dict()
 
     def full_name(self):
         return "".join(self.path)
 
-    def add_name(self, name):
+    def add_name(self, name) -> None:
         self.path.append(titleize(name))
 
-    def add_array_item(self):
+    def add_array_item(self) -> None:
         self.add_name("item")
 
-    def pop_name(self):
+    def pop_name(self) -> None:
         self.path.pop()
 
     def save_object(self, name, definition):
@@ -36,7 +36,7 @@ class Handler:
 
 
 class Flattener:
-    def __init__(self, replace=True):
+    def __init__(self, replace=True) -> None:
         self.replace = replace
 
     def extract(self, data, ctx):

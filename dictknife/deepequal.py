@@ -59,7 +59,7 @@ def halfequal(left, right):
 
 
 class _Atom:
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         self.value = value
 
     @reify
@@ -73,12 +73,12 @@ class _Atom:
     def unwrap(self):
         return self.value
 
-    def arrange(self, new_keys):
+    def arrange(self, new_keys) -> None:
         pass
 
 
 class _Collection:
-    def __init__(self, value, keys):
+    def __init__(self, value, keys) -> None:
         self.value = value
         self.keys = keys
 
@@ -89,12 +89,12 @@ class _Collection:
     def unwrap(self):
         return [v.unwrap() for v in self.value]
 
-    def arrange(self, new_keys):
+    def arrange(self, new_keys) -> None:
         self.keys = new_keys
 
 
 class _Dict:
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         self.value = value
 
     @reify
@@ -111,7 +111,7 @@ class _Dict:
             d[k] = d[k].unwrap()
         return d
 
-    def arrange(self, new_keys):
+    def arrange(self, new_keys) -> None:
         self.keys = new_keys
 
 

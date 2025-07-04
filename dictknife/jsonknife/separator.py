@@ -30,7 +30,7 @@ def _with_format(name: str, *, format: str = None, default=".yaml"):
 
 
 class Separator:  # todo: rename
-    def __init__(self, resolver, *, format=None, here=None):
+    def __init__(self, resolver, *, format=None, here=None) -> None:
         self.resolver = resolver
         self.format = format
         self.here = here
@@ -43,7 +43,7 @@ class Separator:  # todo: rename
     def emitter(self):
         return Emitter(self.resolver, format=self.format, here=self.here)
 
-    def separate(self, doc=None, *, name="main", dst=None):
+    def separate(self, doc=None, *, name="main", dst=None) -> None:
         doc = doc or self.resolver.doc
 
         ns_map = self.scanner.scan(doc)
@@ -54,7 +54,7 @@ class Separator:  # todo: rename
 
 
 class Scanner:
-    def __init__(self, resolver: ExternalFileResolver, *, here=None, format=None):
+    def __init__(self, resolver: ExternalFileResolver, *, here=None, format=None) -> None:
         self.resolver = resolver
         self.here = here or resolver.name
         self.format = format
@@ -109,7 +109,7 @@ class Scanner:
 
 
 class Emitter:
-    def __init__(self, resolver, *, here: str = None, format=None):
+    def __init__(self, resolver, *, here: str = None, format=None) -> None:
         self.resolver = resolver
         self.here = here or resolver.name
         self.format = format
@@ -158,7 +158,7 @@ class Emitter:
         # todo: to dumper
         loading.dumpfile(doc, def_item["new_filepath"])
 
-    def emit_main(self, *, doc: dict = None, dst: str = None, name: str = "main"):
+    def emit_main(self, *, doc: dict = None, dst: str = None, name: str = "main") -> None:
         doc = doc or self.resolver.doc
         new_doc = copy.deepcopy(doc)
         for ref, data in self.registered:

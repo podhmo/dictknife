@@ -15,7 +15,7 @@ logger = logging.getLogger("jsonknife.resolver")
 
 
 class OneDocResolver(AccessingMixin):
-    def __init__(self, doc, *, name="*root*", onload=None, format=None):
+    def __init__(self, doc, *, name="*root*", onload=None, format=None) -> None:
         self.doc = doc
         self.name = name
         self.onload = onload
@@ -43,7 +43,7 @@ class ExternalFileResolver(AccessingMixin):
         onload=None,
         format=None,
         wrap_exception=wrap_exception,
-    ):
+    ) -> None:
         self.rawfilename = rawfilename or filename
         self.filename = os.path.normpath(os.path.abspath(str(filename)))
         self.cache = {} if cache is None else cache  # filename -> resolver
@@ -57,7 +57,7 @@ class ExternalFileResolver(AccessingMixin):
             if self.onload is not None:
                 self.onload(doc, self)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<FileResolver {!r}>".format(self.filename)
 
     @property

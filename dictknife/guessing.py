@@ -4,7 +4,7 @@ from .accessing import get_modifier
 
 
 class Guesser:
-    def __init__(self, modifier, default=None):
+    def __init__(self, modifier, default=None) -> None:
         self.modifier = modifier
         self.default = default or self.guess_default
 

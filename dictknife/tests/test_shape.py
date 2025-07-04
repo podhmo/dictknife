@@ -8,7 +8,7 @@ class Tests(unittest.TestCase):
 
         return shape(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         C = namedtuple("C", "input, output, squash, skiplist")
         candidates = [
             C(input={}, output=[], squash=False, skiplist=False),

@@ -3,10 +3,10 @@ from .operators import apply
 
 
 class SimpleContext(object):
-    def push(self, ctx):
+    def push(self, ctx) -> None:
         pass
 
-    def pop(self):
+    def pop(self) -> None:
         pass
 
     def new_child(self):
@@ -17,13 +17,13 @@ class SimpleContext(object):
 
 
 class PathContext(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.path = []
 
-    def push(self, v):
+    def push(self, v) -> None:
         self.path.append(v)
 
-    def pop(self):
+    def pop(self) -> None:
         self.path.pop()
 
     def __call__(self, walker, fn, value):
@@ -55,7 +55,7 @@ class DictWalker(object):
     context_factory = PathContext
     handler_factory = ContainerHandler
 
-    def __init__(self, qs, handler=None, context_factory=None):
+    def __init__(self, qs, handler=None, context_factory=None) -> None:
         self.qs = qs
         self.context_factory = context_factory or self.__class__.context_factory
         self.handler = handler or self.__class__.handler_factory()

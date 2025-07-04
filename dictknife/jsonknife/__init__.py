@@ -62,7 +62,7 @@ def bundle(
     return r
 
 
-def separate(src: str, *, dst: str = None, input_format=None, output_format=None):
+def separate(src: str, *, dst: str = None, input_format=None, output_format=None) -> None:
     resolver = get_resolver(src, format=input_format)
     separator = Separator(resolver, format=output_format, here=dst or None)
     separator.separate(name="main", dst=dst)

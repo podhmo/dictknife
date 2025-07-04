@@ -7,14 +7,14 @@ class Tests(unittest.TestCase):
 
         return guess(v, *args, **kwargs)
 
-    def test_nan(self):
+    def test_nan(self) -> None:
         import math
 
         v = {"nan": "nan"}
         got = self._callFUT(v)
         self.assertTrue(math.isnan(got["nan"]))
 
-    def test_it(self):
+    def test_it(self) -> None:
         v = [
             {
                 "ints": [{"zero": "0", "nums": ["10", "-2000"]}],
@@ -37,14 +37,14 @@ class Tests(unittest.TestCase):
 
         self.assertEqual(got, expected)
 
-    def test_mutable(self):
+    def test_mutable(self) -> None:
         v = [{"1": 2}]
         got = self._callFUT(v, mutable=True)
         self.assertEqual(id(got), id(v), msg="list")
         self.assertEqual(id(got[0]), id(v[0]), msg="dict")
         self.assertEqual(id(got[0]["1"]), id(v[0]["1"]), msg="item")
 
-    def test_immutable(self):
+    def test_immutable(self) -> None:
         v = [{"1": 2}]
         got = self._callFUT(v, mutable=False)
         self.assertNotEqual(id(got), id(v), msg="list")

@@ -55,7 +55,7 @@ def _merge(r):
 
 class _Walker:
     # two path scan move, copy
-    def __init__(self):
+    def __init__(self) -> None:
         self.move_map = {}  # todo:
 
     def walk(self, src, dst):

@@ -22,7 +22,7 @@ class Tests(unittest.TestCase):
         else:
             self.fail("must be raised")
 
-    def test_nested(self):
+    def test_nested(self) -> None:
         create_class = self._makeOne()
 
         def f():
@@ -41,7 +41,7 @@ class Tests(unittest.TestCase):
             raise MyException("hmm", context="oyoyo")
 
         class MyException(Exception):
-            def __init__(self, val, *, context):
+            def __init__(self, val, *, context) -> None:
                 super().__init__(val)
                 self.context = context
 

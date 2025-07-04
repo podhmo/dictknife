@@ -23,7 +23,7 @@ def resolve_type(val):
 
 
 class NameResolver:
-    def __init__(self):
+    def __init__(self) -> None:
         self.ns = NameStore()
 
 
@@ -55,7 +55,7 @@ class Detector:
         self._detect(d, s[name], name, path=path)
         return s[name]
 
-    def _detect(self, d, s, name, path):
+    def _detect(self, d, s, name, path) -> None:
         if hasattr(d, "keys"):
             s["type"] = "object"
             s["name"] = name
@@ -91,7 +91,7 @@ class Detector:
 
 
 class Emitter:
-    def __init__(self, annotations):
+    def __init__(self, annotations) -> None:
         self.doc = make_dict(definitions=make_dict())
         self.definitions = self.doc["definitions"]
 
@@ -177,10 +177,10 @@ class Emitter:
 
 
 class CommentWriter(object):
-    def __init__(self):
+    def __init__(self) -> None:
         self.cm_map = {}
 
-    def write(self, name, info, parent=None):
+    def write(self, name, info, parent=None) -> None:
         if parent is None:
             return
         cm = self.cm_map[parent["name"]]

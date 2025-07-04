@@ -2,7 +2,7 @@ from dictknife.langhelpers import make_dict
 
 
 class State:
-    def __init__(self, *, limit=5):
+    def __init__(self, *, limit=5) -> None:
         self.max_examples = 1
         self.limit = limit
         self.i = 0

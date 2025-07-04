@@ -9,7 +9,7 @@ from dictknife.cliutils import traceback_shortly
 logger = logging.getLogger(__name__)
 
 
-def cut(*, src, dst, refs):
+def cut(*, src, dst, refs) -> None:
     from dictknife.accessing import Accessor
 
     d = loading.loadfile(src)
@@ -45,7 +45,7 @@ def select(
     input_format: str,
     output_format: str,
     format: str,
-):
+) -> None:
     from dictknife.jsonknife import Expander
     from dictknife.jsonknife.accessor import assign_by_json_pointer
     from dictknife.jsonknife import get_resolver
@@ -83,7 +83,7 @@ def bundle(
     format: str,
     flavor: str,
     extras: list = None,
-):
+) -> None:
     from dictknife.jsonknife import bundle
 
     if ref is not None:
@@ -94,7 +94,7 @@ def bundle(
 
 def separate(
     *, src: str, dst: str = None, input_format: str, output_format: str, format: str
-):
+) -> None:
     from dictknife.jsonknife import separate
 
     separate(
@@ -115,7 +115,7 @@ def examples(
     output_format: str,
     format: str,
     use_expand: bool = False,
-):
+) -> None:
     """output sample value from swagger's spec"""
     from dictknife.jsonknife import extract_example
     from dictknife.jsonknife.accessor import access_by_json_pointer

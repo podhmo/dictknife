@@ -8,10 +8,10 @@ from .accessing import Accessor
 
 
 class _AccessorSupportList(Accessor):
-    def __init__(self, make_dict=make_dict):
+    def __init__(self, make_dict=make_dict) -> None:
         self.make_dict = make_dict
 
-    def assign(self, d, path, value):
+    def assign(self, d, path, value) -> None:
         hist = [d]
         seen = []
         for name in path[:-1]:
@@ -266,7 +266,7 @@ if sys.version_info[:2] < (3, 6):
 
     def __init__(
         self, instream=None, infile=None, posix=False, punctuation_chars=False
-    ):
+    ) -> None:
         if isinstance(instream, str):
             instream = StringIO(instream)
         if instream is not None:

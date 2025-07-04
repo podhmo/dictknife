@@ -36,7 +36,7 @@ def cat(
     slurp=False,
     extra=None,
     merge_method="addtoset",
-):
+) -> None:
     from dictknife import deepmerge
 
     input_format = input_format or format
@@ -77,7 +77,7 @@ def transform(
     output_format: str,
     format: str,
     sort_keys: str,
-):
+) -> None:
     """transform dict"""
     from magicalimport import import_symbol
 
@@ -114,7 +114,7 @@ def diff(
     input_format: str,
     output_format: str = "diff",
     verbose: bool = False,
-):
+) -> None:
     """diff dict"""
     from dictknife.diff import diff, diff_rows, make_jsonpatch
 
@@ -183,7 +183,7 @@ def shape(
     with_type,
     with_example,
     full,
-):
+) -> None:
     """shape"""
     from dictknife import shape
 
@@ -229,7 +229,7 @@ def shrink(
     cont_suffix: str,
     max_length_of_list: int,
     with_tail: bool,
-):
+) -> None:
     """shrink"""
     from dictknife.transform import shrink
 
@@ -255,7 +255,7 @@ def mkdict(
     sort_keys: bool,
     squash: bool,
     extra,
-):
+) -> None:
     from dictknife.mkdict import mkdict
 
     if not extra:
@@ -383,7 +383,7 @@ def main():
         fn.__name__, help=fn.__doc__, formatter_class=parser.formatter_class
     )
 
-    def print_help(*, file=None, self=sparser):
+    def print_help(*, file=None, self=sparser) -> None:
         if file is None:
             file = sys.stdout
         # overwrite help

@@ -11,7 +11,7 @@ class Tests(unittest.TestCase):
 
     maxDiff = None
 
-    def test(self):
+    def test(self) -> None:
         import jsonpatch
 
         C = namedtuple("C", "src, dst, want, skip_patch")

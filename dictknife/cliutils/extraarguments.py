@@ -5,7 +5,7 @@ import argparse
 class ExtraArgumentsParsers:
     def __init__(
         self, parser, dest, *, prefix="extra", parser_factory=argparse.ArgumentParser
-    ):
+    ) -> None:
         self.parser = parser
         self.dest = dest
 
@@ -71,7 +71,7 @@ class ExtraArgumentsParsers:
         self._show_warnigs(rest)
         return args
 
-    def _show_warnigs(self, rest):
+    def _show_warnigs(self, rest) -> None:
         if not rest:
             return
         print(

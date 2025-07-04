@@ -21,7 +21,7 @@ class fixRelpathTests(unittest.TestCase):
 
         return fixpath(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "relpath, where, to, expected")
@@ -56,7 +56,7 @@ class fixRefTests(unittest.TestCase):
 
         return fixref(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "ref, where, to, expected")
@@ -82,7 +82,7 @@ class relRefTests(unittest.TestCase):
 
         return relref(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "ref, where, expected")
@@ -106,7 +106,7 @@ class NormpathTests(unittest.TestCase):
 
         return normpath(*args, **kwargs)
 
-    def test_it(self):
+    def test_it(self) -> None:
         from collections import namedtuple
 
         C = namedtuple("C", "relpath, where, expected")

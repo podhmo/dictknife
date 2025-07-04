@@ -36,7 +36,7 @@ def load(
     return reader
 
 
-def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False):
+def dump(rows, fp, *, delimiter=",", sort_keys=False, fullscan=False) -> None:
     if not rows:
         return
     if hasattr(rows, "keys") or hasattr(rows, "join"):

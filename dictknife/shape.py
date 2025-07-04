@@ -6,11 +6,11 @@ Row = namedtuple("Row", "path, type, example")
 
 
 class _State:
-    def __init__(self):
+    def __init__(self) -> None:
         self.paths = []
         self.examples = defaultdict(list)
 
-    def emit(self, path, example):
+    def emit(self, path, example) -> None:
         path = tuple(path[:])
         if path not in self.examples:
             self.paths.append(path)
@@ -24,7 +24,7 @@ class _State:
 
 
 class Traverser:
-    def __init__(self, iterate=partial(sorted, key=str)):
+    def __init__(self, iterate=partial(sorted, key=str)) -> None:
         self.iterate = iterate
 
     def traverse(self, d):
@@ -32,7 +32,7 @@ class Traverser:
         self._traverse(d, s, [])
         return s
 
-    def _traverse(self, d, s, path):
+    def _traverse(self, d, s, path) -> None:
         if hasattr(d, "keys"):
             self._traverse_dict(d, s, path)
         elif isinstance(d, (list, tuple)):
@@ -40,21 +40,21 @@ class Traverser:
         else:
             self._traverse_atom(d, s, path)
 
-    def _traverse_dict(self, d, s, path):
+    def _traverse_dict(self, d, s, path) -> None:
         s.emit(path, dict(d))
         for k in self.iterate(d.keys()):
             path.append(k)
             self._traverse(d[k], s, path)
             path.pop()
 
-    def _traverse_list(self, xs, s, path):
+    def _traverse_list(self, xs, s, path) -> None:
         s.emit(path, list(xs))
         path.append("[]")
         for x in xs:
             self._traverse(x, s, path)
         path.pop()
 
-    def _traverse_atom(self, v, s, path):
+    def _traverse_atom(self, v, s, path) -> None:
         s.emit(path, v)
 
 

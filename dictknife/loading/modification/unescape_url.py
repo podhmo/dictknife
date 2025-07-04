@@ -3,7 +3,7 @@ import urllib.parse as parselib
 from dictknife.loading.modification import use, is_used
 
 
-def setup(dispatcher):
+def setup(dispatcher) -> None:
     if is_used(dispatcher, __name__):
         return
     use(dispatcher, __name__)
