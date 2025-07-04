@@ -1,6 +1,7 @@
 from functools import partial
 from collections import defaultdict, namedtuple
 from .langhelpers import as_jsonpointer
+from typing import Iterator
 
 Row = namedtuple("Row", "path, type, example")
 
@@ -19,7 +20,7 @@ class _State:
     def count(self, path):
         return len(self.examples[path])
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         return iter(self.paths)
 
 
