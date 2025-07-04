@@ -38,7 +38,7 @@ testing = [
     "jsonpatch",
     "pytest",
 ]
-lint = ["flake8", "black"]
+lint = ["flake8", "black", "mypy"]
 docs = ["sphinx", "recommonmark", "sphinx_rtd_theme"]
 load = ["ruamel.yaml", "tomlkit"]
 command = ["ruamel.yaml", "magicalimport", "prestring"]
@@ -68,6 +68,7 @@ dependencies = [
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:dictknife/tests}"
 lint = "flake8 --show-source --ignore=E501,E121,W503 dictknife"
+type-check = "mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional dictknife"
 format = "black dictknife"
 check = [
   "lint",

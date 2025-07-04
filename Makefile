@@ -17,7 +17,7 @@ lint:
 
 # Run mypy
 type-check:
-	mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional ./dictknife
+	hatch run type-check
 
 # Format the code with black
 format:
