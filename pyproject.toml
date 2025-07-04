@@ -53,12 +53,12 @@ dev = [
 ]
 
 [tool.hatch.version]
-path = "dictknife/__version__.py"
+path = "src/dictknife/__version__.py"
 
 [tool.hatch.build.targets.sdist]
 
 [tool.hatch.build.targets.wheel]
-packages = ["dictknife"]
+packages = ["src/dictknife"]
 
 [tool.hatch.envs.default]
 description = "Default environment for everyday tasks"
@@ -66,10 +66,10 @@ dependencies = [
   "dictknife[dev]",
 ]
 [tool.hatch.envs.default.scripts]
-test = "pytest {args:dictknife/tests}"
-lint = "flake8 --show-source --ignore=E501,E121,W503 dictknife"
-type-check = "mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional dictknife"
-format = "black dictknife"
+test = "pytest {args:src/dictknife/tests}"
+lint = "flake8 --show-source --ignore=E501,E121,W503 src/dictknife"
+type-check = "mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional src/dictknife"
+format = "black src/dictknife"
 check = [
   "lint",
   "format --check --diff",
