@@ -9,7 +9,7 @@ def diff(
     tostring=None,
     fromfile="left",
     tofile="right",
-    n=3,
+    n: int=3,
     terminator="\n",
     normalize: bool=False,
     sort_keys: bool=False,

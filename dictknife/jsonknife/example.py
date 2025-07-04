@@ -2,7 +2,7 @@ from dictknife.langhelpers import make_dict
 
 
 class State:
-    def __init__(self, *, limit=5) -> None:
+    def __init__(self, *, limit: int=5) -> None:
         self.max_examples = 1
         self.limit = limit
         self.i = 0
@@ -49,7 +49,7 @@ def _extract_array(state, items, *, r, path):
     return r
 
 
-def extract(d, *, limit=5):
+def extract(d, *, limit: int=5):
     """example value from swagger's example and default"""
     s = State(limit=limit)
     r = _extract(s, d)

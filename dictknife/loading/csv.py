@@ -65,7 +65,7 @@ def dump(rows, fp, *, delimiter=",", sort_keys: bool=False, fullscan: bool=False
     writer.writerows(itr)
 
 
-def _create_reader_class(csv, errors=None, retry=10):
+def _create_reader_class(csv, errors=None, retry: int=10):
     if sys.version_info[:2] >= (3, 6):
         make_dictReader = csv.DictReader
     else:

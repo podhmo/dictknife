@@ -148,7 +148,7 @@ def _mkdict(
     delimiter,
     accessor,
     guess,
-    depth=0,
+    depth: int=0,
     variables=None,
     shared=None,
 ):
