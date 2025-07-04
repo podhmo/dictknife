@@ -28,6 +28,7 @@ jobs:
       uses: pypa/hatch@install
     - name: unit test
       run: |
+        . "$(hatch env find)/bin/activate"
         make test
     - name: e2e test
       run: |
