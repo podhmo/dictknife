@@ -78,6 +78,15 @@ all = [
   "test",
 ]
 
+[tool.hatch.envs.test]
+dependencies = [
+  "dictknife[testing]"
+]
+
+[[tool.hatch.envs.test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+# TODO: remove
 [tool.hatch.envs.docs]
 description = "Environment for building documentation"
 dependencies = [
