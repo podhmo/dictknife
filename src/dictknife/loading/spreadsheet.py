@@ -6,52 +6,132 @@ from .raw import setup_extra_parser  # noqa
 
 _loader = None
 Guessed = namedtuple("Guessed", "spreadsheet_id, range, sheet_id")
+"""Represents the parsed components of a Google Sheet URL or pattern.
+
+Attributes:
+    spreadsheet_id (str): The ID of the Google Spreadsheet.
+    range (str | None): The specific range within the sheet (e.g., "Sheet1!A1:B2").
+    sheet_id (str | None): The GID of the sheet.
+"""
 
 
 def guess(
     pattern: str, *, sheet_rx=re.compile("/spreadsheets/d/([a-zA-Z0-9-_]+)")
 ) -> Guessed:
+    """Parses a Google Spreadsheet URL or a shorthand pattern to extract spreadsheet ID, range, and sheet GID.
+
+    Supports two main patterns:
+    1. Full HTTPS URL: e.g., "https://docs.google.com/spreadsheets/d/SPREADSHEET_ID/edit#gid=SHEET_GID"
+       or with a range query parameter: "...?ranges=Sheet1!A1:C3"
+    2. Shorthand ID and optional range: e.g., "SPREADSHEET_ID" or "SPREADSHEET_ID#/Sheet1!A1:C3"
+
+    Args:
+        pattern: The URL or shorthand pattern string for the Google Sheet.
+        sheet_rx: A compiled regular expression to find the spreadsheet ID in a URL path.
+
+    Returns:
+        A Guessed namedtuple containing `spreadsheet_id`, `range`, and `sheet_id`.
+        `range` and `sheet_id` can be None if not present in the pattern.
+
+    Raises:
+        AssertionError: If the pattern is a URL but the spreadsheet ID cannot be extracted.
+    """
     if not pattern.startswith("http") or "://" not in pattern:
-        # like 1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps#/sheet1!A1:B2
-        splitted = pattern.split("#/", 1)
-        range_value = None
-        if len(splitted) > 1:
-            range_value = splitted[1]
-        return Guessed(spreadsheet_id=splitted[0], range=range_value, sheet_id=None)
+        # Shorthand pattern: "SPREADSHEET_ID" or "SPREADSHEET_ID#/sheet_name!A1:B2"
+        parts = pattern.split("#/", 1)
+        spreadsheet_id = parts[0]
+        range_value = parts[1] if len(parts) > 1 else None
+        return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=None)
 
-    # like  https://docs.google.com/spreadsheets/d/1qpyC0XzvTcKT6EISywvqESX3A0MwQoFDE8p-Bll4hps/edit#gid=0
-    import urllib.parse as p
+    # Full URL pattern
+    import urllib.parse as p # Lazy import for a standard library module
 
-    parsed = p.urlparse(pattern)
+    parsed_url = p.urlparse(pattern)
 
-    m = sheet_rx.search(parsed.path)
-    assert m is not None
-    spreadsheet_id = m.group(1)
+    match = sheet_rx.search(parsed_url.path)
+    if match is None:
+        # This case should ideally raise a more specific error if the URL is expected to be valid.
+        # For now, it relies on the assertion, but a ValueError might be more informative.
+        raise ValueError(f"Could not extract spreadsheet ID from URL path: {parsed_url.path}")
+    spreadsheet_id = match.group(1)
 
-    range_value = None
-    if parsed.query:
-        qd = p.parse_qs(parsed.query)
-        if "ranges" in qd:
-            range_value = qd["ranges"][0]
-    sheet_id = None
-    if parsed.fragment:
-        sheet_id = parsed.fragment.replace("gid=", "")
-    return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=sheet_id)
+    query_params = p.parse_qs(parsed_url.query)
+    range_value = query_params.get("ranges", [None])[0] # Get first range if multiple, or None
+
+    sheet_id_from_fragment = None
+    if parsed_url.fragment and parsed_url.fragment.startswith("gid="):
+        sheet_id_from_fragment = parsed_url.fragment[4:] # Strip "gid="
+
+    return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=sheet_id_from_fragment)
 
 
 def load(pattern: str, *, errors=None, loader=None, **kwargs):
+    """Loads data from a Google Spreadsheet specified by a URL or pattern.
+
+    This function requires the `google-api-python-client` and `google-auth-oauthlib`
+    packages to be installed, as well as proper authentication configured for
+    accessing Google Sheets API. These can be installed via `pip install dictknife[spreadsheet]`.
+
+    The `pattern` is first parsed by the `guess` function to extract spreadsheet ID,
+    range, and sheet GID. Then, it uses a lazily initialized `gsuite.Loader`
+    to fetch the data.
+
+    Args:
+        pattern: The URL or shorthand pattern for the Google Sheet.
+                 (e.g., "https://docs.google.com/spreadsheets/d/ID/edit#gid=0" or "ID#/Sheet1!A1:B2")
+        errors: (Unused) Error handling scheme, kept for API consistency.
+        loader: (Optional) An instance of `gsuite.Loader`. If None, a global instance
+                is used/created.
+        **kwargs: Additional keyword arguments (currently unused by this loader but
+                  kept for API consistency).
+
+    Returns:
+        The data loaded from the Google Spreadsheet, typically a list of lists or list of dicts
+        depending on the underlying `gsuite.Loader` implementation.
+    """
     global _loader
-    loader = loader or _loader
-    if _loader is None:
+    # Use the provided loader if available, otherwise fall back to the global _loader.
+    # This allows for dependency injection, e.g., for testing or custom configurations.
+    current_loader = loader or _loader
+    if current_loader is None:
+        # Lazily initialize the global loader if it hasn't been created yet.
+        # This avoids importing m.gsuite and its dependencies unless actually needed.
         _loader = m.gsuite.Loader()
-    guessed = guess(pattern)
-    return _loader.load_sheet(guessed)
+        current_loader = _loader
+
+    guessed_params = guess(pattern)
+    # The actual loading is delegated to the gsuite.Loader instance.
+    return current_loader.load_sheet(guessed_params)
 
 
 def dump(rows, fp, *, sort_keys: bool = False):
-    raise NotImplementedError("><")
+    """Dumping data to a Google Spreadsheet is not implemented.
+
+    Args:
+        rows: Data to dump.
+        fp: File-like object (irrelevant for this loader).
+        sort_keys: Whether to sort keys (irrelevant).
+
+    Raises:
+        NotImplementedError: Always, as this functionality is not available.
+    """
+    raise NotImplementedError("Dumping to Google Spreadsheet is not supported.")
 
 
 @contextlib.contextmanager
-def not_open(path, encoding=None, errors=None):
+def not_open(path: str, encoding=None, errors=None):
+    """A context manager that doesn't actually open a file, but yields the path itself.
+
+    This is used by the `dictknife` loading mechanism when a custom opener is
+    provided for a format. For spreadsheets, the 'path' is the URL or pattern,
+    which is directly consumed by the `load` function, not opened as a local file.
+
+    Args:
+        path: The path (URL or pattern string) to the spreadsheet.
+        encoding: (Unused) Encoding, kept for API consistency.
+        errors: (Unused) Error handling, kept for API consistency.
+
+    Yields:
+        The path string, stripped of leading/trailing whitespace.
+    """
     yield path.strip()
