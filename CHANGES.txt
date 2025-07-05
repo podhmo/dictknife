@@ -1,3 +1,7 @@
+0.14.2
+
+- modernization
+
 0.14.1
 
 - fix bug `unexpected keyword argument loader` is occured when yaml library is not installed
