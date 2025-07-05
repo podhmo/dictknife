@@ -6,7 +6,7 @@ class Tests(unittest.TestCase):
     maxDiff = None
 
     def _getTarget(self):
-        from dictknife.cliutils.extraarguments import ExtraArgumentsParsers
+        from dictknife.commands._cliutils import ExtraArgumentsParsers
 
         return ExtraArgumentsParsers
 

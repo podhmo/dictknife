@@ -4,7 +4,7 @@ import warnings
 import contextlib
 from typing import Dict, Any, List, Optional, cast  # Added Optional, cast
 from dictknife import loading
-from dictknife.cliutils import traceback_shortly
+from dictknife.commands._cliutils import traceback_shortly
 from magicalimport import import_symbol
 
 logger = logging.getLogger(__name__)

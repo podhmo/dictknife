@@ -5,7 +5,7 @@ from typing import List, Any, Optional
 from dictknife.langhelpers import make_dict
 from dictknife import loading
 from dictknife import deepmerge
-from dictknife.cliutils import traceback_shortly
+from dictknife.commands._cliutils import traceback_shortly
 
 logger = logging.getLogger(__name__)
 
