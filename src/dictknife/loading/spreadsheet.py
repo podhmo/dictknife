@@ -44,23 +44,31 @@ def guess(
         return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=None)
 
     # Full URL pattern
-    import urllib.parse as p # Lazy import for a standard library module
+    import urllib.parse as p  # Lazy import for a standard library module
 
     parsed_url = p.urlparse(pattern)
 
     match = sheet_rx.search(parsed_url.path)
     if match is None:
-        raise ValueError(f"Could not extract spreadsheet ID from URL path: {parsed_url.path}")
+        raise ValueError(
+            f"Could not extract spreadsheet ID from URL path: {parsed_url.path}"
+        )
     spreadsheet_id = match.group(1)
 
     query_params = p.parse_qs(parsed_url.query)
-    range_value = query_params.get("ranges", [None])[0] # Get first range if multiple, or None
+    range_value = query_params.get("ranges", [None])[
+        0
+    ]  # Get first range if multiple, or None
 
     sheet_id_from_fragment = None
     if parsed_url.fragment and parsed_url.fragment.startswith("gid="):
-        sheet_id_from_fragment = parsed_url.fragment[4:] # Strip "gid="
+        sheet_id_from_fragment = parsed_url.fragment[4:]  # Strip "gid="
 
-    return Guessed(spreadsheet_id=spreadsheet_id, range=range_value, sheet_id=sheet_id_from_fragment)
+    return Guessed(
+        spreadsheet_id=spreadsheet_id,
+        range=range_value,
+        sheet_id=sheet_id_from_fragment,
+    )
 
 
 def load(pattern: str, *, errors=None, loader=None, **kwargs):

@@ -61,7 +61,7 @@ def load(
         DictReader = _registry[k] = (create_reader_class or _create_reader_class)(
             m.csv, k
         )
-    reader = DictReader(fp, delimiter=delimiter, **kwargs) # Pass kwargs here
+    reader = DictReader(fp, delimiter=delimiter, **kwargs)  # Pass kwargs here
     return reader
 
 
@@ -83,20 +83,20 @@ def dump(
     """
     if not rows:
         return
-    if hasattr(rows, "keys") or hasattr(rows, "join"): # handles single dict or string
+    if hasattr(rows, "keys") or hasattr(rows, "join"):  # handles single dict or string
         rows = [rows]
 
     itr = iter(rows)
     try:
         first_row = next(itr)
-    except StopIteration: # empty iterator after handling single item case
+    except StopIteration:  # empty iterator after handling single item case
         return
     scanned = [first_row]
     fields = list(first_row.keys())
     seen = set(fields)
 
     if fullscan:
-        for row in itr: # itr continues from where next(itr) left off
+        for row in itr:  # itr continues from where next(itr) left off
             for k in row.keys():
                 if k not in seen:
                     seen.add(k)
@@ -109,11 +109,12 @@ def dump(
         # We need to write the first_row (already in scanned) and then the rest of itr
         itr_for_writing = iter(scanned + list(itr))
 
-
     if sort_keys:
-        fields = sorted(list(seen)) # Use 'seen' for sorted fields if fullscan, else 'fields'
+        fields = sorted(
+            list(seen)
+        )  # Use 'seen' for sorted fields if fullscan, else 'fields'
     else:
-        fields = list(fields) # Ensure it's the order from first row or appended order
+        fields = list(fields)  # Ensure it's the order from first row or appended order
 
     writer = m.csv.DictWriter(
         fp, fields, delimiter=delimiter, lineterminator="\r\n", quoting=m.csv.QUOTE_ALL
@@ -147,7 +148,7 @@ def _create_reader_class(csv_module, errors=None, retry: int = 10):
             def __next__(self):
                 if self.line_num == 0:
                     # Used only for its side effect of initializing fieldnames.
-                    _ = self.fieldnames # Ensure fieldnames are read
+                    _ = self.fieldnames  # Ensure fieldnames are read
                 row = next(self.reader)
                 self.line_num = self.reader.line_num
 
@@ -167,19 +168,23 @@ def _create_reader_class(csv_module, errors=None, retry: int = 10):
                     for key in self.fieldnames[len_row:]:
                         d[key] = self.restval
                 return d
+
         base_dict_reader = OldPythonDictReader
 
     original_next = base_dict_reader.__next__
 
     if errors == "ignore":
-        def __next__(self, current_retry=retry): # Renamed arg to avoid conflict
+
+        def __next__(self, current_retry=retry):  # Renamed arg to avoid conflict
             try:
                 d = original_next(self)
-                return guess(d, mutable=True) # Type guess values
+                return guess(d, mutable=True)  # Type guess values
             except csv_module.Error as e:
                 logger.info(
-                    "line=%d CSV parsing error occurred, skipping. Error: %r", self.line_num +1, e
-                ) # line_num might be 0-indexed from reader
+                    "line=%d CSV parsing error occurred, skipping. Error: %r",
+                    self.line_num + 1,
+                    e,
+                )  # line_num might be 0-indexed from reader
                 if current_retry <= 0:
                     raise
                 # This recursive call might lead to deep stacks on many consecutive errors.
@@ -190,15 +195,22 @@ def _create_reader_class(csv_module, errors=None, retry: int = 10):
         # or if __next__ itself needs to advance the underlying reader upon error.
         # This simplified version assumes original_next advances the reader or error is fatal for the line.
 
-    else: # errors is None or any other value, treat as strict
-        def __next__(self, current_retry=None): # Added current_retry for signature consistency
+    else:  # errors is None or any other value, treat as strict
+
+        def __next__(
+            self, current_retry=None
+        ):  # Added current_retry for signature consistency
             d = original_next(self)
-            return guess(d, mutable=True) # Type guess values
+            return guess(d, mutable=True)  # Type guess values
 
     # Create a new class with the modified __next__
     # The name of the class is dynamic to reflect its configuration if needed,
     # or simply "CustomDictReader"
-    custom_reader_name = f"CustomDictReader_{errors}" if errors else "CustomDictReader_strict"
-    CustomDictReader = type(custom_reader_name, (base_dict_reader,), {"__next__": __next__})
+    custom_reader_name = (
+        f"CustomDictReader_{errors}" if errors else "CustomDictReader_strict"
+    )
+    CustomDictReader = type(
+        custom_reader_name, (base_dict_reader,), {"__next__": __next__}
+    )
 
     return CustomDictReader

@@ -32,13 +32,22 @@ def emit_environ(structure, make_dict, parse):
                 except (ValueError, TypeError) as e:
                     # Handle cases where conversion fails, e.g., int("non-numeric")
                     # Or decide to raise an error, log, or return a default
-                    print(f"Warning: Could not convert '{emitted}' using {fn.__name__} for key '{k}': {e}", file=sys.stderr)
-                    continue # Or d[k] = None or some default
+                    print(
+                        f"Warning: Could not convert '{emitted}' using {fn.__name__} for key '{k}': {e}",
+                        file=sys.stderr,
+                    )
+                    continue  # Or d[k] = None or some default
             d[k] = emitted
         return d
     elif isinstance(structure, (list, tuple)):
         # Filter out None values if environment variables are missing for list items
-        return [item for item in (emit_environ(x, make_dict=make_dict, parse=parse) for x in structure) if item is not None]
+        return [
+            item
+            for item in (
+                emit_environ(x, make_dict=make_dict, parse=parse) for x in structure
+            )
+            if item is not None
+        ]
     else:
         return os.environ.get(structure)
 
@@ -109,9 +118,9 @@ def load(fp, *, loader=None, make_dict=make_dict, parse=parse_value, errors=None
     # This assumes the dispatcher can handle "basename" correctly or that the
     # .env part is just a marker.
     # A more robust way might involve checking registered extensions.
-    basename = os.path.splitext(fname)[0] # e.g., "config.env" from "config.env.json"
-    if basename.endswith(".env"): # A common pattern for this loader
-        basename = os.path.splitext(basename)[0] # e.g., "config" from "config.env"
+    basename = os.path.splitext(fname)[0]  # e.g., "config.env" from "config.env.json"
+    if basename.endswith(".env"):  # A common pattern for this loader
+        basename = os.path.splitext(basename)[0]  # e.g., "config" from "config.env"
 
     # Dispatch to the loader for the base file type (e.g., json, yaml)
     # The `loader.fn_map` contains format -> load_function mappings.
@@ -121,13 +130,15 @@ def load(fp, *, loader=None, make_dict=make_dict, parse=parse_value, errors=None
         base_load_func = loader.dispatcher.dispatch(basename, loader.fn_map)
         # We need to pass the original fp here, as the content is what matters
         # The `base_load_func` will read `fp` according to its format (JSON, YAML, etc.)
-        template_dict = base_load_func(fp) # fp is already open
+        template_dict = base_load_func(fp)  # fp is already open
     except Exception as e:
         # It's possible `fp` was already consumed or closed by a previous attempt
         # or the format dispatch failed.
         # This part might need careful handling of fp state if retries are involved.
         # For now, assume fp is readable here.
-        sys.stderr.write(f"Error loading template file '{fname}' with base format for '{basename}': {e}\n")
-        return make_dict() # Return an empty dict or raise
+        sys.stderr.write(
+            f"Error loading template file '{fname}' with base format for '{basename}': {e}\n"
+        )
+        return make_dict()  # Return an empty dict or raise
 
     return emit_environ(template_dict, make_dict=make_dict, parse=parse)

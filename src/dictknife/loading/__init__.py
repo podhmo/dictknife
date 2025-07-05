@@ -32,6 +32,7 @@ class Loader:
     Refer to the documentation of individual format handlers or the project's
     main documentation for specific requirements and installation instructions.
     """
+
     def __init__(self, dispatcher) -> None:
         """Initializes the Loader with a dispatcher.
 
@@ -147,6 +148,7 @@ class Dumper:
     documentation of individual format handlers or the project's main documentation
     for specific requirements and installation instructions.
     """
+
     def __init__(self, dispatcher) -> None:
         """Initializes the Dumper with a dispatcher.
 
@@ -165,7 +167,9 @@ class Dumper:
         """
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *, format: str = None, sort_keys: bool = False, extra=None, **kwargs) -> str:
+    def dumps(
+        self, d, *, format: str = None, sort_keys: bool = False, extra=None, **kwargs
+    ) -> str:
         """Dumps data to a string.
 
         Args:
@@ -265,6 +269,7 @@ class Dispatcher:
     The Dispatcher holds instances of Loader and Dumper and maps file extensions
     to specific formats.
     """
+
     loader_factory = Loader
     dumper_factory = Dumper
 
@@ -306,7 +311,13 @@ class Dispatcher:
         return fn_map[fmt]
 
     def add_format(
-        self, fmt: str, load: Callable, dump: Callable, *, exts: list[str] = [], opener: Callable = None
+        self,
+        fmt: str,
+        load: Callable,
+        dump: Callable,
+        *,
+        exts: list[str] = [],
+        opener: Callable = None,
     ) -> None:
         """Adds a new format with its load, dump functions, and associated extensions.
 
@@ -363,7 +374,9 @@ guess_format = dispatcher.guess_format
 """Alias for `dispatcher.guess_format`."""
 
 
-def get_opener(*, format: str = None, filename: str = None, default=open, dispatcher=dispatcher) -> Callable:
+def get_opener(
+    *, format: str = None, filename: str = None, default=open, dispatcher=dispatcher
+) -> Callable:
     """Gets the appropriate file opener for a given format or filename.
 
     If format is not provided, it's guessed from the filename.
@@ -417,7 +430,12 @@ def get_unknown(dispatcher=dispatcher):
     return sys.modules[loader.__module__]
 
 
-def setup(input: Callable = None, output: Callable = None, dispatcher=dispatcher, unknown=unknown) -> None:
+def setup(
+    input: Callable = None,
+    output: Callable = None,
+    dispatcher=dispatcher,
+    unknown=unknown,
+) -> None:
     """Configures the default loader and dumper for 'unknown' formats.
 
     This allows overriding the default behavior for files where the format

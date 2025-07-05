@@ -44,10 +44,10 @@ def dump(d, fp, *, sort_keys: bool = False, **kwargs):
     # or sorting should be handled before this call. We'll pass `sort_keys` along
     # in case a future version of tomlkit or a different underlying library handles it,
     # but it's not currently used by tomlkit.
-    if "sort_keys" in kwargs and sort_keys: # pragma: no cover
+    if "sort_keys" in kwargs and sort_keys:  # pragma: no cover
         # this path is not typically hit because dispatcher usually filters sort_keys
         pass
-    elif sort_keys and "sort_keys" not in kwargs: # pragma: no cover
+    elif sort_keys and "sort_keys" not in kwargs:  # pragma: no cover
         # This is a hint; actual sorting must be done on `d` before this call.
         # Consider if a warning or specific handling is needed if `sort_keys` is True.
         pass

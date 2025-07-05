@@ -41,35 +41,42 @@ def load(
             if "|" in line:
                 keys = [tok.strip() for tok in line.strip("|\n").split("|")]
         except StopIteration:
-            return # No header found or empty file
+            return  # No header found or empty file
 
     maybe_nums = None
     # Find the separator row to determine numeric columns
     while maybe_nums is None:
         try:
             line = next(fp)
-            if "|" in line and "---" in line: # Check for separator pattern
+            if "|" in line and "---" in line:  # Check for separator pattern
                 maybe_nums = [
-                    tok.strip().endswith(":") and not tok.strip().startswith(":") # right-align for numbers
+                    tok.strip().endswith(":")
+                    and not tok.strip().startswith(":")  # right-align for numbers
                     for tok in line.strip("|\n").split("|")
                 ]
-                if len(maybe_nums) != len(keys): # header and separator column count mismatch
+                if len(maybe_nums) != len(
+                    keys
+                ):  # header and separator column count mismatch
                     # This could be an error or a malformed table.
                     # For now, we'll proceed, but it might lead to issues.
                     # Consider raising an error or logging a warning.
                     # Fallback: assume no numeric columns if mismatch
                     maybe_nums = [False] * len(keys)
-            elif "|" not in line and "---" not in line and line.strip(): # Non-table content after header
-                 maybe_nums = [False] * len(keys) # Assume no numeric types if separator is missing
-                 break
+            elif (
+                "|" not in line and "---" not in line and line.strip()
+            ):  # Non-table content after header
+                maybe_nums = [False] * len(
+                    keys
+                )  # Assume no numeric types if separator is missing
+                break
 
         except StopIteration:
             # No separator line found after header, assume all non-numeric or handle error
-            maybe_nums = [False] * len(keys) # Default to non-numeric
-            break # Exit loop as fp is exhausted
+            maybe_nums = [False] * len(keys)  # Default to non-numeric
+            break  # Exit loop as fp is exhausted
 
     for line in fp:
-        if "|" not in line: # Skip non-table lines
+        if "|" not in line:  # Skip non-table lines
             continue
         row = make_dict()
         cells = [tok.strip() for tok in line.strip("|\n").split("|")]
@@ -78,15 +85,14 @@ def load(
         # For now, iterate up to the minimum of len(keys) or len(cells)
         # or consider padding/truncating if strictness is required.
         for i, name in enumerate(keys):
-            if i >= len(cells): # Fewer cells than headers
+            if i >= len(cells):  # Fewer cells than headers
                 # row[name] = None # Or some default, or skip
                 continue
 
             val_str = cells[i]
             is_numeric_column = maybe_nums[i] if i < len(maybe_nums) else False
 
-
-            if not val_str: # Empty cell
+            if not val_str:  # Empty cell
                 # row[name] = None # Or skip, current behavior is to skip
                 continue
             elif val_str == null_value:
@@ -98,10 +104,10 @@ def load(
                     else:
                         row[name] = int(val_str)
                 except ValueError:
-                    row[name] = val_str # Fallback to string if conversion fails
+                    row[name] = val_str  # Fallback to string if conversion fails
             else:
                 row[name] = val_str
-        if row: # Only yield if row is not empty
+        if row:  # Only yield if row is not empty
             yield row
 
 
@@ -121,22 +127,22 @@ def dump(
     """
     if not rows:
         return
-    if hasattr(rows, "keys"): # Single dictionary
+    if hasattr(rows, "keys"):  # Single dictionary
         rows = [rows]
-    elif isinstance(rows, str): # Single string, treat as a single cell in a single row
-        rows = [{"column1": rows}] # Assign a default key if it's just a string
+    elif isinstance(rows, str):  # Single string, treat as a single cell in a single row
+        rows = [{"column1": rows}]  # Assign a default key if it's just a string
 
     # Use itertools.tee to avoid exhausting the iterator if `rows` is a generator
     row_iter_for_keys, row_iter_for_data = itertools.tee(iter(rows))
 
     keys = []
     seen_keys = set()
-    maybe_nums = {} # Store type information (True if numeric)
+    maybe_nums = {}  # Store type information (True if numeric)
 
     # First pass: determine all keys and guess if columns are numeric
     # This ensures all columns are captured even if not present in the first row.
     for row in row_iter_for_keys:
-        if not isinstance(row, dict): # Handle cases where items in rows are not dicts
+        if not isinstance(row, dict):  # Handle cases where items in rows are not dicts
             # For example, if `rows` was `["string1", "string2"]`
             # This part might need more robust handling depending on expected input.
             # For now, skip non-dict rows or convert them if a strategy is defined.
@@ -145,13 +151,18 @@ def dump(
             if k not in seen_keys:
                 keys.append(k)
                 seen_keys.add(k)
-                maybe_nums[k] = isinstance(val, (int, float)) and not isinstance(val, bool)
-            elif not maybe_nums[k] and isinstance(val, (int, float)) and not isinstance(val, bool):
+                maybe_nums[k] = isinstance(val, (int, float)) and not isinstance(
+                    val, bool
+                )
+            elif (
+                not maybe_nums[k]
+                and isinstance(val, (int, float))
+                and not isinstance(val, bool)
+            ):
                 # If a column was previously thought non-numeric, but a number appears, update.
                 maybe_nums[k] = True
 
-
-    if not keys: # No keys found (e.g., rows was empty or contained no dicts)
+    if not keys:  # No keys found (e.g., rows was empty or contained no dicts)
         return
 
     if sort_keys:
@@ -164,7 +175,9 @@ def dump(
     # Print separator
     separator_parts = []
     for k in keys:
-        if maybe_nums.get(k, False): # Default to non-numeric if key somehow missing from maybe_nums
+        if maybe_nums.get(
+            k, False
+        ):  # Default to non-numeric if key somehow missing from maybe_nums
             separator_parts.append("---:")  # Right-align for numbers
         else:
             separator_parts.append(":---")  # Left-align for text
