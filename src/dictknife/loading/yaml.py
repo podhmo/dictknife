@@ -5,6 +5,9 @@ from .raw import setup_extra_parser  # noqa
 def load(fp, *, errors=None, **kwargs):
     """Loads YAML data from a file-like object.
 
+    For specific dependency requirements and installation, refer to the `Loader`
+    class documentation or the project's main documentation.
+
     Args:
         fp: A file-like object supporting .read().
         errors: (Unused by ruamel.yaml's load in this context, but kept for API consistency)
@@ -19,6 +22,9 @@ def load(fp, *, errors=None, **kwargs):
 
 def dump(d, fp, *, sort_keys: bool = False):
     """Dumps a Python object to a file-like object in YAML format.
+
+    For specific dependency requirements and installation, refer to the `Dumper`
+    class documentation or the project's main documentation.
 
     Args:
         d: The Python object to dump.

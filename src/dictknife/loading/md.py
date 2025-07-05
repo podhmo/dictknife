@@ -184,10 +184,10 @@ def dump(
         for k in keys:
             val = row.get(k)
             if val is None:
-                cells.append(str(null_value))
-            elif val == "": # Explicit empty string
-                cells.append("")
+                cells.append(str(null_value))  # Noneはnull_value（デフォルト"null"）として出力
+            elif val == "":
+                cells.append("")  # 空文字は空文字として出力
             else:
-                cells.append(str(val))
+                cells.append(str(val)) # それ以外は文字列化して出力
         row_str = "| {} |".format(" | ".join(cells))
         print(row_str, file=fp)

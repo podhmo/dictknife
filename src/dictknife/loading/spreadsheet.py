@@ -67,8 +67,9 @@ def load(pattern: str, *, errors=None, loader=None, **kwargs):
     """Loads data from a Google Spreadsheet specified by a URL or pattern.
 
     For this loader to function, appropriate Google API client libraries must be
-    installed and authentication configured. Refer to the project documentation
-    or `Loader` class docstring for more details on setting up spreadsheet support.
+    installed and authentication configured. For specific dependency requirements
+    and installation, refer to the `Loader` class documentation or the project's
+    main documentation.
 
     The `pattern` is first parsed by the `guess` function to extract spreadsheet ID,
     range, and sheet GID. Then, it uses a lazily initialized `gsuite.Loader`
