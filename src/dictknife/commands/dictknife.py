@@ -5,8 +5,8 @@ import warnings
 import contextlib
 import itertools
 from dictknife.langhelpers import make_dict
+from dictknife.commands._cliutils import traceback_shortly
 from dictknife import loading
-from dictknife.cliutils import traceback_shortly
 from dictknife.commands._monkeypatch import (
     apply_loading_format_extra_arguments_parser,
     apply_rest_arguments_as_extra_arguments_parser,

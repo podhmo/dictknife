@@ -15,7 +15,7 @@ def apply_loading_format_extra_arguments_parser(parser) -> None:
     import sys
     import argparse
     from importlib import import_module
-    from dictknife.cliutils.extraarguments import ExtraArgumentsParsers
+    from dictknife.commands._cliutils import ExtraArgumentsParsers
     from dictknife import loading
 
     formats = loading.get_formats()
