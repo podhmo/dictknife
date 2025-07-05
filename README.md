@@ -14,6 +14,6 @@ see [./examples/dictknife](https://github.com/podhmo/dictknife/tree/master/examp
 
 ## doc
 
-http://dictknife.readthedocs.io
-
-(:warning: this document is obsoleted)
+- https://deepwiki.com/podhmo/dictknife
+- http://dictknife.readthedocs.io
+    - ( ⚠️ this document is obsoleted)
