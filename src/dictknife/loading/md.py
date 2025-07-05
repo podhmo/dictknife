@@ -181,13 +181,16 @@ def dump(
             continue
 
         cells = []
-        for k in keys:
-            val = row.get(k)
-            if val is None:
-                cells.append(str(null_value))  # Noneはnull_value（デフォルト"null"）として出力
-            elif val == "":
-                cells.append("")  # 空文字は空文字として出力
+        for k in keys:  # keys は全行から集めたヘッダーのリスト
+            if k not in row:  # ケース1: キー自体が存在しない
+                cells.append("")
             else:
-                cells.append(str(val)) # それ以外は文字列化して出力
+                val = row[k]  # キーが存在するので直接アクセス
+                if val is None:  # ケース2: 値がNone (JSONのnull)
+                    cells.append(str(null_value))
+                elif val == "":  # ケース3: 値が空文字列
+                    cells.append("")
+                else:
+                    cells.append(str(val))
         row_str = "| {} |".format(" | ".join(cells))
         print(row_str, file=fp)
