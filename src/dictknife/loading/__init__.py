@@ -335,14 +335,14 @@ class Dispatcher:
 
 
 dispatcher = Dispatcher()
-dispatcher.add_format("yaml", yaml.load, yaml.dump, exts=(".yaml", ".yml"))
-dispatcher.add_format("json", json.load, json.dump, exts=(".json", ".js"))
-dispatcher.add_format("toml", toml.load, toml.dump, exts=(".toml",))
-dispatcher.add_format("csv", csv.load, csv.dump, exts=(".csv",))
-dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=(".tsv",))
+dispatcher.add_format("yaml", yaml.load, yaml.dump, exts=[".yaml", ".yml"])
+dispatcher.add_format("json", json.load, json.dump, exts=[".json", ".js"])
+dispatcher.add_format("toml", toml.load, toml.dump, exts=[".toml"])
+dispatcher.add_format("csv", csv.load, csv.dump, exts=[".csv"])
+dispatcher.add_format("tsv", tsv.load, tsv.dump, exts=[".tsv"])
 dispatcher.add_format("raw", raw.load, raw.dump, exts=[])
-dispatcher.add_format("env", env.load, None, exts=(".env", ".environ"))
-dispatcher.add_format("md", md.load, md.dump, exts=(".md", ".mdtable"))
+dispatcher.add_format("env", env.load, None, exts=[".env", ".environ"])
+dispatcher.add_format("md", md.load, md.dump, exts=[".md", ".mdtable"])
 dispatcher.add_format("markdown", md.load, md.dump, exts=[])
 dispatcher.add_format(
     "spreadsheet", spreadsheet.load, None, exts=[], opener=spreadsheet.not_open
