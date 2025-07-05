@@ -4,6 +4,7 @@ import io
 import warnings
 import contextlib
 import itertools
+from dictknife.langhelpers import make_dict
 from dictknife.commands._cliutils import traceback_shortly
 from dictknife import loading
 from dictknife.commands._monkeypatch import (
