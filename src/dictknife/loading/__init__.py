@@ -19,20 +19,69 @@ unknown = "(unknown)"
 
 
 class Loader:
+    """A class for loading data from various formats.
+
+    The Loader class provides methods to load data from file-like objects or strings.
+    It uses a dispatcher to determine the correct loading function based on the format
+    or file extension.
+
+    Note: Loading certain formats might require optional dependencies. For example,
+    loading from Google Spreadsheets (via the `loadfile` method with a spreadsheet URL)
+    requires `google-api-python-client` and `google-auth-oauthlib`. These can often
+    be installed using extras, e.g., `pip install dictknife[spreadsheet]`.
+    Refer to the documentation of individual format handlers or the project's
+    main documentation for specific requirements and installation instructions.
+    """
+
     def __init__(self, dispatcher) -> None:
+        """Initializes the Loader with a dispatcher.
+
+        Args:
+            dispatcher: The dispatcher instance to use for format detection.
+        """
         self.dispatcher = dispatcher
         self.fn_map: dict[str, Callable] = {}
         self.opener_map: dict[str, Callable] = {}
 
-    def add_format(self, fmt, fn: Callable, *, opener: Callable = None) -> None:
+    def add_format(self, fmt: str, fn: Callable, *, opener: Callable = None) -> None:
+        """Adds a new format and its corresponding loading function.
+
+        Args:
+            fmt: The format identifier (e.g., "json", "yaml").
+            fn: The function to call for loading this format.
+            opener: An optional function to open files for this format.
+        """
         self.fn_map[fmt] = fn
         if opener is not None:
             self.opener_map[fmt] = opener
 
-    def loads(self, s, *args, **kwargs):
+    def loads(self, s: str, *args, **kwargs):
+        """Loads data from a string.
+
+        Args:
+            s: The string containing the data to load.
+            *args: Additional arguments to pass to the loading function.
+            **kwargs: Additional keyword arguments to pass to the loading function.
+
+        Returns:
+            The loaded data.
+        """
         return load(StringIO(s), *args, **kwargs)
 
-    def load(self, fp, format=None, errors=None):
+    def load(self, fp, format: str = None, errors=None):
+        """Loads data from a file-like object.
+
+        If format is not specified, it attempts to guess the format from the
+        environment variable DICTKNIFE_LOAD_FORMAT or the file extension.
+
+        Args:
+            fp: The file-like object to read from.
+            format: The format of the data. If None, it will be guessed.
+            errors: Error handling scheme for codecs.
+
+        Returns:
+            The loaded data.
+        """
         load_func: Callable
         if format is not None:
             load_func = self.fn_map[format]
@@ -48,13 +97,28 @@ class Loader:
 
     def loadfile(
         self,
-        filename=None,
-        format=None,
+        filename: str = None,
+        format: str = None,
         opener: Callable = None,
-        encoding=None,
+        encoding: str = None,
         errors=None,
     ):
-        """load file or stdin"""
+        """Loads data from a file or stdin.
+
+        If filename is None, reads from stdin.
+        If format is not specified, it's guessed from the filename extension.
+        Optional dependencies might be required for certain formats (e.g., 'spreadsheet').
+
+        Args:
+            filename: The path to the file to load. If None, reads from stdin.
+            format: The format of the data. If None, it will be guessed.
+            opener: An optional function to open the file.
+            encoding: The encoding to use when opening the file.
+            errors: Error handling scheme for codecs.
+
+        Returns:
+            The loaded data.
+        """
         if filename is None:
             return self.load(sys.stdin, format=format)
         else:
@@ -71,19 +135,70 @@ class Loader:
 
 
 class Dumper:
+    """A class for dumping data to various formats.
+
+    The Dumper class provides methods to dump data to file-like objects or strings.
+    It uses a dispatcher to determine the correct dumping function based on the format
+    or file extension.
+
+    Note: Dumping to certain formats might require optional dependencies. For example,
+    YAML format requires `ruamel.yaml`, and TOML format requires `tomlkit`.
+    These can often be installed using extras, e.g., `pip install dictknife[load]`
+    (as the 'load' extra includes common serialization libraries). Refer to the
+    documentation of individual format handlers or the project's main documentation
+    for specific requirements and installation instructions.
+    """
+
     def __init__(self, dispatcher) -> None:
+        """Initializes the Dumper with a dispatcher.
+
+        Args:
+            dispatcher: The dispatcher instance to use for format detection.
+        """
         self.dispatcher = dispatcher
         self.fn_map: dict[str, Callable] = {}
 
-    def add_format(self, fmt, fn: Callable) -> None:
+    def add_format(self, fmt: str, fn: Callable) -> None:
+        """Adds a new format and its corresponding dumping function.
+
+        Args:
+            fmt: The format identifier (e.g., "json", "yaml").
+            fn: The function to call for dumping this format.
+        """
         self.fn_map[fmt] = fn
 
-    def dumps(self, d, *, format=None, sort_keys: bool = False, extra=None, **kwargs):
+    def dumps(
+        self, d, *, format: str = None, sort_keys: bool = False, extra=None, **kwargs
+    ) -> str:
+        """Dumps data to a string.
+
+        Args:
+            d: The data to dump.
+            format: The format to dump to. If None, it will be guessed.
+            sort_keys: Whether to sort keys in the output.
+            extra: Additional arguments for the dumping function.
+            **kwargs: Additional keyword arguments for the dumping function.
+
+        Returns:
+            A string representation of the data in the specified format.
+        """
         fp = StringIO()
         self.dump(d, fp, format=format, sort_keys=sort_keys, extra=extra, **kwargs)
         return fp.getvalue()
 
-    def dump(self, d, fp, *, format=None, sort_keys: bool = False, extra=None):
+    def dump(self, d, fp, *, format: str = None, sort_keys: bool = False, extra=None):
+        """Dumps data to a file-like object.
+
+        If format is not specified, it attempts to guess the format from the
+        environment variable DICTKNIFE_DUMP_FORMAT or the file extension.
+
+        Args:
+            d: The data to dump.
+            fp: The file-like object to write to.
+            format: The format to dump to. If None, it will be guessed.
+            sort_keys: Whether to sort keys in the output.
+            extra: Additional arguments for the dumping function.
+        """
         dump_func: Callable
         if format is not None:
             dump_func = self.fn_map[format]
@@ -100,14 +215,27 @@ class Dumper:
     def dumpfile(
         self,
         d,
-        filename=None,
+        filename: str = None,
         *,
-        format=None,
+        format: str = None,
         sort_keys: bool = False,
         extra=None,
         _retry: bool = False,
     ):
-        """dump file or stdout"""
+        """Dumps data to a file or stdout.
+
+        If filename is None, writes to stdout.
+        If the directory for the output file does not exist, it will be created.
+        Optional dependencies might be required for certain formats (e.g., 'yaml', 'toml').
+
+        Args:
+            d: The data to dump.
+            filename: The path to the file to write. If None, writes to stdout.
+            format: The format to dump to. If None, it will be guessed.
+            sort_keys: Whether to sort keys in the output.
+            extra: Additional arguments for the dumping function.
+            _retry: Internal flag for retrying after directory creation.
+        """
         if hasattr(d, "__next__"):  # iterator
             d = list(d)
 
@@ -136,29 +264,70 @@ class Dumper:
 
 
 class Dispatcher:
+    """A class for managing and dispatching loading and dumping functions.
+
+    The Dispatcher holds instances of Loader and Dumper and maps file extensions
+    to specific formats.
+    """
+
     loader_factory = Loader
     dumper_factory = Dumper
 
     def __init__(self) -> None:
+        """Initializes the Dispatcher, creating Loader and Dumper instances."""
         self.loader = self.loader_factory(self)
         self.dumper = self.dumper_factory(self)
         self.exts_matching: dict[str, str] = {}
 
-    def guess_format(self, filename, *, default=unknown):
+    def guess_format(self, filename: str, *, default=unknown) -> str:
+        """Guesses the data format based on the filename extension.
+
+        Args:
+            filename: The name of the file.
+            default: The default format to return if no match is found.
+
+        Returns:
+            The guessed format string (e.g., "json", "yaml") or the default.
+        """
         if filename is None:
             return default
         _, ext = os.path.splitext(filename)
         return self.exts_matching.get(ext) or default
 
     def dispatch(
-        self, filename, fn_map: dict[str, Callable], default=unknown
+        self, filename: str, fn_map: dict[str, Callable], default=unknown
     ) -> Callable:
+        """Dispatches to the appropriate function based on the guessed format.
+
+        Args:
+            filename: The name of the file.
+            fn_map: A dictionary mapping format strings to functions.
+            default: The default format to use if guessing fails.
+
+        Returns:
+            The function corresponding to the guessed format.
+        """
         fmt = self.guess_format(filename, default=default)
         return fn_map[fmt]
 
     def add_format(
-        self, fmt, load: Callable, dump: Callable, *, exts=[], opener: Callable = None
+        self,
+        fmt: str,
+        load: Callable,
+        dump: Callable,
+        *,
+        exts: list[str] = [],
+        opener: Callable = None,
     ) -> None:
+        """Adds a new format with its load, dump functions, and associated extensions.
+
+        Args:
+            fmt: The format identifier (e.g., "json", "yaml").
+            load: The function to call for loading this format.
+            dump: The function to call for dumping this format.
+            exts: A list of file extensions associated with this format (e.g., [".json", ".js"]).
+            opener: An optional function to open files for this format (for loader).
+        """
         self.loader.add_format(fmt, load, opener=opener)
         self.dumper.add_format(fmt, dump)
         for ext in exts:
@@ -182,15 +351,47 @@ dispatcher.add_format(unknown, yaml.load, yaml.dump, exts=[])
 
 # short cuts
 load = dispatcher.loader.load
+"""Alias for `dispatcher.loader.load`."""
 loads = dispatcher.loader.loads
+"""Alias for `dispatcher.loader.loads`."""
 loadfile = dispatcher.loader.loadfile
+"""Alias for `dispatcher.loader.loadfile`.
+
+For information on optional dependencies required by certain file formats,
+please refer to the `Loader` class docstring or the project documentation.
+"""
 dump = dispatcher.dumper.dump
+"""Alias for `dispatcher.dumper.dump`."""
 dumps = dispatcher.dumper.dumps
+"""Alias for `dispatcher.dumper.dumps`."""
 dumpfile = dispatcher.dumper.dumpfile
+"""Alias for `dispatcher.dumper.dumpfile`.
+
+For information on optional dependencies required by certain file formats,
+please refer to the `Dumper` class docstring or the project documentation.
+"""
 guess_format = dispatcher.guess_format
+"""Alias for `dispatcher.guess_format`."""
 
 
-def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatcher):
+def get_opener(
+    *, format: str = None, filename: str = None, default=open, dispatcher=dispatcher
+) -> Callable:
+    """Gets the appropriate file opener for a given format or filename.
+
+    If format is not provided, it's guessed from the filename.
+    This is particularly useful for formats that require special file handling,
+    like spreadsheets.
+
+    Args:
+        format: The data format (e.g., "spreadsheet").
+        filename: The name of the file (used to guess format if `format` is None).
+        default: The default opener function to return if no specific opener is found.
+        dispatcher: The dispatcher instance to use.
+
+    Returns:
+        A callable that can be used to open a file.
+    """
     if format is None and filename is not None:
         if hasattr(filename, "name"):
             filename = filename.name  # IO
@@ -202,16 +403,50 @@ def get_opener(*, format=None, filename=None, default=open, dispatcher=dispatche
     return opener
 
 
-def get_formats(dispatcher=dispatcher):
+def get_formats(dispatcher=dispatcher) -> list[str]:
+    """Returns a list of supported format identifiers.
+
+    Args:
+        dispatcher: The dispatcher instance to use.
+
+    Returns:
+        A list of format strings (e.g., ["json", "yaml", "toml"]).
+    """
     return [fmt for fmt in dispatcher.loader.fn_map.keys() if fmt != unknown]
 
 
 def get_unknown(dispatcher=dispatcher):
+    """Gets the module associated with the 'unknown' format loader.
+
+    This is typically the default loader used when a format cannot be determined.
+
+    Args:
+        dispatcher: The dispatcher instance to use.
+
+    Returns:
+        The module object for the unknown format loader.
+    """
     loader = dispatcher.loader.fn_map[unknown]
     return sys.modules[loader.__module__]
 
 
-def setup(input=None, output=None, dispatcher=dispatcher, unknown=unknown) -> None:
+def setup(
+    input: Callable = None,
+    output: Callable = None,
+    dispatcher=dispatcher,
+    unknown=unknown,
+) -> None:
+    """Configures the default loader and dumper for 'unknown' formats.
+
+    This allows overriding the default behavior for files where the format
+    cannot be automatically determined.
+
+    Args:
+        input: The function to use for loading unknown formats.
+        output: The function to use for dumping unknown formats.
+        dispatcher: The dispatcher instance to configure.
+        unknown: The identifier for the unknown format.
+    """
     if input is not None:
         logger.debug("setup input format: %s", input)
         dispatcher.loader.add_format(unknown, input)
