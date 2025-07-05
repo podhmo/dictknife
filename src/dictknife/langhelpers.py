@@ -6,7 +6,7 @@ else:
     from collections import OrderedDict as make_dict  # noqa
 
 # for backword comaptibility (TODO: remove)
-from .cliutils import traceback_shortly  # noqa F401
+from .commands._cliutils import traceback_shortly  # noqa F401
 from .naming import normalize, titleize, untitleize  # noqa F401
 
 
