@@ -38,13 +38,6 @@ docs = ["sphinx", "recommonmark", "sphinx_rtd_theme"]
 load = ["ruamel.yaml", "tomlkit"]
 command = ["ruamel.yaml", "magicalimport", "prestring"]
 spreadsheet = ["google-api-python-client", "google-auth-oauthlib"]
-dev = [
-    "dictknife[lint]",
-    "dictknife[load]",
-    "dictknife[command]",
-#    "dictknife[docs]",
-#    "dictknife[spreadsheet]",
-]
 
 [tool.hatch.version]
 path = "src/dictknife/__version__.py"
@@ -57,7 +50,11 @@ packages = ["src/dictknife"]
 [tool.hatch.envs.default]
 description = "Default environment for everyday tasks"
 dependencies = [
-  "dictknife[dev]",
+  "dictknife[lint]",
+  "dictknife[load]",
+  "dictknife[command]",
+#  "dictknife[docs]",
+#  "dictknife[spreadsheet]",
 ]
 [tool.hatch.envs.default.scripts]
 lint = "flake8 --show-source --ignore=E501,E121,W503 src/dictknife"
@@ -81,6 +78,12 @@ dependencies = [
 default-args = ["src/dictknife/tests"]
 
 [[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+# e2e
+[tool.hatch.envs.e2e]
+
+[[tool.hatch.envs.e2e.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13"]
 
 # TODO: remove
