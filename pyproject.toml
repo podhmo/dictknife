@@ -33,24 +33,11 @@ jsonknife = "dictknife.commands.jsonknife:main"
 swaggerknife = "dictknife.commands.swaggerknife:main"
 
 [project.optional-dependencies]
-testing = [
-    "ruamel.yaml",
-    "jsonpatch",
-    "pytest",
-]
 lint = ["flake8", "black", "mypy"]
 docs = ["sphinx", "recommonmark", "sphinx_rtd_theme"]
 load = ["ruamel.yaml", "tomlkit"]
 command = ["ruamel.yaml", "magicalimport", "prestring"]
 spreadsheet = ["google-api-python-client", "google-auth-oauthlib"]
-dev = [
-    "dictknife[testing]",
-    "dictknife[lint]",
-    "dictknife[load]",
-    "dictknife[command]",
-#    "dictknife[docs]",
-#    "dictknife[spreadsheet]",
-]
 
 [tool.hatch.version]
 path = "src/dictknife/__version__.py"
@@ -63,10 +50,13 @@ packages = ["src/dictknife"]
 [tool.hatch.envs.default]
 description = "Default environment for everyday tasks"
 dependencies = [
-  "dictknife[dev]",
+  "dictknife[lint]",
+  "dictknife[load]",
+  "dictknife[command]",
+#  "dictknife[docs]",
+#  "dictknife[spreadsheet]",
 ]
 [tool.hatch.envs.default.scripts]
-test = "pytest {args:src/dictknife/tests}"
 lint = "flake8 --show-source --ignore=E501,E121,W503 src/dictknife"
 type-check = "mypy --ignore-missing-imports --check-untyped-defs --no-strict-optional src/dictknife"
 format = "black src/dictknife"
@@ -79,12 +69,21 @@ all = [
   "test",
 ]
 
-[tool.hatch.envs.test]
+[tool.hatch.envs.hatch-test]
 dependencies = [
-  "dictknife[testing]"
+  "ruamel.yaml",
+  "jsonpatch",
+  "pytest",
 ]
+default-args = ["src/dictknife/tests"]
 
-[[tool.hatch.envs.test.matrix]]
+[[tool.hatch.envs.hatch-test.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+# e2e
+[tool.hatch.envs.e2e]
+
+[[tool.hatch.envs.e2e.matrix]]
 python = ["3.10", "3.11", "3.12", "3.13"]
 
 # TODO: remove
