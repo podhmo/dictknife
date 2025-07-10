@@ -34,10 +34,10 @@ jobs:
       uses: pypa/hatch@install
     - name: unit test
       run: |
-        hatch test -py {{ matrix.python-version }}
+        hatch test -py ${{ matrix.python-version }}
     - name: lint
       run: |
-        hatch run +py={{ matrix.python-version }} e2e:lint
+        hatch run +py=${{ matrix.python-version }} e2e:lint
     - name: e2e test
       run: |
         hatch env create "e2e.py${{ matrix.python-version }}"
