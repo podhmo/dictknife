@@ -63,6 +63,7 @@ format = "black src/dictknife"
 check = [
   "lint",
   "format --check --diff",
+  "type-check",
 ]
 all = [
   "check",

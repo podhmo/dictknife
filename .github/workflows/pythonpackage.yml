@@ -37,7 +37,7 @@ jobs:
         hatch test -py ${{ matrix.python-version }}
     - name: lint
       run: |
-        hatch run +py=${{ matrix.python-version }} e2e:lint
+        hatch run +py=${{ matrix.python-version }} e2e:check
     - name: e2e test
       run: |
         hatch env create "e2e.py${{ matrix.python-version }}"
