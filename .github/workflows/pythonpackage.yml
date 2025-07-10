@@ -34,13 +34,13 @@ jobs:
       uses: pypa/hatch@install
     - name: unit test
       run: |
-        hatch test
-    - name: e2e test
-      run: |
-        hatch env create
-        . "$(hatch env find default)/bin/activate"
-        python -V
-        make ci
+        hatch test -py {{ matrix.python-version }}
     - name: lint
       run: |
-        make lint
+        hatch run +py={{ matrix.python-version }} e2e:lint
+    - name: e2e test
+      run: |
+        hatch env create "e2e.py${{ matrix.python-version }}"
+        . "$(hatch env find "e2e.py${{ matrix.python-version }}")/bin/activate"
+        python -V
+        make ci
