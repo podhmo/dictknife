@@ -34,11 +34,12 @@ jobs:
       uses: pypa/hatch@install
     - name: unit test
       run: |
-        make test
+        hatch test
     - name: e2e test
       run: |
         hatch env create
-        . "$(hatch env find)/bin/activate"
+        . "$(hatch env find default)/bin/activate"
+        python -V
         make ci
     - name: lint
       run: |

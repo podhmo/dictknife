@@ -5,7 +5,7 @@
 
 # Run tests using the 'test' environment defined in pyproject.toml
 test:
-	hatch run test
+	hatch test
 
 # Build the documentation using the 'docs' environment
 docs:
